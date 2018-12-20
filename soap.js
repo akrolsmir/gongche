@@ -7,6 +7,7 @@ const snippetCtx = snippet.getContext('2d');
 const img = new Image();
 
 let annotations;
+let symbols;
 let pdf;
 let pageNum = 46;
 
@@ -72,24 +73,76 @@ function colorWords(json) {
   annotations.splice(0, 1);
   for (const annotation of annotations) {
     const [start, end] = getStartEnd(annotation.boundingPoly);
-    ctx.strokeStyle = 'yellow';
+    ctx.strokeStyle = 'green';
     ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
-    ctx.fillStyle = 'rgba(240, 240, 40, 0.2';
-    ctx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
   }
+
+  symbols = [];
+  const fullTextAnnotations = json.responses[0].fullTextAnnotation;
+  const page = fullTextAnnotations.pages[0];
+  for (const block of page.blocks) {
+    for (const paragraph of block.paragraphs) {
+      for (const word of paragraph.words) {
+        for (const symbol of word.symbols) {
+          // Add a parent reference and save the symbol.
+          symbol.parent = word;
+          symbols.push(symbol);
+
+          colorSymbol(symbol);
+        }
+      }
+    }
+  }
+}
+
+function colorSymbol(symbol) {
+  // Draw symbol box, on blue <-> red spectrum based on confidence.
+  const [start, end] = getStartEnd(symbol.boundingBox);
+  ctx.strokeStyle = 'blue';
+  ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
+
+  const blue = 256 * symbol.confidence;
+  const red = 256 - blue;
+  ctx.fillStyle = `rgba(${red}, 0, ${blue}, 0.2)`;
+  ctx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
 }
 
 /** Copies the annotation box's text into the textarea. */
 function processClick(event) {
-  let lastText; // Since boxes may overlap, use the last one.
-  for (const annotation of annotations) {
-    const [start, end] = getStartEnd(annotation.boundingPoly);
+  let lastSymbol; // Since boxes may overlap, use the last one.
+  for (const symbol of symbols) {
+    const [start, end] = getStartEnd(symbol.boundingBox);
     if (start.x <= event.offsetX && event.offsetX <= end.x &&
       start.y <= event.offsetY && event.offsetY <= end.y) {
-      lastText = annotation.description;
+      lastSymbol = symbol;
     }
   }
-  lyricsTextField.value += lastText;
+  splitSong(lastSymbol, lastSymbol.parent);
+  lyricsTextField.value = printSong();
+}
+
+const songLines = [];
+const songBreaks = [];
+
+function splitSong(symbol, line) {
+  if (!songLines.includes(line)) {
+    songLines.push(line);
+  }
+  songBreaks.push(symbol);
+}
+
+function printSong() {
+  let output = "";
+  for (const line of songLines) {
+    for (const symbol of line.symbols) {
+      if (!songBreaks.includes(symbol)) {
+        output += symbol.text;
+      } else {
+        output += "\n";
+      }
+    }
+  }
+  return output;
 }
 
 /** Convert a OCR rectangle into a pair of points. */
