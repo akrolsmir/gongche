@@ -76,6 +76,7 @@ function analyze() {
   // TODO: drawSeparators is slow (~300ms). Optimize or move to async.
   drawSeparators(ctx);
   requestOcr(canvas).then(json => saveOcrResults(json));
+  lyricsTextField.placeholder = 'Click on boxes around 句/韻/押';
 }
 
 function saveOcrResults(json) {
