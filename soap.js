@@ -8,6 +8,7 @@ const img = new Image();
 
 let annotations;
 let symbols;
+let words;
 let pdf;
 let pageNum = 46;
 
@@ -63,62 +64,98 @@ function nextPage() {
 function analyze() {
   // TODO: drawSeparators is slow (~300ms). Optimize or move to async.
   drawSeparators(ctx);
-  requestOcr(canvas).then(json => colorWords(json));
+  requestOcr(canvas).then(json => saveOcrResults(json));
 }
 
-/** Draws boxes around each annotation. */
-function colorWords(json) {
+function saveOcrResults(json) {
   annotations = json.responses[0].textAnnotations;
   // Remove the first (overarching) annotation.
   annotations.splice(0, 1);
+
+  symbols = [];
+  words = [];
+  const fullTextAnnotations = json.responses[0].fullTextAnnotation;
+  const page = fullTextAnnotations.pages[0];
+  for (const block of page.blocks) {
+    for (const paragraph of block.paragraphs) {
+      for (const word of paragraph.words) {
+        words.push(word);
+
+        for (const symbol of word.symbols) {
+          // Add a parent reference and save the symbol.
+          symbol.parent = word;
+          symbols.push(symbol);
+        }
+      }
+    }
+  }
+  colorBoxes();
+}
+
+/** Draws boxes around each annotation. */
+function colorBoxes() {
   for (const annotation of annotations) {
     const [start, end] = getStartEnd(annotation.boundingPoly);
     ctx.strokeStyle = 'green';
     ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
   }
 
-  symbols = [];
-  const fullTextAnnotations = json.responses[0].fullTextAnnotation;
-  const page = fullTextAnnotations.pages[0];
-  for (const block of page.blocks) {
-    for (const paragraph of block.paragraphs) {
-      for (const word of paragraph.words) {
-        for (const symbol of word.symbols) {
-          // Add a parent reference and save the symbol.
-          symbol.parent = word;
-          symbols.push(symbol);
+  for (const symbol of symbols) {
+    const [start, end] = getStartEnd(symbol.boundingBox);
+    ctx.strokeStyle = 'blue';
+    ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
+  }
 
-          colorSymbol(symbol);
-        }
-      }
+  for (const line of songLines) {
+    for (const symbol of line.symbols) {
+      // Draw symbol box, on blue <-> red spectrum based on confidence.
+      const [start, end] = getStartEnd(symbol.boundingBox);
+
+      const blue = 256 * symbol.confidence;
+      const red = 256 - blue;
+      ctx.fillStyle = `rgba(${red}, 0, ${blue}, 0.2)`;
+      ctx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
     }
   }
 }
 
-function colorSymbol(symbol) {
-  // Draw symbol box, on blue <-> red spectrum based on confidence.
-  const [start, end] = getStartEnd(symbol.boundingBox);
-  ctx.strokeStyle = 'blue';
-  ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
-
-  const blue = 256 * symbol.confidence;
-  const red = 256 - blue;
-  ctx.fillStyle = `rgba(${red}, 0, ${blue}, 0.2)`;
-  ctx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
+/** Given a list of objects with boundingBoxes, find one containing (x, y). */
+function intersect(x, y, objects) {
+  for (const object of objects) {
+    const [start, end] = getStartEnd(object.boundingBox);
+    if (start.x <= x && x <= end.x && start.y <= y && y <= end.y) {
+      return object;
+    }
+  }
 }
 
 /** Copies the annotation box's text into the textarea. */
 function processClick(event) {
-  let lastSymbol; // Since boxes may overlap, use the last one.
-  for (const symbol of symbols) {
-    const [start, end] = getStartEnd(symbol.boundingBox);
-    if (start.x <= event.offsetX && event.offsetX <= end.x &&
-      start.y <= event.offsetY && event.offsetY <= end.y) {
-      lastSymbol = symbol;
+   // Since boxes may overlap, use the last one.
+  let lastSymbol = intersect(event.offsetX, event.offsetY, symbols);
+  if (!lastSymbol) {
+    // TODO: Using words as line grouping may cause problems
+    // (eg: if clicked outside word, or word is not parsed correctly).
+    // Consider the vertical line approach.
+
+    const line = intersect(event.offsetX, event.offsetY, words);
+    // Create a fake symbol to use as a pointer.
+    lastSymbol = { x: event.offsetX, y: event.offsetY, parent: line };
+    // Find where in the line to inject this symbol.
+    let i = 0;
+    for (; i < line.symbols.length; i++) {
+      const word = line.symbols[i];
+      const [start, end] = getStartEnd(word.boundingBox);
+      if (lastSymbol.y <= start.y) {
+        break;
+      }
     }
+    line.symbols.splice(i, 0, lastSymbol);
+
   }
   splitSong(lastSymbol, lastSymbol.parent);
   lyricsTextField.value = printSong();
+  colorBoxes();
 }
 
 const songLines = [];
@@ -145,7 +182,10 @@ function printSong() {
   return output;
 }
 
-/** Convert a OCR rectangle into a pair of points. */
+/** 
+ * Convert a OCR rectangle into a pair of points. 
+ * See: https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#BoundingPoly
+ */
 function getStartEnd(boundingPoly) {
   function helper(axis, func) {
     let result = boundingPoly.vertices[0][axis];
