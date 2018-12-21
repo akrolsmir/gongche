@@ -5,6 +5,8 @@ const pageNumText = document.getElementById('pagenum');
 const ctx = canvas.getContext('2d');
 const snippetCtx = snippet.getContext('2d');
 const img = new Image();
+const uiCanvas = document.createElement('canvas');
+const bgCanvas = document.createElement('canvas');
 
 let annotations;
 let symbols;
@@ -34,6 +36,8 @@ function loadPdf(src) {
 }
 
 function renderPdfPage() {
+  songLines = [];
+  songBreaks = [];
   pageNumText.value = `Page ${pageNum}`;
   pdf.getPage(pageNum)
     .then(page => {
@@ -42,12 +46,19 @@ function renderPdfPage() {
 
       canvas.height = viewport.height;
       canvas.width = viewport.width;
+      uiCanvas.height = canvas.height;
+      uiCanvas.width = canvas.width;
+      bgCanvas.height = canvas.height;
+      bgCanvas.width = canvas.width;
 
       const renderContext = {
-        canvasContext: ctx,
+        canvasContext: bgCanvas.getContext('2d'),
         viewport: viewport
       };
-      return page.render(renderContext);
+      return page.render(renderContext)
+    })
+    .then(() => {
+      ctx.drawImage(bgCanvas, 0, 0);
     });
 }
 
@@ -89,34 +100,46 @@ function saveOcrResults(json) {
       }
     }
   }
-  colorBoxes();
+  drawUiLayer();
 }
 
-/** Draws boxes around each annotation. */
-function colorBoxes() {
+function drawUiLayer() {
+  // Clear out the UI layer
+  const uiCtx = uiCanvas.getContext('2d');
+  uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
+
+  // Draw empty green boxes around each line(?)
   for (const annotation of annotations) {
     const [start, end] = getStartEnd(annotation.boundingPoly);
-    ctx.strokeStyle = 'green';
-    ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
+    uiCtx.strokeStyle = 'green';
+    uiCtx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
   }
 
+  // Draw empty blue boxes around each symbol
   for (const symbol of symbols) {
     const [start, end] = getStartEnd(symbol.boundingBox);
-    ctx.strokeStyle = 'blue';
-    ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
+    uiCtx.strokeStyle = 'blue';
+    uiCtx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
   }
 
   for (const line of songLines) {
     for (const symbol of line.symbols) {
-      // Draw symbol box, on blue <-> red spectrum based on confidence.
+      if (songBreaks.includes(symbol)) {
+        // Color break symbols as green.
+        uiCtx.fillStyle = 'rgba(0, 256, 0, 0.2)';
+      } else {
+        // Color song symbols using blue <-> red spectrum, based on confidence.
+        const blue = 256 * symbol.confidence;
+        const red = 256 - blue;
+        uiCtx.fillStyle = `rgba(${red}, 0, ${blue}, 0.2)`;
+      }
       const [start, end] = getStartEnd(symbol.boundingBox);
-
-      const blue = 256 * symbol.confidence;
-      const red = 256 - blue;
-      ctx.fillStyle = `rgba(${red}, 0, ${blue}, 0.2)`;
-      ctx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
+      uiCtx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
     }
   }
+  // Draw the layers from bottom to top.
+  ctx.drawImage(bgCanvas, 0, 0);
+  ctx.drawImage(uiCanvas, 0, 0);
 }
 
 /** Given a list of objects with boundingBoxes, find one containing (x, y). */
@@ -155,11 +178,11 @@ function processClick(event) {
   }
   splitSong(lastSymbol, lastSymbol.parent);
   lyricsTextField.value = printSong();
-  colorBoxes();
+  drawUiLayer();
 }
 
-const songLines = [];
-const songBreaks = [];
+let songLines = [];
+let songBreaks = [];
 
 function splitSong(symbol, line) {
   if (!songLines.includes(line)) {
