@@ -3,7 +3,6 @@ const lyricsTextField = document.getElementById('lyrics');
 const uiCanvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
-let annotations = [];
 let lines = [];
 let symbols = [];
 
@@ -15,10 +14,6 @@ function analyze() {
 }
 
 function saveOcrResults(json) {
-  annotations = json.responses[0].textAnnotations;
-  // Remove the first (overarching) annotation.
-  annotations.splice(0, 1);
-
   symbols = [];
   lines = [];
   const fullTextAnnotations = json.responses[0].fullTextAnnotation;
@@ -44,9 +39,9 @@ function drawUiLayer() {
   const uiCtx = uiCanvas.getContext('2d');
   uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
 
-  // Draw empty green boxes around each line(?)
-  for (const annotation of annotations) {
-    const [start, end] = getStartEnd(annotation.boundingPoly);
+  // Draw empty green boxes around each line
+  for (const line of lines) {
+    const [start, end] = getStartEnd(line.boundingBox);
     uiCtx.strokeStyle = 'green';
     uiCtx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
   }
@@ -73,6 +68,7 @@ function drawUiLayer() {
       uiCtx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
     }
   }
+
   // Draw the layers from bottom to top.
   ctx.drawImage(bgCanvas, 0, 0);
   ctx.drawImage(uiCanvas, 0, 0);
