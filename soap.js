@@ -88,27 +88,39 @@ function intersect(x, y, objects) {
 function processClick(event) {
   let clickedSymbol = intersect(event.offsetX, event.offsetY, symbols);
   if (!clickedSymbol) {
-    // TODO: Using words as line grouping may cause problems
-    // (eg: if clicked outside word, or word is not parsed correctly).
-    // Consider the vertical line approach.
-    const line = intersect(event.offsetX, event.offsetY, lines);
     // Create a fake symbol to use as a pointer.
-    clickedSymbol = { x: event.offsetX, y: event.offsetY, parent: line };
+    // TODO: Handle break symbol above/below a line
+    const line = intersect(event.offsetX, event.offsetY, lines);
+    clickedSymbol = makeFakeBreakSymbol(event.offsetX, event.offsetY, line);
     // Find where in the line to inject this symbol.
     let i = 0;
     for (; i < line.symbols.length; i++) {
-      const word = line.symbols[i];
-      const [start, end] = getStartEnd(word.boundingBox);
-      if (clickedSymbol.y <= start.y) {
+      const symbol = line.symbols[i];
+      const [start, end] = getStartEnd(symbol.boundingBox);
+      if (event.offsetY <= start.y) {
         break;
       }
     }
     line.symbols.splice(i, 0, clickedSymbol);
-
   }
   splitSong(clickedSymbol, clickedSymbol.parent);
   lyricsTextField.value = printSong();
   drawUiLayer();
+}
+
+function makeFakeBreakSymbol(xc, yc, line) {
+  return {
+    parent: line,
+    text: 'fakebreak',
+    boundingBox: {
+      vertices: [ // Currently a 50 x 50 box.
+        {x: xc - 25, y: yc - 25},
+        {x: xc - 25, y: yc + 25},
+        {x: xc + 25, y: yc + 25},
+        {x: xc + 25, y: yc - 25},
+      ]
+    }
+  }
 }
 
 let songLines = [];
