@@ -90,7 +90,10 @@ function processClick(event) {
   if (!clickedSymbol) {
     // Create a fake symbol to use as a pointer.
     // TODO: Handle break symbol above/below a line
-    const line = intersect(event.offsetX, event.offsetY, lines);
+    let line = intersect(event.offsetX, event.offsetY, lines);
+    if (!line) {
+      line = findNearestLine(event.offsetX, event.offsetY, lines);
+    }
     clickedSymbol = makeFakeBreakSymbol(event.offsetX, event.offsetY, line);
     // Find where in the line to inject this symbol.
     let i = 0;
@@ -106,6 +109,19 @@ function processClick(event) {
   splitSong(clickedSymbol, clickedSymbol.parent);
   lyricsTextField.value = printSong();
   drawUiLayer();
+}
+
+function findNearestLine(xc, yc, lines) {
+  for (const line of lines) {
+    const [start, end] = getStartEnd(line.boundingBox);
+    // Return any line in the same x range.
+    // TODO: if multiple lines, return nearest by y?
+    if (start.x <= xc && xc <= end.x) {
+      return line;
+    }
+  }
+  // TODO: Replace with exception
+  alert('Could not find a line for this break symbol.');
 }
 
 function makeFakeBreakSymbol(xc, yc, line) {
