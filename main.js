@@ -105,8 +105,14 @@ function processClick(event) {
       }
     }
     line.symbols.splice(i, 0, clickedSymbol);
+    // Also stick it into all symbols, for rendering.
+    symbols.push(clickedSymbol);
   }
-  splitSong(clickedSymbol, clickedSymbol.parent);
+  if (songBreaks.includes(clickedSymbol)) {
+    unsplitSong(clickedSymbol);
+  } else {
+    splitSong(clickedSymbol);
+  }
   lyricsTextField.value = printSong();
   drawUiLayer();
 }
@@ -142,9 +148,30 @@ function makeFakeBreakSymbol(xc, yc, line) {
 let songLines = [];
 let songBreaks = [];
 
-function splitSong(symbol, line) {
-  if (!songLines.includes(line)) {
-    songLines.push(line);
+function unsplitSong(symbol) {
+  remove(songBreaks, symbol);
+  if (symbol.text == 'fakebreak') {
+    remove(symbol.parent.symbols, symbol);
+    remove(symbols, symbol);
+  }
+  let danglingParent = true;
+  for (const child of symbol.parent.symbols) {
+    if (songBreaks.includes(child)) {
+      danglingParent = false;
+    }
+  }
+  if (danglingParent) {
+    remove(songLines, symbol.parent);
+  }
+}
+
+function remove(array, element) {
+  array.splice(array.indexOf(element), 1);
+}
+
+function splitSong(symbol) {
+  if (!songLines.includes(symbol.parent)) {
+    songLines.push(symbol.parent);
   }
   songBreaks.push(symbol);
 }
