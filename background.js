@@ -3,7 +3,7 @@ const bgCanvas = document.createElement('canvas');
 const img = new Image();
 
 let pdf;
-let pageNum = 46;
+let pageNum = 64;
 
 // loadImage('assets/2880.png');
 loadPdf('assets/104.pdf');
@@ -27,8 +27,7 @@ function loadPdf(src) {
 }
 
 function renderPdfPage() {
-  songLines = [];
-  songBreaks = [];
+  resetSong();
   pageNumText.value = `Page ${pageNum}`;
   pdf.getPage(pageNum)
     .then(page => {
@@ -37,8 +36,6 @@ function renderPdfPage() {
 
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-      uiCanvas.height = canvas.height;
-      uiCanvas.width = canvas.width;
       bgCanvas.height = canvas.height;
       bgCanvas.width = canvas.width;
 

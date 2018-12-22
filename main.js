@@ -1,6 +1,5 @@
 const canvas = document.getElementById('canvas');
 const lyricsTextField = document.getElementById('lyrics');
-const uiCanvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
 let lines = [];
@@ -31,13 +30,15 @@ function saveOcrResults(json) {
       }
     }
   }
-  drawUiLayer();
+  drawUiLayer(canvas);
 }
 
-function drawUiLayer() {
-  // Clear out the UI layer
+function drawUiLayer(canvas) {
+  // Create the hidden UI layer
+  const uiCanvas = document.createElement('canvas');
+  uiCanvas.width = canvas.width;
+  uiCanvas.height = canvas.height;
   const uiCtx = uiCanvas.getContext('2d');
-  uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
 
   // Draw empty green boxes around each line
   for (const line of lines) {
@@ -70,6 +71,7 @@ function drawUiLayer() {
   }
 
   // Draw the layers from bottom to top.
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(bgCanvas, 0, 0);
   ctx.drawImage(uiCanvas, 0, 0);
 }
@@ -114,7 +116,7 @@ function processClick(event) {
     splitSong(clickedSymbol);
   }
   lyricsTextField.value = printSong();
-  drawUiLayer();
+  drawUiLayer(canvas);
 }
 
 function findNearestLine(xc, yc, lines) {
@@ -149,6 +151,10 @@ let songLines = [];
 let songBreaks = [];
 
 function unsplitSong(symbol) {
+  function remove(array, element) {
+    array.splice(array.indexOf(element), 1);
+  }
+
   remove(songBreaks, symbol);
   if (symbol.text == 'fakebreak') {
     remove(symbol.parent.symbols, symbol);
@@ -163,10 +169,6 @@ function unsplitSong(symbol) {
   if (danglingParent) {
     remove(songLines, symbol.parent);
   }
-}
-
-function remove(array, element) {
-  array.splice(array.indexOf(element), 1);
 }
 
 function splitSong(symbol) {
@@ -188,6 +190,11 @@ function printSong() {
     }
   }
   return output;
+}
+
+function resetSong() {
+  songLines = [];
+  songBreaks = [];
 }
 
 /** 
