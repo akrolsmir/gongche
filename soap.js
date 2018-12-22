@@ -1,76 +1,11 @@
 const canvas = document.getElementById('canvas');
-const snippet = document.getElementById('snippet');
 const lyricsTextField = document.getElementById('lyrics');
-const pageNumText = document.getElementById('pagenum');
-const ctx = canvas.getContext('2d');
-const snippetCtx = snippet.getContext('2d');
-const img = new Image();
 const uiCanvas = document.createElement('canvas');
-const bgCanvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
 
-let annotations;
-let symbols;
-let words;
-let pdf;
-let pageNum = 46;
-
-// loadImage('assets/2880.png');
-loadPdf('assets/104.pdf');
-
-function loadImage(src) {
-  img.onload = () => {
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    ctx.drawImage(img, 0, 0);
-  }
-  img.src = src;
-}
-
-function loadPdf(src) {
-  pdfjsLib.getDocument(src)
-    .then(result => {
-      pdf = result;
-      renderPdfPage();
-    });
-}
-
-function renderPdfPage() {
-  songLines = [];
-  songBreaks = [];
-  pageNumText.value = `Page ${pageNum}`;
-  pdf.getPage(pageNum)
-    .then(page => {
-      const scale = 1.3;
-      const viewport = page.getViewport(scale);
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      uiCanvas.height = canvas.height;
-      uiCanvas.width = canvas.width;
-      bgCanvas.height = canvas.height;
-      bgCanvas.width = canvas.width;
-
-      const renderContext = {
-        canvasContext: bgCanvas.getContext('2d'),
-        viewport: viewport
-      };
-      return page.render(renderContext)
-    })
-    .then(() => {
-      ctx.drawImage(bgCanvas, 0, 0);
-    });
-}
-
-function prevPage() {
-  pageNum--;
-  renderPdfPage();
-}
-
-function nextPage() {
-  pageNum++;
-  renderPdfPage();
-}
+let annotations = [];
+let lines = [];
+let symbols = [];
 
 function analyze() {
   // TODO: drawSeparators is slow (~300ms). Optimize or move to async.
@@ -85,13 +20,13 @@ function saveOcrResults(json) {
   annotations.splice(0, 1);
 
   symbols = [];
-  words = [];
+  lines = [];
   const fullTextAnnotations = json.responses[0].fullTextAnnotation;
   const page = fullTextAnnotations.pages[0];
   for (const block of page.blocks) {
     for (const paragraph of block.paragraphs) {
       for (const word of paragraph.words) {
-        words.push(word);
+        lines.push(word);
 
         for (const symbol of word.symbols) {
           // Add a parent reference and save the symbol.
@@ -153,31 +88,29 @@ function intersect(x, y, objects) {
   }
 }
 
-/** Copies the annotation box's text into the textarea. */
+/** Remember the clicked box as a break symbol. */
 function processClick(event) {
-   // Since boxes may overlap, use the last one.
-  let lastSymbol = intersect(event.offsetX, event.offsetY, symbols);
-  if (!lastSymbol) {
+  let clickedSymbol = intersect(event.offsetX, event.offsetY, symbols);
+  if (!clickedSymbol) {
     // TODO: Using words as line grouping may cause problems
     // (eg: if clicked outside word, or word is not parsed correctly).
     // Consider the vertical line approach.
-
-    const line = intersect(event.offsetX, event.offsetY, words);
+    const line = intersect(event.offsetX, event.offsetY, lines);
     // Create a fake symbol to use as a pointer.
-    lastSymbol = { x: event.offsetX, y: event.offsetY, parent: line };
+    clickedSymbol = { x: event.offsetX, y: event.offsetY, parent: line };
     // Find where in the line to inject this symbol.
     let i = 0;
     for (; i < line.symbols.length; i++) {
       const word = line.symbols[i];
       const [start, end] = getStartEnd(word.boundingBox);
-      if (lastSymbol.y <= start.y) {
+      if (clickedSymbol.y <= start.y) {
         break;
       }
     }
-    line.symbols.splice(i, 0, lastSymbol);
+    line.symbols.splice(i, 0, clickedSymbol);
 
   }
-  splitSong(lastSymbol, lastSymbol.parent);
+  splitSong(clickedSymbol, clickedSymbol.parent);
   lyricsTextField.value = printSong();
   drawUiLayer();
 }
@@ -226,30 +159,4 @@ function getStartEnd(boundingPoly) {
   const maxY = helper('y', Math.max);
 
   return [{ x: minX, y: minY }, { x: maxX, y: maxY }];
-}
-
-/** Handle drag + dropped image or PDF.*/
-var dropzone = document.getElementById('dropzone');
-
-dropzone.ondragover = function (e) {
-  e.preventDefault();
-}
-
-dropzone.ondrop = function (e) {
-  e.preventDefault();
-  var files = e.dataTransfer.files;
-  replaceImage(files[0]);
-}
-
-function replaceImage(file) {
-  let reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onloadend = () => {
-    const dataUrl = reader.result;
-    if (file.name.endsWith('pdf')) {
-      loadPdf(dataUrl);
-    } else {
-      loadImage(dataUrl);
-    }
-  }
 }

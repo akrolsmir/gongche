@@ -1,36 +1,5 @@
-let downEvent;
-function mouseDown(e) {
-  switch (e.which) {
-    case 3: // Right mouse click
-      downEvent = e;
-  }
-}
-
-function mouseUp(e) {
-  switch (e.which) {
-    case 3: // Right mouse click
-      const clipWidth = e.offsetX - downEvent.offsetX;
-      const clipHeight = e.offsetY - downEvent.offsetY;
-      // Resize the snippet canvas, then copy to it
-      snippet.width = clipWidth;
-      snippet.height = clipHeight
-      snippetCtx.drawImage(canvas,
-        // Source: x, y, width, hight
-        downEvent.offsetX, downEvent.offsetY, clipWidth, clipHeight,
-        // Destination: x, y, width, height
-        0, 0, clipWidth, clipHeight);
-      requestOcr(snippet)
-        .then(json => {
-          if (json.responses.length > 0) {
-            const text = json.responses[0].textAnnotations[0].description;
-            lyricsTextField.value += text;
-          }
-        });
-  }
-}
-
 const OCR_URL = 'https://vision.googleapis.com/v1/images:annotate?key=AIzaSyA7ZlydINXmk61P2lz3sDi0ACSIwJEloUY';
-function buildRequest(base64) {
+function buildOcrRequest(base64) {
   return `{
   "requests": [
     {
@@ -53,16 +22,50 @@ function buildRequest(base64) {
 `;
 }
 
+/** Upload the image from the canvas to OCR. */
 async function requestOcr(canvas) {
-  // Send the base64 image to Google OCR API
   const dataUrl = canvas.toDataURL("image/png");
   const base64 = dataUrl.substring(dataUrl.indexOf(',') + 1);
   const response = await fetch(OCR_URL, {
     method: 'POST',
-    body: buildRequest(base64),
+    body: buildOcrRequest(base64),
     headers: { 'Content-Type': 'application/json' }
   });
   return await response.json();
+}
+
+/** Send right-click drag area to OCR. */
+let downEvent;
+function mouseDown(e) {
+  switch (e.which) {
+    case 3: // Right mouse click
+      downEvent = e;
+  }
+}
+
+function mouseUp(e) {
+  switch (e.which) {
+    case 3: // Right mouse click
+      const snippet = document.getElementById('snippet');
+      const snippetCtx = snippet.getContext('2d');
+      const clipWidth = e.offsetX - downEvent.offsetX;
+      const clipHeight = e.offsetY - downEvent.offsetY;
+      // Resize the snippet canvas, then copy to it
+      snippet.width = clipWidth;
+      snippet.height = clipHeight
+      snippetCtx.drawImage(canvas,
+        // Source: x, y, width, hight
+        downEvent.offsetX, downEvent.offsetY, clipWidth, clipHeight,
+        // Destination: x, y, width, height
+        0, 0, clipWidth, clipHeight);
+      requestOcr(snippet)
+        .then(json => {
+          if (json.responses.length > 0) {
+            const text = json.responses[0].textAnnotations[0].description;
+            lyricsTextField.value += text; // TODO: Remove global ref
+          }
+        });
+  }
 }
 
 /** Prevent right click menu from appearing. */
