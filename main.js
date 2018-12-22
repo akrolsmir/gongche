@@ -19,13 +19,19 @@ function saveOcrResults(json) {
   const page = fullTextAnnotations.pages[0];
   for (const block of page.blocks) {
     for (const paragraph of block.paragraphs) {
-      for (const word of paragraph.words) {
-        lines.push(word);
+      for (const line of paragraph.words) {
+        let lineContainsChinese = false;
 
-        for (const symbol of word.symbols) {
-          // Add a parent reference and save the symbol.
-          symbol.parent = word;
-          symbols.push(symbol);
+        for (const symbol of line.symbols) {
+          if (symbol.text.match(/[\u3400-\u9FBF]/)) {
+            // If it's a Chinese symbol, remember its line and save it.
+            symbol.parent = line;
+            symbols.push(symbol);
+            lineContainsChinese = true;
+          }
+        }
+        if (lineContainsChinese) {
+          lines.push(line);
         }
       }
     }
