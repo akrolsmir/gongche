@@ -1,4 +1,5 @@
 const pageNumText = document.getElementById('pagenum');
+// Invisible intermediate canvas for loading PDF.
 const bgCanvas = document.createElement('canvas');
 const img = new Image();
 
@@ -18,36 +19,29 @@ function loadImage(src) {
   img.src = src;
 }
 
-function loadPdf(src) {
-  pdfjsLib.getDocument(src)
-    .then(result => {
-      pdf = result;
-      renderPdfPage();
-    });
+async function loadPdf(src) {
+  pdf = await pdfjsLib.getDocument(src);
+  renderPdfPage();
 }
 
-function renderPdfPage() {
+async function renderPdfPage() {
   resetSong();
   pageNumText.value = `Page ${pageNum}`;
-  pdf.getPage(pageNum)
-    .then(page => {
-      const scale = 1.3;
-      const viewport = page.getViewport(scale);
+  const page = await pdf.getPage(pageNum);
+  const scale = 1.3;
+  const viewport = page.getViewport(scale);
 
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      bgCanvas.height = canvas.height;
-      bgCanvas.width = canvas.width;
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+  bgCanvas.height = canvas.height;
+  bgCanvas.width = canvas.width;
 
-      const renderContext = {
-        canvasContext: bgCanvas.getContext('2d'),
-        viewport: viewport
-      };
-      return page.render(renderContext)
-    })
-    .then(() => {
-      ctx.drawImage(bgCanvas, 0, 0);
-    });
+  const renderContext = {
+    canvasContext: bgCanvas.getContext('2d'),
+    viewport: viewport
+  };
+  await page.render(renderContext);
+  ctx.drawImage(bgCanvas, 0, 0);
 }
 
 function prevPage() {
