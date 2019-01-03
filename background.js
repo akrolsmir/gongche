@@ -6,7 +6,18 @@ const img = new Image();
 let pdf;
 const pdfOffset = 6531; // Delta between pdf and printed page num
 let pageNum = 6608 - pdfOffset;
-let songIndex = 30;
+
+let songs;
+let songIndex = 18;
+
+async function main() {
+  // loadImage('assets/2880.png');
+  // TODO: Consider parallelizing these async calls.
+  await loadPdf('assets/104.pdf');
+  songs = await parseTable(rawTable);
+  jumpToSong();
+}
+main();
 
 function saveLyrics() {
   const song = songs[songIndex];
@@ -69,9 +80,6 @@ async function parseTable(table) {
   }
   return fullTable;
 }
-
-// loadImage('assets/2880.png');
-loadPdf('assets/104.pdf');
 
 function loadImage(src) {
   img.onload = () => {
@@ -144,7 +152,7 @@ function replaceImage(file) {
   }
 }
 
-let rawTable = [
+const rawTable = [
   ["木蘭花", "月令承應", 6571],
   ["", "月令承應", 6571],
   ["", "月令承應", 6572],
@@ -209,6 +217,4 @@ let rawTable = [
   ["", "法宮雅奏", 6619],
   ["", "董西廂", 6620],
   ["隨煞", "散曲", 6620],
-]
-let songs;
-parseTable(rawTable).then(result => songs = result);
+];
