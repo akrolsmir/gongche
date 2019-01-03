@@ -19,6 +19,20 @@ body {
   align-items: flex-start;
 }
 
+.songdata {
+  display: flex;
+  flex-direction: column;
+}
+
 .songdata > textarea {
   font-size: 30pt;
+}
+
+.songbar {
+  display: flex;
+  height: 80px
+}
+
+.songbar > input {
+  font-size: 20pt;
 }
