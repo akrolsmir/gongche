@@ -19,6 +19,6 @@ body {
   align-items: flex-start;
 }
 
-.editor > textarea {
+.songdata > textarea {
   font-size: 30pt;
 }

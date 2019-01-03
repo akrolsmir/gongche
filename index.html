@@ -11,6 +11,9 @@
     <input type="text" id="pagenum" value="Page X" readonly>
     <input type="button" id="prevpage" value="Next =)" onclick="nextPage()">
     <input type="button" id="separator" value="Analyze" onclick="analyze()">
+    <input type="button" id="nextsong" value="Prev Song" onclick="prevSong()">
+    <input type="text" id="songnum" value="Song X" readonly>
+    <input type="button" id="prevsong" value="Next Song" onclick="nextSong()">
   </div>
   <div class="editor">
     <div id="dropzone">
@@ -19,8 +22,17 @@
           onmouseup="mouseUp(event)" oncontextmenu="contextMenu(event)">
       </canvas>
     </div>
-    <textarea name="lyrics" id="lyrics" rows="10" cols="20"
-        placeholder="Click 'Analyze'""></textarea>
+    <div class="songdata">
+      Title
+      <textarea name="title" id="title" rows="1" cols="20"
+          placeholder="Title"></textarea>
+      Composer
+      <textarea name="composer" id="composer" rows="1" cols="20"
+          placeholder="Composer"></textarea>
+      Lyrics
+      <textarea name="lyrics" id="lyrics" rows="10" cols="20"
+          placeholder="Click 'Analyze'"></textarea>
+    </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
 </body>
