@@ -8,45 +8,64 @@ const pdfOffset = 6531; // Delta between pdf and printed page num
 let pageNum = 6608 - pdfOffset;
 let songIndex = 30;
 
+function saveLyrics() {
+  const song = songs[songIndex];
+  const lyricsTextField = document.getElementById('lyrics');
+  if (song.lyrics != lyricsTextField.value) {
+    song.lyrics = lyricsTextField.value;
+    saveSong(song);
+    alert('Saved ' + song.title);
+  }
+}
+
 function nextSong() {
+  saveLyrics();
   songIndex++;
   jumpToSong();
 }
 
 function prevSong() {
+  saveLyrics();
   songIndex--;
   jumpToSong();
 }
 
 function jumpToSong() {
-  const [title, composer, printedPageNum, songId] = tableOfContents[songIndex];
-  pageNum = printedPageNum - pdfOffset;
+  const song = songs[songIndex];
+  pageNum = song.pageNum - pdfOffset;
   renderPdfPage();
 
   const titleTextField = document.getElementById('title');
   const composerTextField = document.getElementById('composer');
   const songIdTextField = document.getElementById('songnum');
-  titleTextField.value = title;
-  composerTextField.value = composer;
-  songIdTextField.value = songId;
+  const lyricsTextField = document.getElementById('lyrics');
+  titleTextField.value = song.title;
+  composerTextField.value = song.composer;
+  songIdTextField.value = song.id;
+  lyricsTextField.value = song.lyrics;
 }
 
-function fillTableOfContents(table) {
+async function parseTable(table) {
+  const songsMap = await loadSongs();
   const fullTable = [];
   let orderInPage = 1;
   for (let i = 0; i < table.length; i++) {
     let [title, composer, pageNum] = table[i];
     if (i > 0) {
-      const [lastTitle, lastComposer, lastPageNum] = fullTable[i - 1];
+      const lastSong = fullTable[i - 1];
       // Empty titles should refer to the last known title.
       if (!title) {
-        title = lastTitle; 
+        title = lastSong.title; 
       }
       // Determine whether this song is the first of its page.
-      orderInPage = (lastPageNum != pageNum) ? 1 : orderInPage + 1;
+      orderInPage = (lastSong.pageNum != pageNum) ? 1 : orderInPage + 1;
     }
     const id = `${pageNum}.${orderInPage}`
-    fullTable.push([title, composer, pageNum, id]);
+    if (songsMap.has(id)) {
+      fullTable.push(Song.fromJson(songsMap.get(id)));
+    } else {
+      fullTable.push(new Song(id, title, composer, pageNum, ''));
+    }
   }
   return fullTable;
 }
@@ -125,7 +144,7 @@ function replaceImage(file) {
   }
 }
 
-let tableOfContents = [
+let rawTable = [
   ["木蘭花", "月令承應", 6571],
   ["", "月令承應", 6571],
   ["", "月令承應", 6572],
@@ -191,4 +210,5 @@ let tableOfContents = [
   ["", "董西廂", 6620],
   ["隨煞", "散曲", 6620],
 ]
-tableOfContents = fillTableOfContents(tableOfContents);
+let songs;
+parseTable(rawTable).then(result => songs = result);
