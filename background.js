@@ -19,14 +19,25 @@ async function main() {
 }
 main();
 
+/** If the song's lyrics were changed, color the text field yellow. */
+function colorLyricsBackground() {
+  const song = songs[songIndex];
+  const lyricsTextField = document.getElementById('lyrics');
+  if (song.lyrics == lyricsTextField.value) {
+    lyricsTextField.style.backgroundColor = 'white';
+  } else {
+    lyricsTextField.style.backgroundColor = 'rgba(256, 256, 0, 0.2)';
+  }
+}
+
 function saveLyrics() {
   const song = songs[songIndex];
   const lyricsTextField = document.getElementById('lyrics');
   if (song.lyrics != lyricsTextField.value) {
     song.lyrics = lyricsTextField.value;
     saveSong(song);
-    alert('Saved ' + song.title);
   }
+  colorLyricsBackground();
 }
 
 function nextSong() {
@@ -117,11 +128,13 @@ async function renderPdfPage() {
 }
 
 function prevPage() {
+  saveLyrics();
   pageNum--;
   renderPdfPage();
 }
 
 function nextPage() {
+  saveLyrics();
   pageNum++;
   renderPdfPage();
 }

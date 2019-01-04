@@ -121,7 +121,9 @@ function processClick(event) {
   } else {
     splitSong(clickedSymbol);
   }
-  lyricsTextField.value = printSong();
+  // TODO remove cross-dependency?
+  lyricsTextField.value = songs[songIndex].lyrics + printSong();
+  colorLyricsBackground();
   drawUiLayer(canvas);
 }
 
