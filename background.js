@@ -8,13 +8,13 @@ const pdfOffset = 6531; // Delta between pdf and printed page num
 let pageNum = 6608 - pdfOffset;
 
 let songs;
-let songIndex = 18;
+let songIndex = 6282;
 
 async function main() {
   // loadImage('assets/2880.png');
   // TODO: Consider parallelizing these async calls.
   await loadPdf('assets/104.pdf');
-  songs = await parseTable(rawTable);
+  songs = await parseTable(getRawTable());
   jumpToSong();
 }
 main();
@@ -73,6 +73,7 @@ async function parseTable(table) {
   let orderInPage = 1;
   for (let i = 0; i < table.length; i++) {
     let [title, composer, pageNum] = table[i];
+    pageNum = parseInt(pageNum.substring(1, pageNum.length)); // '頁42' -> 42
     if (i > 0) {
       const lastSong = fullTable[i - 1];
       // Empty titles should refer to the last known title.
