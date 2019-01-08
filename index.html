@@ -22,21 +22,21 @@
     <div class="songdata">
       Title
       <textarea name="title" id="title" rows="1" cols="20"
-          placeholder="Title"></textarea>
+          placeholder="Title" v-model="song.title"></textarea>
       Composer
       <textarea name="composer" id="composer" rows="1" cols="20"
-          placeholder="Composer"></textarea>
+          placeholder="Composer" v-model="song.composer"></textarea>
       Lyrics
       <textarea name="lyrics" id="lyrics" rows="5" cols="20"
-          placeholder="Click 'Analyze'" oninput="colorLyricsBackground()"></textarea>
+          placeholder="Click 'Analyze'" v-bind:style="lyricsStyle" v-model="editedLyrics"></textarea>
       Song Id
       <div class="songbar">
         <input type="button" id="nextsong" value="Prev" onclick="prevSong()">
-        <input readonly type="text" id="songnum" value="Song Id" size="8">
+        <input readonly type="text" id="songnum" v-model="song.id" size="8">
         <input type="button" id="prevsong" value="Next" onclick="nextSong()">
       </div>
       Current Lyric
-      <textarea readonly id="lyricpreview" rows="1" cols="1"></textarea>
+      <textarea readonly id="lyricpreview" rows="1" cols="1" v-model="lyricPreview"></textarea>
       Melody
       <table>
         <tr>
@@ -69,7 +69,7 @@
         </tr>
       </table>
       <textarea name="melody" id="melody" rows="10" cols="20"
-          placeholder="Type melody" oninput="rewriteWithGongche()"></textarea>
+          placeholder="Type melody" v-bind:style="melodyStyle" v-model="melodyGongche"></textarea>
     </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
@@ -77,6 +77,7 @@
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="models/song.js"></script>
 <script src="database.js"></script>
 <script src="assets/mulu.js"></script>

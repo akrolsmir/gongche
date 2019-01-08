@@ -34,6 +34,8 @@ let bookOffsets = [
   [18, 6535 - 4]
 ];
 
+let songDataApp;
+
 function findBookAndOffset(pageNum) {
   let i = 0
   for (; i < bookOffsets.length; i++) {
@@ -50,54 +52,75 @@ async function main() {
   // TODO: Consider parallelizing these async calls.
   await loadPdf('assets/book (18).pdf');
   songs = await parseTable(getRawTable());
+  songDataApp = configSongData();
   renderSong();
 }
 main();
 
-/** If the song's lyrics were changed, color the text field yellow. */
-function colorLyricsBackground() {
-  const song = songs[songIndex];
-  const lyricsTextField = document.getElementById('lyrics');
-  if (song.lyrics == lyricsTextField.value) {
-    lyricsTextField.style.backgroundColor = 'white';
-  } else {
-    lyricsTextField.style.backgroundColor = 'rgba(256, 256, 0, 0.4)';
-  }
-}
+function configSongData() {
+  return new Vue({
+    el: '.songdata',
+    data: {
+      song: '',
+      editedLyrics: 'Placeholder lyrics',
+      editedMelody: 'Placeholder melody',
+    },
+    computed: {
+      // If the song's lyrics or melody were edited, color the field yellow.
+      lyricsStyle: function () {
+        const yellow = 'rgba(256, 256, 0, 0.4)';
+        const color = this.song.lyrics == this.editedLyrics ? 'white' : yellow;
+        return {
+          backgroundColor: color,
+        }
+      },
+      melodyStyle: function () {
+        const yellow = 'rgba(256, 256, 0, 0.4)';
+        const color = this.song.melody == this.editedMelody ? 'white' : yellow;
+        return {
+          backgroundColor: color,
+        }
+      },
+      // Show the current lyric, based on the spaces in the melody field.
+      lyricPreview: function () {
+        const melodySpaces = this.editedMelody.split(' ').length - 1;
+        const unspacedLyrics = this.editedLyrics.replace(/\s/g, '');
+        if (0 <= melodySpaces && melodySpaces < unspacedLyrics.length) {
+          return unspacedLyrics[melodySpaces];
+        }
+        return '';
+      },
+      // Rewrite melody text with Gongche, and mark the character on the canvas.
+      melodyGongche: {
+        get: function () {
+          return this.editedMelody;
+        },
+        set: function (input) {
+          let output = "";
+          for (char of input) {
+            const gongche = keyboardToGongche[char];
+            output += gongche ? gongche : char;
+          }
+          this.editedMelody = output;
 
-function colorMelodyBackground() {
-  const song = songs[songIndex];
-  const melodyTextField = document.getElementById('melody');
-  if (song.melody == melodyTextField.value) {
-    melodyTextField.style.backgroundColor = 'white';
-  } else {
-    melodyTextField.style.backgroundColor = 'rgba(256, 256, 0, 0.4)';
-  }
-}
-
-function updateLyricPreview(index) {
-  const lyricsTextField = document.getElementById('lyrics');
-  const lyrics = lyricsTextField.value.replace(/\s/g, ''); // Remove whitespace
-  if (0 <= index && index < lyrics.length) {
-    const lyricPreviewTextField = document.getElementById('lyricpreview');
-    lyricPreviewTextField.value = lyrics[index];
-  }
+          const spaceCount = output.split(' ').length - 1;
+          drawUiLayer(spaceCount, /* showAnnotations = */ false);
+        }
+      }
+    }
+  });
 }
 
 function saveLyricsAndMelody() {
   const song = songs[songIndex];
-  const lyricsTextField = document.getElementById('lyrics');
-  const melodyTextField = document.getElementById('melody');
-  if (song.lyrics != lyricsTextField.value) {
-    song.lyrics = lyricsTextField.value;
+  if (song.lyrics != songDataApp.editedLyrics) {
+    song.lyrics = songDataApp.editedLyrics;
     saveSong(song);
   }
-  if (song.melody != melodyTextField.value) {
-    song.melody = melodyTextField.value;
+  if (song.melody != songDataApp.editedMelody) {
+    song.melody = songDataApp.editedMelody;
     saveSong(song);
   }
-  colorLyricsBackground();
-  colorMelodyBackground();
 }
 
 function nextSong() {
@@ -117,16 +140,9 @@ function renderSong() {
   pageNum = song.pageNum;
   renderPdfPage();
 
-  const titleTextField = document.getElementById('title');
-  const composerTextField = document.getElementById('composer');
-  const songIdTextField = document.getElementById('songnum');
-  const lyricsTextField = document.getElementById('lyrics');
-  const melodyTextField = document.getElementById('melody');
-  titleTextField.value = song.title;
-  composerTextField.value = song.composer;
-  songIdTextField.value = song.id;
-  lyricsTextField.value = song.lyrics;
-  melodyTextField.value = song.melody;
+  songDataApp.song = song;
+  songDataApp.editedLyrics = song.lyrics;
+  songDataApp.editedMelody = song.melody;
 }
 
 async function parseTable(table) {

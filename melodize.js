@@ -12,18 +12,3 @@ const keyboardToGongche = {
   '.': '。',
   ',': '、',
 }
-
-function rewriteWithGongche() {
-  const melodyInput = document.getElementById('melody');
-  let output = "";
-  for (char of melodyInput.value) {
-    const gongche = keyboardToGongche[char];
-    output += gongche ? gongche : char;
-  }
-  melodyInput.value = output;
-  colorMelodyBackground();
-
-  const spaceCount = output.split(' ').length - 1;
-  updateLyricPreview(spaceCount);
-  drawUiLayer(spaceCount, /* showAnnotations = */ false);
-}

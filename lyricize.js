@@ -128,8 +128,7 @@ function processClick(event) {
     splitSong(clickedSymbol);
   }
   // TODO remove cross-dependency?
-  lyricsTextField.value = songs[songIndex].lyrics + printSong();
-  colorLyricsBackground();
+  songDataApp.editedLyrics = songDataApp.song.lyrics + printSong();
   drawUiLayer();
 }
 
