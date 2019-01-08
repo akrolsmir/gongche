@@ -15,7 +15,7 @@ async function main() {
   // TODO: Consider parallelizing these async calls.
   await loadPdf('assets/104.pdf');
   songs = await parseTable(getRawTable());
-  jumpToSong();
+  renderSong();
 }
 main();
 
@@ -43,16 +43,16 @@ function saveLyrics() {
 function nextSong() {
   saveLyrics();
   songIndex++;
-  jumpToSong();
+  renderSong();
 }
 
 function prevSong() {
   saveLyrics();
   songIndex--;
-  jumpToSong();
+  renderSong();
 }
 
-function jumpToSong() {
+function renderSong() {
   const song = songs[songIndex];
   pageNum = song.pageNum - pdfOffset;
   renderPdfPage();
@@ -110,8 +110,14 @@ async function loadPdf(src) {
 
 async function renderPdfPage() {
   resetSong();
-  pageNumText.value = `Page ${pageNum + pdfOffset}`;
-  const page = await pdf.getPage(pageNum);
+  let page;
+  try {
+    page = await pdf.getPage(pageNum);
+  } catch (error) {
+    alert(`Page not found: ${pageNum + pdfOffset}`);
+    pageNum = 1;
+    page = await pdf.getPage(pageNum);
+  }
   const scale = 1.3;
   const viewport = page.getViewport(scale);
 
@@ -126,6 +132,7 @@ async function renderPdfPage() {
   };
   await page.render(renderContext);
   ctx.drawImage(bgCanvas, 0, 0);
+  pageNumText.value = `Page ${pageNum + pdfOffset}`;
 }
 
 function prevPage() {
@@ -138,6 +145,17 @@ function nextPage() {
   saveLyrics();
   pageNum++;
   renderPdfPage();
+}
+
+function jumpToPage() {
+  try {
+    saveLyrics();
+    const match = pageNumText.value.match(/\d+/);
+    pageNum = parseInt(match[0]) - pdfOffset;
+    renderPdfPage();
+  } catch (error) {
+    alert(`No number found: ${pageNumText.value}`)
+  }
 }
 
 /** Handle drag + dropped image or PDF.*/

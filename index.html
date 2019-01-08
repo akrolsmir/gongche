@@ -8,7 +8,7 @@
 <body>
   <div class="toolbar">
     <input type="button" id="nextpage" value="(= Prev" onclick="prevPage()">
-    <input type="text" id="pagenum" value="Page X" readonly>
+    <input type="text" id="pagenum" value="Page X" onchange="jumpToPage()">
     <input type="button" id="prevpage" value="Next =)" onclick="nextPage()">
     <input type="button" id="separator" value="Analyze" onclick="analyze()">
   </div>
