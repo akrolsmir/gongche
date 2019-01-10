@@ -26,7 +26,7 @@ function colorLyricsBackground() {
   if (song.lyrics == lyricsTextField.value) {
     lyricsTextField.style.backgroundColor = 'white';
   } else {
-    lyricsTextField.style.backgroundColor = 'rgba(256, 256, 0.4)';
+    lyricsTextField.style.backgroundColor = 'rgba(256, 256, 0, 0.4)';
   }
 }
 
