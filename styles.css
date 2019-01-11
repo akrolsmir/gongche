@@ -36,3 +36,12 @@ body {
 .songbar > input {
   font-size: 20pt;
 }
+
+table {
+  border-collapse: collapse;
+  border: 2px solid rgb(200,200,200);
+}
+
+td, th {
+  border: 1px solid rgb(190,190,190);
+}

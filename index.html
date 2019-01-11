@@ -30,12 +30,45 @@
       <textarea readonly name="songnum" id="songnum" rows="1" cols="20"
           placeholder="Id"></textarea>
       Lyrics
-      <textarea name="lyrics" id="lyrics" rows="10" cols="20"
+      <textarea name="lyrics" id="lyrics" rows="5" cols="20"
           placeholder="Click 'Analyze'" oninput="colorLyricsBackground()"></textarea>
       <div class="songbar">
         <input type="button" id="nextsong" value="Prev Song" onclick="prevSong()">
         <input type="button" id="prevsong" value="Next Song" onclick="nextSong()">
       </div>
+      Melody
+      <table>
+        <tr>
+          <td>s</td>
+          <td>c</td>
+          <td>g</td>
+          <td>f</td>
+          <td>l</td>
+          <td>w</td>
+          <td>y</td>
+          <td>h</td>
+          <td>x</td>
+          <td>i</td>
+          <td>.</td>
+          <td>,</td>
+        </tr>
+        <tr>
+          <td>上</td>
+          <td>尺</td>
+          <td>工</td>
+          <td>凡</td>
+          <td>六</td>
+          <td>五</td>
+          <td>乙</td>
+          <td>合</td>
+          <td>四</td>
+          <td>一</td>
+          <td>。</td>
+          <td>、</td>
+        </tr>
+      </table>
+      <textarea name="melody" id="melody" rows="10" cols="20"
+          placeholder="Type melody" oninput="rewriteWithGongche()"></textarea>
     </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
@@ -50,3 +83,4 @@
 <script src="separator.js"></script>
 <script src="background.js"></script>
 <script src="lyricize.js"></script>
+<script src="melodize.js"></script>
