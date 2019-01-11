@@ -30,24 +30,40 @@ function colorLyricsBackground() {
   }
 }
 
-function saveLyrics() {
+function colorMelodyBackground() {
+  const song = songs[songIndex];
+  const melodyTextField = document.getElementById('melody');
+  if (song.melody == melodyTextField.value) {
+    melodyTextField.style.backgroundColor = 'white';
+  } else {
+    melodyTextField.style.backgroundColor = 'rgba(256, 256, 0, 0.4)';
+  }
+}
+
+function saveLyricsAndMelody() {
   const song = songs[songIndex];
   const lyricsTextField = document.getElementById('lyrics');
+  const melodyTextField = document.getElementById('melody');
   if (song.lyrics != lyricsTextField.value) {
     song.lyrics = lyricsTextField.value;
     saveSong(song);
   }
+  if (song.melody != melodyTextField.value) {
+    song.melody = melodyTextField.value;
+    saveSong(song);
+  }
   colorLyricsBackground();
+  colorMelodyBackground();
 }
 
 function nextSong() {
-  saveLyrics();
+  saveLyricsAndMelody();
   songIndex++;
   renderSong();
 }
 
 function prevSong() {
-  saveLyrics();
+  saveLyricsAndMelody();
   songIndex--;
   renderSong();
 }
@@ -61,10 +77,12 @@ function renderSong() {
   const composerTextField = document.getElementById('composer');
   const songIdTextField = document.getElementById('songnum');
   const lyricsTextField = document.getElementById('lyrics');
+  const melodyTextField = document.getElementById('melody');
   titleTextField.value = song.title;
   composerTextField.value = song.composer;
   songIdTextField.value = song.id;
   lyricsTextField.value = song.lyrics;
+  melodyTextField.value = song.melody;
 }
 
 async function parseTable(table) {
@@ -87,7 +105,7 @@ async function parseTable(table) {
     if (songsMap.has(id)) {
       fullTable.push(Song.fromJson(songsMap.get(id)));
     } else {
-      fullTable.push(new Song(id, title, composer, pageNum, ''));
+      fullTable.push(new Song(id, title, composer, pageNum));
     }
   }
   return fullTable;
@@ -136,20 +154,20 @@ async function renderPdfPage() {
 }
 
 function prevPage() {
-  saveLyrics();
+  saveLyricsAndMelody();
   pageNum--;
   renderPdfPage();
 }
 
 function nextPage() {
-  saveLyrics();
+  saveLyricsAndMelody();
   pageNum++;
   renderPdfPage();
 }
 
 function jumpToPage() {
   try {
-    saveLyrics();
+    saveLyricsAndMelody();
     const match = pageNumText.value.match(/\d+/);
     pageNum = parseInt(match[0]) - pdfOffset;
     renderPdfPage();

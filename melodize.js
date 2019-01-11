@@ -21,4 +21,5 @@ function rewriteWithGongche() {
     output += gongche ? gongche : char;
   }
   melodyInput.value = output;
+  colorMelodyBackground();
 }
