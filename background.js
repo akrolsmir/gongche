@@ -40,6 +40,15 @@ function colorMelodyBackground() {
   }
 }
 
+function updateLyricPreview(index) {
+  const lyricsTextField = document.getElementById('lyrics');
+  const lyrics = lyricsTextField.value.replace(/\s/g, ''); // Remove whitespace
+  if (0 <= index && index < lyrics.length) {
+    const lyricPreviewTextField = document.getElementById('lyricpreview');
+    lyricPreviewTextField.value = lyrics[index];
+  }
+}
+
 function saveLyricsAndMelody() {
   const song = songs[songIndex];
   const lyricsTextField = document.getElementById('lyrics');

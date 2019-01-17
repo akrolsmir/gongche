@@ -28,6 +28,10 @@ body {
   font-size: 20pt;
 }
 
+#lyricpreview {
+  font-size: 40pt;
+}
+
 .songbar {
   display: flex;
   height: 60px

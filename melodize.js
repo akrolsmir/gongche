@@ -22,4 +22,7 @@ function rewriteWithGongche() {
   }
   melodyInput.value = output;
   colorMelodyBackground();
+
+  const spaceCount = output.split(' ').length - 1;
+  updateLyricPreview(spaceCount);
 }
