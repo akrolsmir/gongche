@@ -25,4 +25,5 @@ function rewriteWithGongche() {
 
   const spaceCount = output.split(' ').length - 1;
   updateLyricPreview(spaceCount);
+  drawUiLayer(spaceCount, /* showAnnotations = */ false);
 }

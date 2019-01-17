@@ -36,28 +36,27 @@ function saveOcrResults(json) {
       }
     }
   }
-  drawUiLayer(canvas);
+  drawUiLayer();
 }
 
-function drawUiLayer(canvas) {
-  // Create the hidden UI layer
+/** 
+ * Draw boxes for annotations and selected lyrics.
+ * @var melodyIndex If provided, highlight the current melody symbol.
+ */
+function drawUiLayer(melodyIndex = -1, showAnnotations = true) {
+  // Create a hidden UI layer to stage changes
   const uiCanvas = document.createElement('canvas');
   uiCanvas.width = canvas.width;
   uiCanvas.height = canvas.height;
   const uiCtx = uiCanvas.getContext('2d');
 
-  // Draw empty green boxes around each line
-  for (const line of lines) {
-    const [start, end] = getStartEnd(line.boundingBox);
-    uiCtx.strokeStyle = 'green';
-    uiCtx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
-  }
-
-  // Draw empty blue boxes around each symbol
-  for (const symbol of symbols) {
-    const [start, end] = getStartEnd(symbol.boundingBox);
-    uiCtx.strokeStyle = 'blue';
-    uiCtx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
+  if (showAnnotations) {
+    // Draw gray box around each symbol
+    for (const symbol of symbols) {
+      const [start, end] = getStartEnd(symbol.boundingBox);
+      uiCtx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      uiCtx.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);      
+    }
   }
 
   for (const line of songLines) {
@@ -65,6 +64,9 @@ function drawUiLayer(canvas) {
       if (songBreaks.includes(symbol)) {
         // Color break symbols as green.
         uiCtx.fillStyle = 'rgba(0, 256, 0, 0.2)';
+      } else if (0 <= melodyIndex && getSongSymbol(melodyIndex) == symbol) {
+        // Color the current melody symbol as yellow.
+        uiCtx.fillStyle = 'rgba(256, 256, 0, 0.2)';
       } else {
         // Color song symbols using blue <-> red spectrum, based on confidence.
         const blue = 256 * symbol.confidence;
@@ -124,7 +126,7 @@ function processClick(event) {
   // TODO remove cross-dependency?
   lyricsTextField.value = songs[songIndex].lyrics + printSong();
   colorLyricsBackground();
-  drawUiLayer(canvas);
+  drawUiLayer();
 }
 
 function findNearestLine(xc, yc, lines) {
@@ -203,6 +205,22 @@ function printSong() {
 function resetSong() {
   songLines = [];
   songBreaks = [];
+}
+
+/** Return the song symbol at the specified index, ignoring breaks.  */
+function getSongSymbol(index) {
+  let i = 0;
+  for (const line of songLines) {
+    for (const symbol of line.symbols) {
+      if (songBreaks.includes(symbol)) {
+        continue;
+      }
+      if (i == index) {
+        return symbol;
+      }
+      i++;
+    }
+  }
 }
 
 /** 
