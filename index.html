@@ -26,15 +26,14 @@
       Composer
       <textarea name="composer" id="composer" rows="1" cols="20"
           placeholder="Composer"></textarea>
-      Id
-      <textarea readonly name="songnum" id="songnum" rows="1" cols="20"
-          placeholder="Id"></textarea>
       Lyrics
       <textarea name="lyrics" id="lyrics" rows="5" cols="20"
           placeholder="Click 'Analyze'" oninput="colorLyricsBackground()"></textarea>
+      Song Id
       <div class="songbar">
-        <input type="button" id="nextsong" value="Prev Song" onclick="prevSong()">
-        <input type="button" id="prevsong" value="Next Song" onclick="nextSong()">
+        <input type="button" id="nextsong" value="Prev" onclick="prevSong()">
+        <input readonly type="text" id="songnum" value="Song Id" size="8">
+        <input type="button" id="prevsong" value="Next" onclick="nextSong()">
       </div>
       Current Lyric
       <textarea readonly id="lyricpreview" rows="1" cols="1"></textarea>
