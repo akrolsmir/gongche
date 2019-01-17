@@ -1,6 +1,6 @@
 body {
   display: grid;
-  grid-template-rows: 80px 350px 50px;
+  grid-template-rows: 60px 350px 50px;
 }
 
 .toolbar {
@@ -25,12 +25,12 @@ body {
 }
 
 .songdata > textarea {
-  font-size: 30pt;
+  font-size: 20pt;
 }
 
 .songbar {
   display: flex;
-  height: 80px
+  height: 60px
 }
 
 .songbar > input {
