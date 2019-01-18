@@ -8,7 +8,8 @@ let pdfOffset; // Delta between pdf and printed page num
 let pageNum = 6608; // Printed page number
 
 let songs;
-let songIndex = 6282;
+let songsById;
+let songIndex = 6288;
 
 let currentBook = 1;
 let bookOffsets = [
@@ -129,6 +130,7 @@ function renderSong() {
 }
 
 async function parseTable(table) {
+  songsById = {}; // TODO Remove global usage;
   const songsMap = await loadSongs();
   const fullTable = [];
   let orderInPage = 1;
@@ -150,6 +152,7 @@ async function parseTable(table) {
     } else {
       fullTable.push(new Song(id, title, composer, pageNum));
     }
+    songsById[id] = i;
   }
   return fullTable;
 }
@@ -221,7 +224,14 @@ function jumpToPage() {
     saveLyricsAndMelody();
     const match = pageNumText.value.match(/\d+/);
     pageNum = parseInt(match[0]);
-    renderPdfPage();
+    const id = `${pageNum}.1`;
+    if (songsById[id]) {
+      saveLyricsAndMelody();
+      songIndex = songsById[id];
+      renderSong();
+    } else {
+      renderPdfPage();
+    }
   } catch (error) {
     alert(`No number found: ${pageNumText.value}`)
   }
