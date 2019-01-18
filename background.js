@@ -4,16 +4,50 @@ const bgCanvas = document.createElement('canvas');
 const img = new Image();
 
 let pdf;
-const pdfOffset = 6531; // Delta between pdf and printed page num
-let pageNum = 6608 - pdfOffset;
+let pdfOffset; // Delta between pdf and printed page num
+let pageNum = 6608; // Printed page number
 
 let songs;
 let songIndex = 6282;
 
+let currentBook = 1;
+let bookOffsets = [
+  // [Book num, first printed page num - page it appears]
+  [1, 1 - 247],
+  [2, 315 - 3],
+  [3, 749 - 3],
+  [4, 1149 - 3],
+  [5, 1557 - 3],
+  [6, 1945 - 3],
+  [7, 2327 - 3],
+  [8, 2693 - 3],
+  [9, 3045 - 3],
+  [10, 3441 - 3],
+  [11, 3849 - 3],
+  [12, 4271 - 3],
+  [13, 4679 - 3],
+  [14, 5097 - 3],
+  [15, 5505 - 3],
+  [16, 5885 - 3],
+  [17, 6165 - 3],
+  [18, 6535 - 4]
+];
+
+function findBookAndOffset(pageNum) {
+  let i = 0
+  for (; i < bookOffsets.length; i++) {
+    let [book, page] = bookOffsets[i];
+    if (pageNum < page) {
+      break;
+    }
+  }
+  return bookOffsets[i - 1];
+}
+
 async function main() {
   // loadImage('assets/2880.png');
   // TODO: Consider parallelizing these async calls.
-  await loadPdf('assets/104.pdf');
+  await loadPdf('assets/book (18).pdf');
   songs = await parseTable(getRawTable());
   renderSong();
 }
@@ -79,7 +113,7 @@ function prevSong() {
 
 function renderSong() {
   const song = songs[songIndex];
-  pageNum = song.pageNum - pdfOffset;
+  pageNum = song.pageNum;
   renderPdfPage();
 
   const titleTextField = document.getElementById('title');
@@ -132,18 +166,26 @@ function loadImage(src) {
 
 async function loadPdf(src) {
   pdf = await pdfjsLib.getDocument(src);
-  renderPdfPage();
+  await renderPdfPage();
 }
 
 async function renderPdfPage() {
+  const [bookIndex, offset] = findBookAndOffset(pageNum);
+  pdfOffset = offset;
+  if (bookIndex != currentBook) {
+    currentBook = bookIndex;
+    await loadPdf(`assets/book (${bookIndex}).pdf`);
+  }
+
   resetSong();
   let page;
   try {
-    page = await pdf.getPage(pageNum);
+    page = await pdf.getPage(pageNum - pdfOffset);
   } catch (error) {
-    alert(`Page not found: ${pageNum + pdfOffset}`);
+    alert(`Page not found: ${pageNum}`);
     pageNum = 1;
-    page = await pdf.getPage(pageNum);
+    await renderPdfPage();
+    return;
   }
   const scale = 1.3;
   const viewport = page.getViewport(scale);
@@ -159,7 +201,7 @@ async function renderPdfPage() {
   };
   await page.render(renderContext);
   ctx.drawImage(bgCanvas, 0, 0);
-  pageNumText.value = `Page ${pageNum + pdfOffset}`;
+  pageNumText.value = `Page ${pageNum}`;
 }
 
 function prevPage() {
@@ -178,7 +220,7 @@ function jumpToPage() {
   try {
     saveLyricsAndMelody();
     const match = pageNumText.value.match(/\d+/);
-    pageNum = parseInt(match[0]) - pdfOffset;
+    pageNum = parseInt(match[0]);
     renderPdfPage();
   } catch (error) {
     alert(`No number found: ${pageNumText.value}`)
