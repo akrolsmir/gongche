@@ -1,6 +1,8 @@
 const canvas = document.getElementById('canvas');
 const lyricsTextField = document.getElementById('lyrics');
 const ctx = canvas.getContext('2d');
+// Google's OCR boxes are a little offset from the PDF.
+const UI_VERTICAL_OFFSET = -15;
 
 let lines = [];
 let symbols = [];
@@ -81,7 +83,7 @@ function drawUiLayer(melodyIndex = -1, showAnnotations = true) {
   // Draw the layers from bottom to top.
   const ctx = canvas.getContext('2d');
   ctx.drawImage(bgCanvas, 0, 0);
-  ctx.drawImage(uiCanvas, 0, 0);
+  ctx.drawImage(uiCanvas, 0, UI_VERTICAL_OFFSET);
 }
 
 /** Given a list of objects with boundingBoxes, find one containing (x, y). */
@@ -96,21 +98,23 @@ function intersect(x, y, objects) {
 
 /** Remember the clicked box as a break symbol. */
 function processClick(event) {
-  let clickedSymbol = intersect(event.offsetX, event.offsetY, symbols);
+  let x = event.offsetX;
+  let y = event.offsetY - UI_VERTICAL_OFFSET
+  let clickedSymbol = intersect(x, y, symbols);
   if (!clickedSymbol) {
     // Create a fake symbol to use as a pointer.
     // TODO: Handle break symbol above/below a line
-    let line = intersect(event.offsetX, event.offsetY, lines);
+    let line = intersect(x, y, lines);
     if (!line) {
-      line = findNearestLine(event.offsetX, event.offsetY, lines);
+      line = findNearestLine(x, y, lines);
     }
-    clickedSymbol = makeFakeBreakSymbol(event.offsetX, event.offsetY, line);
+    clickedSymbol = makeFakeBreakSymbol(x, y, line);
     // Find where in the line to inject this symbol.
     let i = 0;
     for (; i < line.symbols.length; i++) {
       const symbol = line.symbols[i];
       const [start, end] = getStartEnd(symbol.boundingBox);
-      if (event.offsetY <= start.y) {
+      if (y <= start.y) {
         break;
       }
     }
