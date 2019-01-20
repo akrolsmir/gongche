@@ -12,43 +12,10 @@ let songsById;
 let songIndex = 6288;
 
 let currentBook = 1;
-let bookOffsets = [
-  // [Book num, first printed page num - page it appears]
-  [1, 1 - 247],
-  [2, 315 - 3],
-  [3, 749 - 3],
-  [4, 1149 - 3],
-  [5, 1557 - 3],
-  [6, 1945 - 3],
-  [7, 2327 - 3],
-  [8, 2693 - 3],
-  [9, 3045 - 3],
-  [10, 3441 - 3],
-  [11, 3849 - 3],
-  [12, 4271 - 3],
-  [13, 4679 - 3],
-  [14, 5097 - 3],
-  [15, 5505 - 3],
-  [16, 5885 - 3],
-  [17, 6165 - 3],
-  [18, 6535 - 4]
-];
 
 let songDataApp;
 
-function findBookAndOffset(pageNum) {
-  let i = 0
-  for (; i < bookOffsets.length; i++) {
-    let [book, page] = bookOffsets[i];
-    if (pageNum < page) {
-      break;
-    }
-  }
-  return bookOffsets[i - 1];
-}
-
 async function main() {
-  // loadImage('assets/2880.png');
   // TODO: Consider parallelizing these async calls.
   await loadPdf('assets/book (18).pdf');
   songs = await parseTable(getRawTable());
