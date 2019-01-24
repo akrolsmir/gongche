@@ -60,31 +60,12 @@ function buildQuarters(melody, lyrics) {
   return result;
 }
 
-// Create an SVG renderer and attach it to the DIV element named "boo".
-var div = document.getElementById("boo")
-var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
-
-// Size our svg:
-renderer.resize(2500, 800);
-
-// And get a drawing context:
-var context = renderer.getContext();
-
-// Create a stave at position 10, 40 of width 400 on the canvas.
-var stave = new VF.Stave(10, 40, 2500);
-// var stave2 = new VF.Stave(410, 40, 400);
-// var stave3 = new VF.Stave(10, 200, 400);
-// var stave4 = new VF.Stave(410, 200, 400);
-
-
-// Add a clef and time signature.
-stave.addClef("treble").addTimeSignature("4/4").addKeySignature("D");
-
-// Connect it to the rendering context and draw!
-stave.setContext(context).draw();
-// stave2.setContext(context).draw();
-// stave3.setContext(context).draw();
-// stave4.setContext(context).draw();
+function makeStave(index) {
+  const stave = new VF.Stave(10, 40 + 200 * index, 800);
+  stave.addClef("treble").addTimeSignature("4/4").addKeySignature("D");
+  stave.setContext(context).draw();
+  return stave;
+}
 
 function makeNote(key) {
   return new VF.StaveNote({clef: "treble", keys: [key], duration: "q"});
@@ -96,50 +77,105 @@ function makeText(text, line) {
     duration: 'q'
   })
     .setLine(line ? line : 12)
-    .setStave(stave);
+    // TODO Is the stave important here? Might be overwritten later.
+    .setStave(staves[0]);
 }
 
+// Output: [ [melody1, jianpu1, lyrics1], ... ]
 function makeNotes(quarters) {
-  const melodyNotes = [];
-  const jianpuNotes = [];
-  const lyricsNotes = [];
+  let results = [];
+  let melodyNotes = [];
+  let jianpuNotes = [];
+  let lyricsNotes = [];
   for (let i = 0; i < quarters.length; i++) {
+    // Create a new stave every 20 notes.
+    if (i % 20 == 0) {
+      melodyNotes = [];
+      jianpuNotes = [];
+      lyricsNotes = [];
+      results.push([melodyNotes, jianpuNotes, lyricsNotes])
+    }
     const [gongche, lyric] = quarters[i];
     const jianpu = gongcheToJianpu[gongche];
     const key = jianpuToKey[jianpu];
     melodyNotes.push(makeNote(key));
     jianpuNotes.push(makeText(jianpu));
     lyricsNotes.push(makeText(lyric, 16));
-    if (i % 4 == 3) {
+    // Add a BarNote after every 4th note (but not at the end of a stave).
+    if (i % 4 == 3 && i % 20 != 19) {
       melodyNotes.push(new VF.BarNote());
       jianpuNotes.push(new VF.BarNote());
       lyricsNotes.push(new VF.BarNote());
     }
   }
-  return [melodyNotes, jianpuNotes, lyricsNotes];
+  return results;
 }
 
-var [melodyNotes, jianpuNotes, lyricsNotes] = 
-  makeNotes(buildQuarters(testMelody, testLyrics));
+// Return the number of non-BarNotes.
+function countBeats(notes) {
+  let count = 0;
+  for (note of notes) {
+    if (note.attrs.type != "BarNote") {
+      count++;
+    }
+  }
+  return count;
+}
 
-// Create a voice in 4/4 and add above notes
-const beats = buildQuarters(testMelody, testLyrics).length;
+// Output: [ [melodyVoice1, jianpuVoice1, lyricsVoice1], ...]
+function makeVoices(notes) {
+  const voices = [];
+  const i = 0;
+  for (const [melodyNotes, jianpuNotes, lyricsNotes] of notes) {
+    const beats = countBeats(melodyNotes);
 
-var melodyVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
-melodyVoice.addTickables(melodyNotes);
+    var melodyVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
+    melodyVoice.addTickables(melodyNotes);
 
-var jianpuVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
-jianpuVoice.addTickables(jianpuNotes);
+    var jianpuVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
+    jianpuVoice.addTickables(jianpuNotes);
 
-var lyricsVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
-lyricsVoice.addTickables(lyricsNotes);
+    var lyricsVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
+    lyricsVoice.addTickables(lyricsNotes);
 
-// Format and justify the notes to 400 pixels.
-var formatter = new VF.Formatter()
-  .joinVoices([melodyVoice, jianpuVoice, lyricsVoice])
-  .format([melodyVoice, jianpuVoice, lyricsVoice], 2300);
+    voices.push([melodyVoice, jianpuVoice, lyricsVoice]);
+  }
+  return voices;
+}
 
-// Render voice
-melodyVoice.draw(context, stave);
-jianpuVoice.draw(context, stave);
-lyricsVoice.draw(context, stave);
+// Create an SVG renderer and attach it to the DIV element named "boo".
+var div = document.getElementById("boo")
+var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+
+// Size our svg:
+renderer.resize(2500, 2500);
+
+// And get a drawing context:
+var context = renderer.getContext();
+
+// For some reason, we need to attach the TextNotes to some stave at init time,
+// so start by creating the first stave.
+const staves = [makeStave(0)];
+
+const quarters = buildQuarters(testMelody, testLyrics)
+const notes = makeNotes(quarters);
+const voices = makeVoices(notes);
+
+// Now create all the needed staves. 
+for (let i = 1; i < voices.length; i++) {
+  staves.push(makeStave(i));
+}
+
+
+for (let i = 0; i < voices.length; i++) {
+  // Format and justify the notes to 400 pixels.
+  var formatter = new VF.Formatter()
+    .joinVoices(voices[i])
+    .format(voices[i], 700);
+
+  // Render the voices on each stave.
+  const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i]
+  melodyVoice.draw(context, staves[i]);
+  jianpuVoice.draw(context, staves[i]);
+  lyricsVoice.draw(context, staves[i]);
+}
