@@ -18,7 +18,7 @@ let songDataApp;
 async function main() {
   // TODO: Consider parallelizing these async calls.
   await loadPdf('assets/book (18).pdf');
-  songs = await parseTable(getRawTable());
+  [songs, songsById] = await getSongTables();
   songDataApp = configSongData();
   renderSong();
 }
@@ -110,34 +110,6 @@ function renderSong() {
   songDataApp.song = song;
   songDataApp.editedLyrics = song.lyrics;
   songDataApp.editedMelody = song.melody;
-}
-
-async function parseTable(table) {
-  songsById = {}; // TODO Remove global usage;
-  const songsMap = await loadSongs();
-  const fullTable = [];
-  let orderInPage = 1;
-  for (let i = 0; i < table.length; i++) {
-    let [title, composer, pageNum] = table[i];
-    pageNum = parseInt(pageNum.substring(1, pageNum.length)); // '頁42' -> 42
-    if (i > 0) {
-      const lastSong = fullTable[i - 1];
-      // Empty titles should refer to the last known title.
-      if (!title) {
-        title = lastSong.title; 
-      }
-      // Determine whether this song is the first of its page.
-      orderInPage = (lastSong.pageNum != pageNum) ? 1 : orderInPage + 1;
-    }
-    const id = `${pageNum}.${orderInPage}`
-    if (songsMap.has(id)) {
-      fullTable.push(Song.fromJson(songsMap.get(id)));
-    } else {
-      fullTable.push(new Song(id, title, composer, pageNum));
-    }
-    songsById[id] = i;
-  }
-  return fullTable;
 }
 
 function loadImage(src) {
