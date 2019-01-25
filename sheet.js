@@ -1,19 +1,5 @@
 VF = Vex.Flow;
 
-const testLyrics = 
-`堯算欣逢照代
-普照恩光無外
-萬方仁壽胁春臺
-西魏祥隔淑爾
-龍樓上瑞乙
-端的是天漢宗派
-又看蘭玉茵蔡枝
-開到幾莖莫英
-`
-
-const testMelody =
-`四上 、一四上 。六尺 工尺 、工 。尺上_ 。上尺 工尺 、工六工 。尺 、四尺 。上一四_ 尺。上一 四 、四上 。一四合 、上尺 。工尺 、上 。六 工尺 、上 尺 。四上一四 、合 。上 上尺 、六 六。工尺上 、一四合 。尺 上 尺 、工 尺。工尺 、上 。合凡工 。工六 工尺 、上尺 工尺。工 、合四 。上尺 、上 。工 工上一四 、工 合 。四上一四 、合`
-
 const gongcheToJianpu = {
   "一": "7.",
   "四": "6.",
@@ -157,25 +143,45 @@ var context = renderer.getContext();
 // so start by creating the first stave.
 const staves = [makeStave(0)];
 
-const quarters = buildQuarters(testMelody, testLyrics)
-const notes = makeNotes(quarters);
-const voices = makeVoices(notes);
+main();
 
-// Now create all the needed staves. 
-for (let i = 1; i < voices.length; i++) {
-  staves.push(makeStave(i));
-}
+async function main() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let songId = urlParams.get('songId');
+  songId = songId ? songId : "6584.1";
+
+  const [songs, songsById] = await getSongTables();
+  const song = songs[songsById[songId]];
+  const testLyrics = song.lyrics;
+  const testMelody = song.melody;
+
+  const vueApp = new Vue({
+    el: '.songdata',
+    data: {
+      song: song
+    }
+  });
+
+  const quarters = buildQuarters(testMelody, testLyrics)
+  const notes = makeNotes(quarters);
+  const voices = makeVoices(notes);
+
+  // Now create all the needed staves. 
+  for (let i = 1; i < voices.length; i++) {
+    staves.push(makeStave(i));
+  }
 
 
-for (let i = 0; i < voices.length; i++) {
-  // Format and justify the notes to 400 pixels.
-  var formatter = new VF.Formatter()
-    .joinVoices(voices[i])
-    .format(voices[i], 700);
+  for (let i = 0; i < voices.length; i++) {
+    // Format and justify the notes to 400 pixels.
+    var formatter = new VF.Formatter()
+      .joinVoices(voices[i])
+      .format(voices[i], 700);
 
-  // Render the voices on each stave.
-  const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i]
-  melodyVoice.draw(context, staves[i]);
-  jianpuVoice.draw(context, staves[i]);
-  lyricsVoice.draw(context, staves[i]);
+    // Render the voices on each stave.
+    const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i]
+    melodyVoice.draw(context, staves[i]);
+    jianpuVoice.draw(context, staves[i]);
+    lyricsVoice.draw(context, staves[i]);
+  }
 }
