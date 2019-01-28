@@ -326,17 +326,13 @@ const staves = [makeStave(0)];
     }
   }
 
-  // For groups with more than 1 note, draw a tie from first to last.
-  const ties = allLyricGroups
+  // For groups with more than 1 note, draw a slur from first to last.
+  const curves = allLyricGroups
     .filter(lg => lg.children.length > 1)
-    .map(lg => new VF.StaveTie({
-      first_note: lg.children[0].melodyNote,
-      last_note: lg.children[lg.children.length - 1].melodyNote,
-      first_indices: [0],
-      last_indices: [0]
-    }));
-  for (const tie of ties) {
-    tie.setContext(context).draw();
-  }
+    .map(lg => new VF.Curve(
+      lg.children[0].melodyNote,
+      lg.children[lg.children.length - 1].melodyNote,
+    ));
+  curves.forEach(curve => curve.setContext(context).draw());
   
 // }
