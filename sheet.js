@@ -3,14 +3,15 @@ VF = Vex.Flow;
 class Note {
   constructor(gongche) {
     this.gongche = gongche;
-    this.duration; // TODO refactor to method
+    this.duration;
     this.lyricGroup;
   }
   getLyric() {
     const index = this.lyricGroup.children.indexOf(this);
     return index == 0 ? this.lyricGroup.lyric : '-';
   }
-  makeVexNotes() {
+  setDuration(duration) {
+    this.duration = duration;
     const jianpu = gongcheToJianpu[this.gongche];
     const key = jianpuToKey[jianpu];
 
@@ -100,7 +101,6 @@ function assignLengths(notes) {
       // Find durations for notes in the current block
       const injectedAndCropped = injectDurations(block);
       for (const note of injectedAndCropped) {
-        note.makeVexNotes();
         output.push(note);
       }
       if (note == DOWNBEAT) {
@@ -126,28 +126,28 @@ function injectDurations(notes) {
   // console.log(notes);
   if (notes.length == 1) {
     const [n1] = notes;
-    n1.duration = '2' // HALF
+    n1.setDuration('2') // HALF
     return [n1];
   }
   if (notes.length == 2) {
     const [n1, n2] = notes;
-    n1.duration = '4'; // QUARTER
-    n2.duration = '4';
+    n1.setDuration('4'); // QUARTER
+    n2.setDuration('4');
     return [n1, n2];
   }
   if (notes.length == 3) {
     const [n1, n2, n3] = notes;
-    n1.duration = '4'; // QUARTER
-    n2.duration = '8'; // EIGHTH
-    n3.duration = '8';
+    n1.setDuration('4'); // QUARTER
+    n2.setDuration('8'); // EIGHTH
+    n3.setDuration('8');
     return [n1, n2, n3];
   }
   if (notes.length >= 4) {
     const [n1, n2, n3, n4] = notes;
-    n1.duration = '8'; // EIGHTH
-    n2.duration = '8';
-    n3.duration = '8';
-    n4.duration = '8';
+    n1.setDuration('8'); // EIGHTH
+    n2.setDuration('8');
+    n3.setDuration('8');
+    n4.setDuration('8');
     return [n1, n2, n3, n4];
     // For now, drop the extra notes.
   }
