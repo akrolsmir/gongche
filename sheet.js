@@ -173,8 +173,7 @@ function makeTextNote(text, line, duration) {
     duration: duration
   })
     .setLine(line)
-    // TODO Is the stave important here? Might be overwritten later.
-    .setStave(staves[0]);
+    .setContext(context);
 }
 
 // Output: [ [melody1, jianpu1, lyrics1], ... ]
@@ -253,10 +252,6 @@ renderer.resize(2500, 2500);
 // And get a drawing context:
 var context = renderer.getContext();
 
-// For some reason, we need to attach the TextNotes to some stave at init time,
-// so start by creating the first stave.
-const staves = [makeStave(0)];
-
 // main();
 
 // async function main() {
@@ -291,11 +286,6 @@ const staves = [makeStave(0)];
   const modelStaves = splitStaves(assignLengths(quarters));
   const voices = makeVoices(modelStaves);
 
-  // Now create all the needed staves. 
-  for (let i = 1; i < voices.length; i++) {
-    staves.push(makeStave(i));
-  }
-
   for (let i = 0; i < voices.length; i++) {
     const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i];
 
@@ -307,10 +297,11 @@ const staves = [makeStave(0)];
       .joinVoices([melodyVoice, jianpuVoice, lyricsVoice])
       .format([melodyVoice, jianpuVoice, lyricsVoice], 700);
 
-    // Render the voices on each stave.
-    melodyVoice.draw(context, staves[i]);
-    jianpuVoice.draw(context, staves[i]);
-    lyricsVoice.draw(context, staves[i]);
+    // Make the stave and draw voices on it.
+    const vexflowStave = makeStave(i);
+    melodyVoice.draw(context, vexflowStave);
+    jianpuVoice.draw(context, vexflowStave);
+    lyricsVoice.draw(context, vexflowStave);
 
     // Draw the beams
     beams.forEach(beam => beam.setContext(context).draw());
