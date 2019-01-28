@@ -27,9 +27,10 @@ const jianpuToKey = {
   "7": "c/5",
 }
 
-// Right now, output up a list of quarter notes
+// Assign a lyric to each gongche symbol
+// Pass through other symbols unchanged
 // Format: [[gongche, lyric], ...]
-function buildQuarters(melody, lyrics) {
+function assignLyrics(melody, lyrics) {
   const unspacedLyrics = lyrics.replace(/\s/g, '');
   let lyricIndex = 0;
   let currentLyric = unspacedLyrics[lyricIndex];
@@ -41,10 +42,87 @@ function buildQuarters(melody, lyrics) {
     } else if (char in gongcheToJianpu) {
       result.push([char, currentLyric]);
       currentLyric = '-';
+    } else {
+      result.push(char);
     }
   }
   return result;
 }
+
+const BAR = '|';
+
+// Output a list of notes parsed by length.
+// Input: ['.', [g1, l1], ',', [...]...]
+// Format: ['|', [gongche, lyric, length (whole = 1, half = 2...)]]
+// Currently only works with . and ,
+function assignLengths(input) {
+  var output = [BAR]; // TODO use real marking object
+  var symbols = ['。', '、'];
+  const DOWNBEAT = '、';
+  var symbolIndex = 1;
+  var expectedSymbol = symbols[symbolIndex];
+  var block = []
+  for (let i = 0; i < input.length; i++) {
+    var current = input[i];
+    if (current == expectedSymbol) {
+      // This marks the end of a block.
+      // Find durations for notes in the current block
+      const notesWithDurations = injectDurations(block);
+      for (const note of notesWithDurations) {
+        output.push(note);
+      }
+      if (current == DOWNBEAT) {
+        output.push(BAR);
+      }
+      block = [];
+      // Next expected should progress through symbols (circular linked list)
+      symbolIndex = (symbolIndex + 1) % symbols.length;
+      expectedSymbol = symbols[symbolIndex];
+    } else {
+      // Add any gongche notes to this current block
+      if (typeof current == "object") {
+        block.push(current);
+      }
+    }
+  }
+  return output;
+}
+
+// Input: [[gongche1, lyric1], ...]
+// Output: [[gongche, lyric, length (whole = 1, half = 2...)], ...]
+function injectDurations(quarters) {
+  // console.log(quarters);
+  if (quarters.length == 1) {
+    const [q1] = quarters;
+    q1.push('2') // HALF
+    return [q1];
+  }
+  if (quarters.length == 2) {
+    const [q1, q2] = quarters;
+    q1.push('4'); // QUARTER
+    q2.push('4');
+    return [q1, q2];
+  }
+  if (quarters.length == 3) {
+    const [q1, q2, q3] = quarters;
+    q1.push('4'); // QUARTER
+    q2.push('8'); // EIGHTH
+    q3.push('8');
+    return [q1, q2, q3];
+  }
+  if (quarters.length >= 4) {
+    const [q1, q2, q3, q4] = quarters;
+    q1.push('8'); // EIGHTH
+    q2.push('8');
+    q3.push('8');
+    q4.push('8');
+    return [q1, q2, q3, q4];
+    // For now, drop the extra notes.
+  }
+  throw `Invalid input of length ${quarters.length}`
+}
+
+
 
 function makeStave(index) {
   const stave = new VF.Stave(10, 40 + 200 * index, 800);
@@ -53,67 +131,77 @@ function makeStave(index) {
   return stave;
 }
 
-function makeNote(key) {
-  return new VF.StaveNote({clef: "treble", keys: [key], duration: "q"});
+function makeNote(key, duration) {
+  return new VF.StaveNote({clef: "treble", keys: [key], duration: duration});
 }
 
-function makeText(text, line) {
+function makeText(text, line, duration) {
   return new VF.TextNote({
     text: text,
-    duration: 'q'
+    duration: duration
   })
-    .setLine(line ? line : 12)
+    .setLine(line)
     // TODO Is the stave important here? Might be overwritten later.
     .setStave(staves[0]);
 }
 
 // Output: [ [melody1, jianpu1, lyrics1], ... ]
-function makeNotes(quarters) {
-  let results = [];
+function prepareNotesForVoices(notes) {
   let melodyNotes = [];
   let jianpuNotes = [];
   let lyricsNotes = [];
-  for (let i = 0; i < quarters.length; i++) {
-    // Create a new stave every 20 notes.
-    if (i % 20 == 0) {
-      melodyNotes = [];
-      jianpuNotes = [];
-      lyricsNotes = [];
-      results.push([melodyNotes, jianpuNotes, lyricsNotes])
-    }
-    const [gongche, lyric] = quarters[i];
-    const jianpu = gongcheToJianpu[gongche];
-    const key = jianpuToKey[jianpu];
-    melodyNotes.push(makeNote(key));
-    jianpuNotes.push(makeText(jianpu));
-    lyricsNotes.push(makeText(lyric, 16));
-    // Add a BarNote after every 4th note (but not at the end of a stave).
-    if (i % 4 == 3 && i % 20 != 19) {
-      melodyNotes.push(new VF.BarNote());
-      jianpuNotes.push(new VF.BarNote());
-      lyricsNotes.push(new VF.BarNote());
+  let results = [[melodyNotes, jianpuNotes, lyricsNotes]];
+  let barCount = 0;
+  for (note of notes) {
+    if (note == BAR) {
+      barCount++;
+      if (barCount == 5) {
+        // Create a new stave every 5 bars
+        barCount = 0;
+        melodyNotes = [];
+        jianpuNotes = [];
+        lyricsNotes = [];
+        results.push([melodyNotes, jianpuNotes, lyricsNotes]);
+      } else {
+        // Mark a new measure
+        melodyNotes.push(new VF.BarNote());
+        jianpuNotes.push(new VF.BarNote());
+        lyricsNotes.push(new VF.BarNote());
+      }
+    } else {
+      const [gongche, lyric, duration] = note;
+      const jianpu = gongcheToJianpu[gongche];
+      const key = jianpuToKey[jianpu];
+      melodyNotes.push(makeNote(key, duration));
+      jianpuNotes.push(makeText(jianpu, 12, duration));
+      lyricsNotes.push(makeText(lyric, 16, duration));
     }
   }
   return results;
 }
 
-// Return the number of non-BarNotes.
-function countBeats(notes) {
+// Return the number of quarter notes
+function countQuarters(notes) {
+  const durationToQuarters = {
+    'b': 0, // Bar note has 0 length
+    '16': 0.25,
+    '8': 0.5,
+    '4': 1,
+    '2': 2,
+    '1': 4
+  }
   let count = 0;
   for (note of notes) {
-    if (note.attrs.type != "BarNote") {
-      count++;
-    }
+    count += durationToQuarters[note.duration];
   }
-  return count;
+  return Math.round(count);
 }
 
 // Output: [ [melodyVoice1, jianpuVoice1, lyricsVoice1], ...]
 function makeVoices(notes) {
   const voices = [];
-  const i = 0;
   for (const [melodyNotes, jianpuNotes, lyricsNotes] of notes) {
-    const beats = countBeats(melodyNotes);
+    const beats = countQuarters(melodyNotes);
 
     var melodyVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
     melodyVoice.addTickables(melodyNotes);
@@ -143,27 +231,38 @@ var context = renderer.getContext();
 // so start by creating the first stave.
 const staves = [makeStave(0)];
 
-main();
+// main();
 
-async function main() {
-  const urlParams = new URLSearchParams(window.location.search);
-  let songId = urlParams.get('songId');
-  songId = songId ? songId : "6584.1";
+// async function main() {
+//   const urlParams = new URLSearchParams(window.location.search);
+//   let songId = urlParams.get('songId');
+//   songId = songId ? songId : "6584.1";
 
-  const [songs, songsById] = await getSongTables();
-  const song = songs[songsById[songId]];
-  const testLyrics = song.lyrics;
-  const testMelody = song.melody;
+//   const [songs, songsById] = await getSongTables();
+//   const song = songs[songsById[songId]];
+  // const testLyrics = song.lyrics;
+  // const testMelody = song.melody;
+  const testLyrics = 
+`堯算欣逢照代
+普照恩光無外
+萬方仁壽胁春臺
+西魏祥隔淑爾
+龍樓上瑞乙
+端的是天漢宗派
+又看蘭玉茵蔡枝
+開到幾莖莫英
+`
+  const testMelody = `四上 、一四上 。六尺 工尺 、工 。尺上_ 。上尺 工尺 、工六工 。尺 、四尺 。上一四_ 尺。上一 四 、四上 。一四合 、上尺 。工尺 、上 。六 工尺 、上 尺 。四上一四 、合 。上 上尺 、六 六。工尺上 、一四合 。尺 上 尺 、工 尺。工尺 、上 。合凡工 。工六 工尺 、上尺 工尺。工 、合四 。上尺 、上 。工 工上一四 、工 合 。四上一四 、合`;
 
-  const vueApp = new Vue({
-    el: '.songdata',
-    data: {
-      song: song
-    }
-  });
+  // const vueApp = new Vue({
+  //   el: '.songdata',
+  //   data: {
+  //     song: song
+  //   }
+  // });
 
-  const quarters = buildQuarters(testMelody, testLyrics)
-  const notes = makeNotes(quarters);
+  const quarters = assignLyrics(testMelody, testLyrics)
+  const notes = prepareNotesForVoices(assignLengths(quarters));
   const voices = makeVoices(notes);
 
   // Now create all the needed staves. 
@@ -184,4 +283,4 @@ async function main() {
     jianpuVoice.draw(context, staves[i]);
     lyricsVoice.draw(context, staves[i]);
   }
-}
+// }
