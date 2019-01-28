@@ -308,4 +308,28 @@ const staves = [makeStave(0)];
     jianpuVoice.draw(context, staves[i]);
     lyricsVoice.draw(context, staves[i]);
   }
+
+  // Find all lyric groups in order
+  const allLyricGroups = [];
+  for (const modelStave of modelStaves) {
+    for (const note of modelStave) {
+      if (note.lyricGroup && !allLyricGroups.includes(note.lyricGroup)) {
+        allLyricGroups.push(note.lyricGroup);
+      }
+    }
+  }
+
+  // For groups with more than 1 note, draw a tie from first to last.
+  const ties = allLyricGroups
+    .filter(lg => lg.children.length > 1)
+    .map(lg => new VF.StaveTie({
+      first_note: lg.children[0].melodyNote,
+      last_note: lg.children[lg.children.length - 1].melodyNote,
+      first_indices: [0],
+      last_indices: [0]
+    }));
+  for (const tie of ties) {
+    tie.setContext(context).draw();
+  }
+  
 // }
