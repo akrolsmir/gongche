@@ -297,16 +297,23 @@ const staves = [makeStave(0)];
   }
 
   for (let i = 0; i < voices.length; i++) {
-    // Format and justify the notes to 400 pixels.
+    const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i];
+
+    // Automatically beam the notes.
+    var beams = VF.Beam.generateBeams(melodyVoice.getTickables());
+
+    // Format and justify the notes.
     var formatter = new VF.Formatter()
-      .joinVoices(voices[i])
-      .format(voices[i], 700);
+      .joinVoices([melodyVoice, jianpuVoice, lyricsVoice])
+      .format([melodyVoice, jianpuVoice, lyricsVoice], 700);
 
     // Render the voices on each stave.
-    const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i]
     melodyVoice.draw(context, staves[i]);
     jianpuVoice.draw(context, staves[i]);
     lyricsVoice.draw(context, staves[i]);
+
+    // Draw the beams
+    beams.forEach(beam => beam.setContext(context).draw());
   }
 
   // Find all lyric groups in order
