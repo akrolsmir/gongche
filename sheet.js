@@ -67,6 +67,9 @@ const gongcheToJianpu = {
   "六": "5",
   "五": "6",
   "乙": "7",
+  "仩": ".1",
+  "伬": ".2",
+  "仜": ".3",
 }
 
 // TODO replace with function for key signature
@@ -81,6 +84,9 @@ const jianpuToKey = {
   "5": "a/4",
   "6": "b/4",
   "7": "c/5",
+  ".1": "d/5",
+  ".2": "e/5",
+  ".3": "f/5",
 }
 
 // Assign a lyric to each gongche symbol

@@ -39,7 +39,7 @@ function rhythmize4(input) {
       output.push(BAR);
       block.push(new RestNote()); 
     }
-    else if (symbol == "[") {
+    else if (symbol == "▯") {
       // Include the marked (next) note in the block
       i++;
       const markedNote = input[i];

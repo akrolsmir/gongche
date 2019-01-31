@@ -39,34 +39,18 @@
       <textarea readonly id="lyricpreview" rows="1" cols="1" v-model="lyricPreview"></textarea>
       Melody
       <table>
-        <tr>
-          <td>s</td>
-          <td>c</td>
-          <td>g</td>
-          <td>f</td>
-          <td>l</td>
-          <td>w</td>
-          <td>y</td>
-          <td>h</td>
-          <td>4</td>
-          <td>i</td>
-          <td>.</td>
-          <td>,</td>
-        </tr>
-        <tr>
-          <td>上</td>
-          <td>尺</td>
-          <td>工</td>
-          <td>凡</td>
-          <td>六</td>
-          <td>五</td>
-          <td>乙</td>
-          <td>合</td>
-          <td>四</td>
-          <td>一</td>
-          <td>。</td>
-          <td>、</td>
-        </tr>
+        <tbody>
+          <tr>
+            <template v-for="(value, key) in keyboardToGongche">
+            <td>{{key}}</td>
+            </template>
+          </tr>
+          <tr>
+            <template v-for="(value, key) in keyboardToGongche">
+            <td>{{value}}</td>
+            </template>
+          </tr>
+        </tbody>
       </table>
       <textarea name="melody" id="melody" rows="10" cols="20"
           placeholder="Type melody" v-bind:style="melodyStyle" v-model="melodyGongche"></textarea>

@@ -31,6 +31,7 @@ function configSongData() {
       song: '',
       editedLyrics: 'Placeholder lyrics',
       editedMelody: 'Placeholder melody',
+      keyboardToGongche: keyboardToGongche,
     },
     computed: {
       // If the song's lyrics or melody were edited, color the field yellow.
