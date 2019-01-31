@@ -108,78 +108,6 @@ function assignLyrics(melody, lyrics) {
 
 const BAR = '|';
 
-// Output a list of notes parsed by length.
-// Input: ['.', [g1, l1], ',', [...]...]
-// Format: ['|', [gongche, lyric, length (whole = 1, half = 2...)]]
-// Currently only works with . and ,
-function assignLengths(notes) {
-  var output = []; // TODO use real marking object
-  var symbols = ['。', '、'];
-  const DOWNBEAT = '、';
-  var symbolIndex = 1;
-  var expectedSymbol = symbols[symbolIndex];
-  var block = []
-  for (const note of notes) {
-    if (note == expectedSymbol) {
-      // This marks the end of a block.
-      // Find durations for notes in the current block
-      const injectedAndCropped = injectDurations(block);
-      for (const note of injectedAndCropped) {
-        output.push(note);
-      }
-      if (note == DOWNBEAT) {
-        output.push(BAR);
-      }
-      block = [];
-      // Next expected should progress through symbols (circular linked list)
-      symbolIndex = (symbolIndex + 1) % symbols.length;
-      expectedSymbol = symbols[symbolIndex];
-    } else {
-      // Add any gongche notes to this current block
-      if (typeof note == "object") {
-        block.push(note);
-      }
-    }
-  }
-  return output;
-}
-
-// Input: [[gongche1, lyric1], ...]
-// Output: [[gongche, lyric, length (whole = 1, half = 2...)], ...]
-function injectDurations(notes) {
-  // console.log(notes);
-  if (notes.length == 1) {
-    const [n1] = notes;
-    n1.setDuration('2') // HALF
-    return [n1];
-  }
-  if (notes.length == 2) {
-    const [n1, n2] = notes;
-    n1.setDuration('4'); // QUARTER
-    n2.setDuration('4');
-    return [n1, n2];
-  }
-  if (notes.length == 3) {
-    const [n1, n2, n3] = notes;
-    n1.setDuration('4'); // QUARTER
-    n2.setDuration('8'); // EIGHTH
-    n3.setDuration('8');
-    return [n1, n2, n3];
-  }
-  if (notes.length >= 4) {
-    const [n1, n2, n3, n4] = notes;
-    n1.setDuration('8'); // EIGHTH
-    n2.setDuration('8');
-    n3.setDuration('8');
-    n4.setDuration('8');
-    return [n1, n2, n3, n4];
-    // For now, drop the extra notes.
-  }
-  throw `Invalid input of length ${notes.length}`
-}
-
-
-
 function makeStave(index) {
   const stave = new VF.Stave(10, 40 + 200 * index, 800);
   stave.addClef("treble").addTimeSignature("4/4").addKeySignature("D");
@@ -307,8 +235,6 @@ const testMelody = `四上 、一四上 。六尺 工尺 、工 。尺上_ [上�
   // });
 
   const quarters = assignLyrics(testMelody, testLyrics)
-  // const temp0 = assignLengths(quarters);
-  // const modelStaves0 = splitStaves(temp0);
   const temp = rhythmize4(quarters);
   const modelStaves = splitStaves(temp);
   const voices = makeVoices(modelStaves);
