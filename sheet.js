@@ -131,7 +131,7 @@ function makeTextNote(text, line, duration) {
 // Output: [ [melody1, jianpu1, lyrics1], ... ]
 function splitStaves(notes) {
   let stave = [];
-  let staves = [stave];
+  let staves = [];
   let barCount = 0;
   for (note of notes) {
     if (note == BAR) {
@@ -139,8 +139,8 @@ function splitStaves(notes) {
       if (barCount == 4) {
         // Create a new stave every 4 bars
         barCount = 0;
-        stave = [];
         staves.push(stave);
+        stave = [];
       } else {
         // Mark a new measure
         stave.push(new VF.BarNote());
@@ -148,6 +148,10 @@ function splitStaves(notes) {
     } else {
       stave.push(note);
     }
+  }
+  // Include the final stave if it's not empty.
+  if (stave.length > 0) {
+    staves.push(stave);
   }
   return staves;
 }
@@ -215,7 +219,7 @@ async function main() {
   const song = songs[songsById[songId]];
   const testLyrics = song.lyrics;
   const testMelody = song.melody;
-  
+
   const vueApp = new Vue({
     el: '.songdata',
     data: {
