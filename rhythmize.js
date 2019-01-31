@@ -16,82 +16,78 @@
 //   "_": "Sustain to measure, then rests"
 // }
 
-// Input: String "四上 、一四上 。六尺 工尺 、工 。尺上_ 。上尺 工尺 、工六工 。"
-// Output: Complete rhythm information
+// Input: ["、", Note, Note, "。", Note, "_"...]
+// Output: ["|", Note, Note, "|"...], and also assign durations
 function rhythmize4(input) {
-  // input = input.replace(/\s/g, ''); // Remove whitespace
   let output = [];
   let block = [];
-  let lastBeat = 1 % 4;
+  let lastBeat = 1;
   for (let i = 0; i < input.length; i++) {
     const symbol = input[i];
     if (symbol == "、") {
-      blockDuration = between(lastBeat, 1);
-      assignLengths4(block, blockDuration, output);
-      lastBeat = 1;
-      block = [];
+      [block, lastBeat] = processBlock(block, output, lastBeat, 1);
+      // Also add a new bar marker.
       output.push(BAR);
     }
     else if (symbol == "。") {
-      blockDuration = between(lastBeat, 3);
-      assignLengths4(block, blockDuration, output);
-      lastBeat = 3;
-      block = [];
+      [block, lastBeat] = processBlock(block, output, lastBeat, 3);
     }
     else if (symbol == "_") {
-      blockDuration = between(lastBeat, 1);
-      assignLengths4(block, blockDuration, output);
-      // TODO extend marked (prev) note into end of measure
+      [block, lastBeat] = processBlock(block, output, lastBeat, 1);
+      // TODO: Instead, extend marked (prev) note into end of measure
+      // Also add a new bar marker and a rest.
       output.push(BAR);
-      lastBeat = 1;
-      block = [new RestNote()]; 
+      block.push(new RestNote()); 
     }
     else if (symbol == "[") {
-      blockDuration = between(lastBeat, 3);
-      // Add the marked (next) note to the block
+      // Include the marked (next) note in the block
       i++;
       const markedNote = input[i];
       block.push(markedNote);
-      assignLengths4(block, blockDuration, output);
-      // Also sure the marked note sustains to 3
+      // Then process as usual.
+      [block, lastBeat] = processBlock(block, output, lastBeat, 3);
+      // Next, add a quarter copy of the marked note, to sustain it through 3.
       const copy = markedNote.getCopy();
-      copy.setDuration('4'); // Set to 1 quarter 
-      output.push([copy, 1]);
-      lastBeat = 4;
-      block = [];
+      copy.setDuration('4');
+      output.push(copy);
+      // The next beat is thus also adjusted by 1 quarter.
+      lastBeat++;
     }
     else {
       block.push(symbol);
     }
   }
-  console.log('rhythmized');
-  console.log(output);
-  return output.map(entry => Array.isArray(entry) ? entry[0] : entry);
+  return output;
 }
 
-// Output is just for debugging
-function assignLengths4(block, quarters, output) {
+function processBlock(block, output, lastBeat, thisBeat) {
+  assignDurations(block, between(lastBeat, thisBeat));
+  output.push(...block);
+  return [[], thisBeat];
+}
+
+function assignDurations(block, quarters) {
   if (block.length == 0 || block.length > 8) {
     throw `Invalid block length ${block.length}`
   }
-  // TODO does this work for 3 quarters?
-  const fractions = lengthSplits[block.length];
+  const fractions = divideBlock[block.length];
   for (let i = 0; i < block.length; i++) {
-    // TODO better OOP version
-    output.push([block[i], fractions[i] * quarters]);
-
     block[i].setDuration(convertToDuration(fractions[i] * quarters));
   }
 }
 
+/**
+ * Convert from a length (in # of quarters) to a duration 
+ * (e.g. '2' = half note, '8' = eight note)
+ */ 
 function convertToDuration(quarters) {
-  // E.g. 2 quarters = Half ('2'), half a quarter = Eighth ('8')
   return '' + (4 / quarters);
 }
 
-// How to divide up a section, for various lengths of time
-// TODO does this work for 3 quarters?
-const lengthSplits = [
+// How to divide up a section, based on the size of a block.
+// In general, divide evenly into powers of 2, keeping the first notes longer.
+// TODO: Will this work for 3 quarters?
+const divideBlock = [
   [],
   [1],
   [1/2, 1/2],
@@ -103,7 +99,7 @@ const lengthSplits = [
   [1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8]
 ]
 
-// Return the duration between the marked quarter beats.
+// Return the length between the marked quarter beats.
 // Assumes that no length exceeds 3 beats.
 function between(lastBeat, thisBeat, quarters = 4) {
   const length = thisBeat - lastBeat;
