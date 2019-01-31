@@ -19,6 +19,30 @@ class Note {
     this.jianpuNote = makeTextNote(jianpu, 12, this.duration);
     this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration);
   }
+  getCopy() {
+    const copy = new Note(this.gongche);
+    if (this.lyricGroup) {
+      this.lyricGroup.addNote(copy);
+    }
+    if (this.duration) {
+      copy.setDuration(this.duration);
+    }
+    return copy;
+  }
+}
+
+class RestNote {
+  constructor() {
+  }
+  getLyric() {
+    return "R";
+  }
+  setDuration(duration) {
+    this.duration = duration;
+    this.melodyNote = makeStaveNote("b/4", this.duration + 'r');
+    this.jianpuNote = makeTextNote('0', 12, this.duration);
+    this.lyricsNote = makeTextNote(' ', 16, this.duration);
+  }
 }
 
 class LyricGroup {
@@ -273,7 +297,7 @@ var context = renderer.getContext();
 又看蘭玉茵蔡枝
 開到幾莖莫英
 `
-  const testMelody = `四上 、一四上 。六尺 工尺 、工 。尺上_ 。上尺 工尺 、工六工 。尺 、四尺 。上一四_ 尺。上一 四 、四上 。一四合 、上尺 。工尺 、上 。六 工尺 、上 尺 。四上一四 、合 。上 上尺 、六 六。工尺上 、一四合 。尺 上 尺 、工 尺。工尺 、上 。合凡工 。工六 工尺 、上尺 工尺。工 、合四 。上尺 、上 。工 工上一四 、工 合 。四上一四 、合`;
+const testMelody = `四上 、一四上 。六尺 工尺 、工 。尺上_ [上尺 工尺 、工六工 。尺 、四尺 。上一四_ 尺。上一 四 、四上 。一四合 、上尺 。工尺 、上 。六 工尺 、上 尺 。四上一四 、合 。上 上尺 、六 六。工尺上 、一四合 。尺 上 尺 、工 尺。工尺 、上 。合凡工_ [工六 工尺 、上尺 工尺。工 、合四 。上尺 、上 。工 工上一四 、工 合 。四上一四 、合`;
 
   // const vueApp = new Vue({
   //   el: '.songdata',
@@ -283,7 +307,10 @@ var context = renderer.getContext();
   // });
 
   const quarters = assignLyrics(testMelody, testLyrics)
-  const modelStaves = splitStaves(assignLengths(quarters));
+  // const temp0 = assignLengths(quarters);
+  // const modelStaves0 = splitStaves(temp0);
+  const temp = rhythmize4(quarters);
+  const modelStaves = splitStaves(temp);
   const voices = makeVoices(modelStaves);
 
   for (let i = 0; i < voices.length; i++) {
