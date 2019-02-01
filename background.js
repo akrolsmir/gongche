@@ -193,6 +193,52 @@ function jumpToPage() {
   }
 }
 
+/** Use Ctrl + D shortcut to jump to corresponding melody. */
+document.onkeydown = function(event) {
+  if (event.ctrlKey || event.metaKey) {
+    switch (String.fromCharCode(event.which).toLowerCase()) {
+      case 'd':
+        event.preventDefault();
+        selectMelodyForLyrics();
+        break;
+    }
+  }
+}
+
+function selectMelodyForLyrics() {
+  const lyricsText = document.getElementById('lyrics');
+  const melodyText = document.getElementById('melody');
+
+  if (lyricsText != document.activeElement) {
+    return;
+  }
+
+  let lyricsStart = unspacedIndex(lyricsText.value, lyricsText.selectionStart);
+  let lyricsEnd = unspacedIndex(lyricsText.value, lyricsText.selectionEnd);
+
+  let melodyStart = 0;
+  let melodyEnd = 0;
+  let spaceCount = 0;
+  for (let i = 0; i < melodyText.value.length; i++) {
+    if (melodyText.value[i] == ' ') {
+      spaceCount++;
+      if (spaceCount == lyricsStart) {
+        melodyStart = i + 1;
+      }
+      if (spaceCount == lyricsEnd) {
+        melodyEnd = i;
+      }
+    }
+  }
+  melodyText.focus();
+  melodyText.setSelectionRange(melodyStart, melodyEnd);
+}
+
+function unspacedIndex(string, index) {
+  let prefix = string.substring(0, index);
+  return prefix.replace(/\s/g, '').length;
+}
+
 /** Handle drag + dropped image or PDF.*/
 var dropzone = document.getElementById('dropzone');
 
