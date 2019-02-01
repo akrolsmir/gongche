@@ -67,7 +67,7 @@ function processBlock(block, output, lastBeat, thisBeat) {
 }
 
 function assignDurations(block, quarters) {
-  if (block.length == 0 || block.length > 8) {
+  if (block.length > 8) {
     throw `Invalid block length ${block.length}`
   }
   const fractions = divideBlock[block.length];
