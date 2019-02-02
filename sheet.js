@@ -56,6 +56,14 @@ class LyricGroup {
   }
 }
 
+const TimeSignature = {
+  FOUR_FOUR: "four_four",
+  EIGHT_FOUR: "eight_four",
+  FREE: "free",
+}
+
+const BAR = '|';
+
 const gongcheToJianpu = {
   "一": "7.",
   "四": "6.",
@@ -112,11 +120,14 @@ function assignLyrics(melody, lyrics) {
   return result;
 }
 
-const BAR = '|';
-
-function makeStave(index) {
+function makeStave(index, timeSignature) {
   const stave = new VF.Stave(10, 40 + 200 * index, 800);
-  stave.addClef("treble").addTimeSignature("4/4").addKeySignature("D");
+  stave.addClef("treble").addKeySignature("D");
+  if (timeSignature == TimeSignature.FOUR_FOUR) {
+    stave.addTimeSignature("4/4");
+  } else if (timeSignature == TimeSignature.EIGHT_FOUR) {
+    stave.addTimeSignature("8/4");
+  }
   stave.setContext(vexflowContext).draw();
   return stave;
 }
@@ -134,16 +145,21 @@ function makeTextNote(text, line, duration) {
     .setContext(vexflowContext);
 }
 
-// Output: [ [melody1, jianpu1, lyrics1], ... ]
-function splitStaves(notes) {
+// Output: [ [Note, Note, BarNote, Note, ...], ... ]
+function splitStaves(notes, timeSignature) {
+  const BARS_PER_STAVE = {};
+  BARS_PER_STAVE[TimeSignature.FOUR_FOUR] = 4;
+  BARS_PER_STAVE[TimeSignature.EIGHT_FOUR] = 2;
+  BARS_PER_STAVE[TimeSignature.FREE] = 2;
+
   let stave = [];
   let staves = [];
   let barCount = 0;
   for (note of notes) {
     if (note == BAR) {
       barCount++;
-      if (barCount == 4) {
-        // Create a new stave every 4 bars
+      if (barCount == BARS_PER_STAVE[timeSignature]) {
+        // We reached our max number of bars in this stave, so tart a new one.
         barCount = 0;
         staves.push(stave);
         stave = [];
@@ -204,10 +220,16 @@ function makeVoices(staves) {
   return voices;
 }
 
+function getTimeSignature(melody) {
+  // TODO: Identify 8/4 and free rhythm.
+  return TimeSignature.FOUR_FOUR;
+}
+
 function renderSheet(lyrics, melody) {
+  const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
   const temp = rhythmize4(quarters);
-  const modelStaves = splitStaves(temp);
+  const modelStaves = splitStaves(temp, timeSignature);
   const voices = makeVoices(modelStaves);
 
   for (let i = 0; i < voices.length; i++) {
@@ -222,7 +244,7 @@ function renderSheet(lyrics, melody) {
       .format([melodyVoice, jianpuVoice, lyricsVoice], 700);
 
     // Make the stave and draw voices on it.
-    const vexflowStave = makeStave(i);
+    const vexflowStave = makeStave(i, timeSignature);
     melodyVoice.draw(vexflowContext, vexflowStave);
     jianpuVoice.draw(vexflowContext, vexflowStave);
     lyricsVoice.draw(vexflowContext, vexflowStave);
