@@ -117,7 +117,7 @@ const BAR = '|';
 function makeStave(index) {
   const stave = new VF.Stave(10, 40 + 200 * index, 800);
   stave.addClef("treble").addTimeSignature("4/4").addKeySignature("D");
-  stave.setContext(context).draw();
+  stave.setContext(vexflowContext).draw();
   return stave;
 }
 
@@ -131,7 +131,7 @@ function makeTextNote(text, line, duration) {
     duration: duration
   })
     .setLine(line)
-    .setContext(context);
+    .setContext(vexflowContext);
 }
 
 // Output: [ [melody1, jianpu1, lyrics1], ... ]
@@ -190,13 +190,13 @@ function makeVoices(staves) {
   for (const stave of staves) {
     const beats = countQuarters(getTickables(stave, 'melodyNote'));
 
-    var melodyVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
+    const melodyVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
     melodyVoice.addTickables(getTickables(stave, 'melodyNote'));
 
-    var jianpuVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
+    const jianpuVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
     jianpuVoice.addTickables(getTickables(stave, 'jianpuNote'));
 
-    var lyricsVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
+    const lyricsVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
     lyricsVoice.addTickables(getTickables(stave, 'lyricsNote'));
 
     voices.push([melodyVoice, jianpuVoice, lyricsVoice]);
@@ -204,36 +204,8 @@ function makeVoices(staves) {
   return voices;
 }
 
-// Create an SVG renderer and attach it to the DIV element named "boo".
-var div = document.getElementById("boo")
-var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
-
-// Size our svg:
-renderer.resize(2500, 2500);
-
-// And get a drawing context:
-var context = renderer.getContext();
-
-main();
-
-async function main() {
-  const urlParams = new URLSearchParams(window.location.search);
-  let songId = urlParams.get('songId');
-  songId = songId ? songId : "6584.1";
-
-  const [songs, songsById] = await getSongTables();
-  const song = songs[songsById[songId]];
-  const testLyrics = song.lyrics;
-  const testMelody = song.melody;
-
-  const vueApp = new Vue({
-    el: '.songdata',
-    data: {
-      song: song
-    }
-  });
-
-  const quarters = assignLyrics(testMelody, testLyrics)
+function renderSheet(lyrics, melody) {
+  const quarters = assignLyrics(melody, lyrics)
   const temp = rhythmize4(quarters);
   const modelStaves = splitStaves(temp);
   const voices = makeVoices(modelStaves);
@@ -242,21 +214,21 @@ async function main() {
     const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i];
 
     // Automatically beam the notes.
-    var beams = VF.Beam.generateBeams(melodyVoice.getTickables());
+    const beams = VF.Beam.generateBeams(melodyVoice.getTickables());
 
     // Format and justify the notes.
-    var formatter = new VF.Formatter()
+    const formatter = new VF.Formatter()
       .joinVoices([melodyVoice, jianpuVoice, lyricsVoice])
       .format([melodyVoice, jianpuVoice, lyricsVoice], 700);
 
     // Make the stave and draw voices on it.
     const vexflowStave = makeStave(i);
-    melodyVoice.draw(context, vexflowStave);
-    jianpuVoice.draw(context, vexflowStave);
-    lyricsVoice.draw(context, vexflowStave);
+    melodyVoice.draw(vexflowContext, vexflowStave);
+    jianpuVoice.draw(vexflowContext, vexflowStave);
+    lyricsVoice.draw(vexflowContext, vexflowStave);
 
     // Draw the beams
-    beams.forEach(beam => beam.setContext(context).draw());
+    beams.forEach(beam => beam.setContext(vexflowContext).draw());
   }
 
   // Find all lyric groups in order
@@ -276,6 +248,34 @@ async function main() {
       lg.children[0].melodyNote,
       lg.children[lg.children.length - 1].melodyNote,
     ));
-  curves.forEach(curve => curve.setContext(context).draw());
-  
+  curves.forEach(curve => curve.setContext(vexflowContext).draw());
+}
+
+// We do this globally because TextNote needs a global context.
+// TODO: See if we can remove that global context.
+// Create an SVG renderer and attach it to the DIV element named "vexflow".
+const vexflowDiv = document.getElementById("vexflow")
+const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
+// Size our svg:
+vexflowRenderer.resize(2500, 2500);
+// And get a drawing context:
+const vexflowContext = vexflowRenderer.getContext();
+
+main();
+
+async function main() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let songId = urlParams.get('songId');
+  songId = songId ? songId : "6584.1";
+
+  const [songs, songsById] = await getSongTables();
+  const song = songs[songsById[songId]];
+  renderSheet(song.lyrics, song.melody);
+
+  const vueApp = new Vue({
+    el: '.songdata',
+    data: {
+      song: song
+    }
+  });
 }
