@@ -16,6 +16,30 @@
 //   "_": "Sustain to measure, then rests"
 // }
 
+function rhythmize(input, timeSignature) {
+  switch (timeSignature) {
+    case TimeSignature.FOUR_FOUR:
+      return rhythmize4(input);
+    case TimeSignature.EIGHT_FOUR:
+      return rhythmize8(input);
+    case TimeSignature.FREE:
+      return rhythmizeFree(input);
+  }
+}
+
+function rhythmizeFree(input) {
+  let output = [];
+  for (const symbol of input) {
+    if (symbol == "_") {
+      output.push(BAR);
+    } else {
+      symbol.setDuration('4'); // All notes in free rhythm are quarter notes.
+      output.push(symbol);
+    }
+  }
+  return output;
+}
+
 // Input: ["、", Note, Note, "。", Note, "_"...]
 // Output: ["|", Note, Note, "|"...], and also assign durations
 function rhythmize4(input) {
@@ -58,6 +82,10 @@ function rhythmize4(input) {
     }
   }
   return output;
+}
+
+function rhythmize8(input) {
+  throw "8/4 Rhythm is not yet supported."
 }
 
 function processBlock(block, output, lastBeat, thisBeat) {

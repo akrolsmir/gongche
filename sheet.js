@@ -221,15 +221,18 @@ function makeVoices(staves) {
 }
 
 function getTimeSignature(melody) {
-  // TODO: Identify 8/4 and free rhythm.
-  return TimeSignature.FOUR_FOUR;
+  // TODO: Identify 8/4 time
+  if (melody.includes("、")) {
+    return TimeSignature.FOUR_FOUR;
+  }
+  return TimeSignature.FREE;
 }
 
 function renderSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
-  const temp = rhythmize4(quarters);
-  const modelStaves = splitStaves(temp, timeSignature);
+  const rhythmized = rhythmize(quarters, timeSignature);
+  const modelStaves = splitStaves(rhythmized, timeSignature);
   const voices = makeVoices(modelStaves);
 
   for (let i = 0; i < voices.length; i++) {
