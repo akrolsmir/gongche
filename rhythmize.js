@@ -81,6 +81,10 @@ function rhythmize4(input) {
       block.push(symbol);
     }
   }
+  // Add any remaining notes to one last bar.
+  if (block.length > 0) {
+    [block, lastBeat] = processBlock(block, output, lastBeat, 1);
+  }
   return output;
 }
 
