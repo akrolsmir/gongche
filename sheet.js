@@ -8,16 +8,36 @@ class Note {
   }
   getLyric() {
     const index = this.lyricGroup.children.indexOf(this);
-    return index == 0 ? this.lyricGroup.lyric : '-';
+    return index == 0 ? this.lyricGroup.lyric : ' ';
   }
   setDuration(duration) {
     this.duration = duration;
-    const jianpu = gongcheToJianpu[this.gongche];
+    let jianpu = gongcheToJianpu[this.gongche];
     const key = jianpuToKey[jianpu];
 
     this.melodyNote = makeStaveNote(key, this.duration);
-    this.jianpuNote = makeTextNote(jianpu, 12, this.duration);
     this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration);
+
+    this.jianpuOctave = makeTextNote(' ', 12, this.duration);
+    if (jianpu.startsWith('.')) {
+      this.jianpuOctave = makeTextNote('•', 10.5, this.duration);
+    }
+    if (jianpu.endsWith('.')) {
+      this.jianpuOctave = makeTextNote('•', 13.5, this.duration);
+    }
+
+    this.jianpuLength = makeTextNote(' ', 12, this.duration);
+    jianpu = jianpu.replace('.', '');
+    if (this.duration == '1') {
+      jianpu = jianpu + ' - - -';
+    } else if (this.duration == '2') {
+      jianpu = jianpu + ' -';
+    } else if (this.duration == '8') {
+      this.jianpuLength = makeTextNote('_', 12, this.duration);
+    } else if (this.duration == '16') {
+      this.jianpuLength = makeTextNote('‗', 12, this.duration);
+    }
+    this.jianpuNote = makeTextNote(jianpu, 12, this.duration);
   }
   getCopy() {
     const copy = new Note(this.gongche);
@@ -42,6 +62,8 @@ class RestNote {
     this.melodyNote = makeStaveNote("b/4", this.duration + 'r');
     this.jianpuNote = makeTextNote('0', 12, this.duration);
     this.lyricsNote = makeTextNote(' ', 16, this.duration);
+    this.jianpuLength = makeTextNote(' ', 12, this.duration);
+    this.jianpuOctave = makeTextNote(' ', 12, this.duration);
   }
 }
 
@@ -206,16 +228,13 @@ function makeVoices(staves) {
   for (const stave of staves) {
     const beats = countQuarters(getTickables(stave, 'melodyNote'));
 
-    const melodyVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
-    melodyVoice.addTickables(getTickables(stave, 'melodyNote'));
+    const voiceGroup =
+      ["melodyNote", "jianpuNote", "jianpuOctave", "jianpuLength", "lyricsNote"]
+        .map(voiceName => 
+          new VF.Voice({ num_beats: beats, beat_value: 4 })
+            .addTickables(getTickables(stave, voiceName)));
 
-    const jianpuVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
-    jianpuVoice.addTickables(getTickables(stave, 'jianpuNote'));
-
-    const lyricsVoice = new VF.Voice({ num_beats: beats, beat_value: 4 });
-    lyricsVoice.addTickables(getTickables(stave, 'lyricsNote'));
-
-    voices.push([melodyVoice, jianpuVoice, lyricsVoice]);
+    voices.push(voiceGroup);
   }
   return voices;
 }
@@ -238,21 +257,22 @@ function renderSheet(lyrics, melody) {
   const voices = makeVoices(modelStaves);
 
   for (let i = 0; i < voices.length; i++) {
-    const [melodyVoice, jianpuVoice, lyricsVoice] = voices[i];
+    const voiceGroup = voices[i];
+    const melodyVoice = voiceGroup[0];
 
     // Automatically beam the notes.
     const beams = VF.Beam.generateBeams(melodyVoice.getTickables());
 
     // Format and justify the notes.
     const formatter = new VF.Formatter()
-      .joinVoices([melodyVoice, jianpuVoice, lyricsVoice])
-      .format([melodyVoice, jianpuVoice, lyricsVoice], 700);
+      .joinVoices(voiceGroup)
+      .format(voiceGroup, 700);
 
     // Make the stave and draw voices on it.
     const vexflowStave = makeStave(i, timeSignature);
-    melodyVoice.draw(vexflowContext, vexflowStave);
-    jianpuVoice.draw(vexflowContext, vexflowStave);
-    lyricsVoice.draw(vexflowContext, vexflowStave);
+    for (voice of voiceGroup) {
+      voice.draw(vexflowContext, vexflowStave);
+    }
 
     // Draw the beams
     beams.forEach(beam => beam.setContext(vexflowContext).draw());
