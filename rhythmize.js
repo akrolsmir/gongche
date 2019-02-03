@@ -51,11 +51,24 @@ function getBeatForSymbol(symbol, timeSignature, lastBeat) {
 function rhythmizeFixed(input, timeSignature) {
   const ts = timeSignature;
   let output = [];
+  let firstBlock = true;
   let block = [];
   let lastBeat = 1;
   for (let i = 0; i < input.length; i++) {
     const symbol = input[i];
     if (getBeatForSymbol(symbol, timeSignature, lastBeat)) {
+      if (firstBlock) {
+        // Treat the very first block as free rhythm.
+        for (note of block) {
+          note.setDuration('4');
+          output.push(note);
+        }
+        output.push(BAR);
+        block = [];
+        firstBlock = false;
+        continue;
+      }
+
       let markedNote;
       if ("▯L╚".includes(symbol)) {
         // Include the marked (next) note in the block.
