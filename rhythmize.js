@@ -77,6 +77,22 @@ function rhythmize4(input) {
       // The next beat is thus also adjusted by 1 quarter.
       lastBeat++;
     }
+    else if (symbol == "L") {
+      // Include the marked (next) note in the block
+      i++;
+      const markedNote = input[i];
+      block.push(markedNote);
+      // Then process as usual.
+      [block, lastBeat] = processBlock(block, output, lastBeat, 1);
+      // Add a bar marker.
+      output.push(BAR);
+      // Next, add a quarter copy of the marked note, to sustain i.
+      const copy = markedNote.getCopy();
+      copy.setDuration('4');
+      output.push(copy);
+      // The next beat is thus also adjusted by 1 quarter.
+      lastBeat++;
+    }
     else {
       block.push(symbol);
     }
