@@ -149,7 +149,7 @@ function makeTextNote(text, line, duration) {
 function splitStaves(notes, timeSignature) {
   const BARS_PER_STAVE = {};
   BARS_PER_STAVE[TimeSignature.FOUR_FOUR] = 4;
-  BARS_PER_STAVE[TimeSignature.EIGHT_FOUR] = 2;
+  BARS_PER_STAVE[TimeSignature.EIGHT_FOUR] = 4;
   BARS_PER_STAVE[TimeSignature.FREE] = 2;
 
   let stave = [];
@@ -221,7 +221,9 @@ function makeVoices(staves) {
 }
 
 function getTimeSignature(melody) {
-  // TODO: Identify 8/4 time
+  if (melody.includes("﹆") || melody.includes("╚")) {
+    return TimeSignature.EIGHT_FOUR;
+  }
   if (melody.includes("、")) {
     return TimeSignature.FOUR_FOUR;
   }

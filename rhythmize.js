@@ -86,7 +86,7 @@ function rhythmize4(input) {
       [block, lastBeat] = processBlock(block, output, lastBeat, 1);
       // Add a bar marker.
       output.push(BAR);
-      // Next, add a quarter copy of the marked note, to sustain i.
+      // Next, add a quarter copy of the marked note, to sustain it through 1.
       const copy = markedNote.getCopy();
       copy.setDuration('4');
       output.push(copy);
@@ -105,11 +105,89 @@ function rhythmize4(input) {
 }
 
 function rhythmize8(input) {
-  throw "8/4 Rhythm is not yet supported."
+  let output = [];
+  let block = [];
+  let lastBeat = 1;
+  for (let i = 0; i < input.length; i++) {
+    const symbol = input[i];
+    if (symbol == "、") {
+      [block, lastBeat] = processBlock(block, output, lastBeat, 1, 8);
+      // Also add a new bar marker.
+      output.push(BAR);
+    }
+    else if (symbol == "﹆") {
+      [block, lastBeat] = processBlock(block, output, lastBeat, 5, 8);      
+    }
+    else if (symbol == "。") {
+      // This could represent either 3 or 7
+      const nextBeat = lastBeat < 3 ? 3 : 7;
+      [block, lastBeat] = processBlock(block, output, lastBeat, nextBeat, 8);
+    }
+    else if (symbol == "_") {
+      [block, lastBeat] = processBlock(block, output, lastBeat, 1, 8);
+      // TODO: Instead, extend marked (prev) note into end of measure
+      // Also add a new bar marker and a rest.
+      output.push(BAR);
+      block.push(new RestNote());
+    }
+    else if (symbol == "▯") {
+      // Include the marked (next) note in the block
+      i++;
+      const markedNote = input[i];
+      block.push(markedNote);
+      // Then process as usual.
+      const nextBeat = lastBeat < 3 ? 3 : 7;
+      [block, lastBeat] = processBlock(block, output, lastBeat, nextBeat, 8);
+      // Next, add a quarter copy of the marked note, to sustain it.
+      const copy = markedNote.getCopy();
+      copy.setDuration('4');
+      output.push(copy);
+      // The next beat is thus also adjusted by 1 quarter.
+      lastBeat++;
+    }
+    else if (symbol == "L") {
+      // Include the marked (next) note in the block
+      i++;
+      const markedNote = input[i];
+      block.push(markedNote);
+      // Then process as usual.
+      [block, lastBeat] = processBlock(block, output, lastBeat, 1, 8);
+      // Add a bar marker.
+      output.push(BAR);
+      // Next, add a quarter copy of the marked note, to sustain it through 1.
+      const copy = markedNote.getCopy();
+      copy.setDuration('4');
+      output.push(copy);
+      // The next beat is thus also adjusted by 1 quarter.
+      lastBeat++;
+    }
+    else if (symbol == "╚") {
+      // Include the marked (next) note in the block
+      i++;
+      const markedNote = input[i];
+      block.push(markedNote);
+      // Then process as usual.
+      [block, lastBeat] = processBlock(block, output, lastBeat, 5, 8);
+      // Next, add a quarter copy of the marked note, to sustain it.
+      const copy = markedNote.getCopy();
+      copy.setDuration('4');
+      output.push(copy);
+      // The next beat is thus also adjusted by 1 quarter.
+      lastBeat++;
+    }
+    else {
+      block.push(symbol);
+    }
+  }
+  // Add any remaining notes to one last bar.
+  if (block.length > 0) {
+    [block, lastBeat] = processBlock(block, output, lastBeat, 1, 8);
+  }
+  return output;
 }
 
-function processBlock(block, output, lastBeat, thisBeat) {
-  assignDurations(block, between(lastBeat, thisBeat));
+function processBlock(block, output, lastBeat, thisBeat, quarters = 4) {
+  assignDurations(block, between(lastBeat, thisBeat, quarters));
   output.push(...block);
   return [[], thisBeat];
 }
@@ -118,6 +196,7 @@ function assignDurations(block, quarters) {
   if (block.length > 8) {
     throw `Invalid block length ${block.length}`
   }
+  console.log(block);
   const fractions = divideBlock[block.length];
   for (let i = 0; i < block.length; i++) {
     block[i].setDuration(convertToDuration(fractions[i] * quarters));
@@ -129,7 +208,22 @@ function assignDurations(block, quarters) {
  * (e.g. '2' = half note, '8' = eight note)
  */ 
 function convertToDuration(quarters) {
-  return '' + (4 / quarters);
+  const map = {
+    4: '1',
+    2: '2',
+    1: '4',
+    0.5: '8',
+    0.25: '16'
+  }
+
+  // TODO handle dotted notes
+  if (quarters > 4) {
+    return '1';
+  }
+  if (map[quarters]) {
+    return map[quarters];
+  }
+  return '4'; // Default to quarter note when necessary
 }
 
 // How to divide up a section, based on the size of a block.
