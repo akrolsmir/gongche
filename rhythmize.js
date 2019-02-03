@@ -1,9 +1,9 @@
 function rhythmize(input, timeSignature) {
   switch (timeSignature) {
     case TimeSignature.FOUR_FOUR:
-      return rhythmizeBlock(input, timeSignature);
+      return rhythmizeFixed(input, timeSignature);
     case TimeSignature.EIGHT_FOUR:
-      return rhythmizeBlock(input, timeSignature);
+      return rhythmizeFixed(input, timeSignature);
     case TimeSignature.FREE:
       return rhythmizeFree(input);
   }
@@ -48,81 +48,50 @@ function getBeatForSymbol(symbol, timeSignature, lastBeat) {
 
 // Input: ["、", Note, Note, "。", Note, "_"...]
 // Output: ["|", Note, Note, "|"...], and also assign durations
-function rhythmizeBlock(input, timeSignature) {
+function rhythmizeFixed(input, timeSignature) {
   const ts = timeSignature;
   let output = [];
   let block = [];
   let lastBeat = 1;
   for (let i = 0; i < input.length; i++) {
     const symbol = input[i];
-    if (symbol == "、") {
+    if (getBeatForSymbol(symbol, timeSignature, lastBeat)) {
+      let markedNote;
+      if ("▯L╚".includes(symbol)) {
+        // Include the marked (next) note in the block.
+        i++;
+        markedNote = input[i];
+        block.push(markedNote);
+      }
+      
+      // Assign durations to each note in this rhythm block.
       [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
-      // Also add a new bar marker.
-      output.push(BAR);
-    }
-    else if (symbol == "﹆") {
-      [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);      
-    }
-    else if (symbol == "。") {
-      [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
-    }
-    else if (symbol == "_") {
-      [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
-      // TODO: Instead, extend marked (prev) note into end of measure
-      // Also add a new bar marker and a rest.
-      output.push(BAR);
-      block.push(new RestNote());
-    }
-    else if (symbol == "▯") {
-      // Include the marked (next) note in the block
-      i++;
-      const markedNote = input[i];
-      block.push(markedNote);
-      // Then process as usual.
-      [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
-      // Next, add a quarter copy of the marked note, to sustain it.
-      const copy = markedNote.getCopy();
-      copy.setDuration('4');
-      output.push(copy);
-      // The next beat is thus also adjusted by 1 quarter.
-      lastBeat++;
-    }
-    else if (symbol == "L") {
-      // Include the marked (next) note in the block
-      i++;
-      const markedNote = input[i];
-      block.push(markedNote);
-      // Then process as usual.
-      [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
-      // Add a bar marker.
-      output.push(BAR);
-      // Next, add a quarter copy of the marked note, to sustain it through 1.
-      const copy = markedNote.getCopy();
-      copy.setDuration('4');
-      output.push(copy);
-      // The next beat is thus also adjusted by 1 quarter.
-      lastBeat++;
-    }
-    else if (symbol == "╚") {
-      // Include the marked (next) note in the block
-      i++;
-      const markedNote = input[i];
-      block.push(markedNote);
-      // Then process as usual.
-      [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
-      // Next, add a quarter copy of the marked note, to sustain it.
-      const copy = markedNote.getCopy();
-      copy.setDuration('4');
-      output.push(copy);
-      // The next beat is thus also adjusted by 1 quarter.
-      lastBeat++;
-    }
-    else {
+
+      if ("、_L".includes(symbol)) {
+        // Add a new bar marker, since we're starting on 1.
+        output.push(BAR);
+      }
+
+      if (symbol == "_"){
+        // Make sure to rest on 1.
+        block.push(new RestNote());
+      }
+
+      if (markedNote) {
+        // Sustain the note an additional quarter-beat by adding a copy.
+        const copy = markedNote.getCopy();
+        copy.setDuration('4');
+        output.push(copy);
+        // Also adjust the next beat by 1 quarter.
+        lastBeat++;
+      }
+    } else {
+      // Treat this entry as a note.
       block.push(symbol);
     }
   }
-  // Add any remaining notes to one last bar.
   if (block.length > 0) {
+    // Add any remaining notes to one last bar.
     [block, lastBeat] = processBlock(block, output, lastBeat, "、", ts);
   }
   return output;
@@ -140,7 +109,6 @@ function assignDurations(block, quarters) {
   if (block.length > 8) {
     throw `Invalid block length ${block.length}`
   }
-  console.log(block);
   const fractions = divideBlock[block.length];
   for (let i = 0; i < block.length; i++) {
     block[i].setDuration(convertToDuration(fractions[i] * quarters));
