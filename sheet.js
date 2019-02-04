@@ -161,7 +161,7 @@ function assignLyrics(melody, lyrics) {
 }
 
 function makeStave(index, timeSignature) {
-  const stave = new VF.Stave(10, 40 + 200 * index, 800);
+  const stave = new VF.Stave(10, 200 * index, 800);
   stave.addClef("treble").addKeySignature(vueApp.keySignature);
   if (timeSignature == TimeSignature.FOUR_FOUR) {
     stave.addTimeSignature("4/4");
@@ -320,7 +320,7 @@ function renderSheet(lyrics, melody) {
 const vexflowDiv = document.getElementById("vexflow")
 const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 // Size our svg:
-vexflowRenderer.resize(2500, 2500);
+vexflowRenderer.resize(900, 2500);
 // And get a drawing context:
 const vexflowContext = vexflowRenderer.getContext();
 let vueApp;
