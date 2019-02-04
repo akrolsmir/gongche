@@ -5,6 +5,12 @@
   <p>Title: {{ song.title }}
   <p>Composer: {{ song.composer }}
   <p>Song ID: {{ song.id }}
+  <p>Key Signature: 
+  <select v-model="keySignature">
+    <option v-for="s in signatures">
+      {{ s }}
+    </option>
+  </select>
 </div>
 <div id="vexflow"></div>
 <script src="https://unpkg.com/vexflow@1.2.87/releases/vexflow-debug.js" ></script>

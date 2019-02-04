@@ -13,11 +13,12 @@ class Note {
   setDuration(duration) {
     this.duration = duration;
     let jianpu = gongcheToJianpu[this.gongche];
-    const key = jianpuToKey[jianpu];
+    const key = jianpuToKey(jianpu, vueApp.keySignature);
 
     this.melodyNote = makeStaveNote(key, this.duration);
     this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration);
 
+    // If shifted by an octave, add a dot above or below.
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
     if (jianpu.startsWith('.')) {
       this.jianpuOctave = makeTextNote('•', 10.5, this.duration);
@@ -26,6 +27,7 @@ class Note {
       this.jianpuOctave = makeTextNote('•', 13.5, this.duration);
     }
 
+    // Append dashes, or (double) underline to indicate note length.
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     jianpu = jianpu.replace('.', '');
     if (this.duration == '1') {
@@ -87,9 +89,9 @@ const TimeSignature = {
 const BAR = '|';
 
 const gongcheToJianpu = {
-  "一": "7.",
-  "四": "6.",
   "合": "5.",
+  "四": "6.",
+  "一": "7.",
   "上": "1",
   "尺": "2",
   "工": "3",
@@ -102,21 +104,37 @@ const gongcheToJianpu = {
   "仜": ".3",
 }
 
-// TODO replace with function for key signature
-const jianpuToKey = {
-  "5.": "a/3",
-  "6.": "b/3",
-  "7.": "c/4",
-  "1": "d/4",
-  "2": "e/4",
-  "3": "f/4",
-  "4": "g/4",
-  "5": "a/4",
-  "6": "b/4",
-  "7": "c/5",
-  ".1": "d/5",
-  ".2": "e/5",
-  ".3": "f/5",
+const jianpuToOffset = {
+  "5.": -3,
+  "6.": -2,
+  "7.": -1,
+  "1": 0,
+  "2": 1,
+  "3": 2,
+  "4": 3,
+  "5": 4,
+  "6": 5,
+  "7": 6,
+  ".1": 7,
+  ".2": 8,
+  ".3": 9,
+}
+
+function jianpuToKey(jianpu, keySignature) {
+  const PITCHES = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+
+  // E.g. "c/1" = 0, "b/1" = 1, "c/2" = 7...
+  function keyToCode(pitch, octave) {
+    return PITCHES.indexOf(pitch) + octave * 7;
+  }
+  function codeToKey(code) {
+    return `${PITCHES[code % 7]}/${Math.floor(code / 7)}`;
+  }
+
+  const signaturePitch = keySignature[0].toLowerCase();
+  const signatureCode = keyToCode(signaturePitch, 4);
+  const code = signatureCode + jianpuToOffset[jianpu];
+  return codeToKey(code);
 }
 
 // Assign a lyric to each gongche symbol
@@ -144,7 +162,7 @@ function assignLyrics(melody, lyrics) {
 
 function makeStave(index, timeSignature) {
   const stave = new VF.Stave(10, 40 + 200 * index, 800);
-  stave.addClef("treble").addKeySignature("D");
+  stave.addClef("treble").addKeySignature(vueApp.keySignature);
   if (timeSignature == TimeSignature.FOUR_FOUR) {
     stave.addTimeSignature("4/4");
   } else if (timeSignature == TimeSignature.EIGHT_FOUR) {
@@ -307,6 +325,7 @@ const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 vexflowRenderer.resize(2500, 2500);
 // And get a drawing context:
 const vexflowContext = vexflowRenderer.getContext();
+let vueApp;
 
 main();
 
@@ -317,12 +336,20 @@ async function main() {
 
   const [songs, songsById] = await getSongTables();
   const song = songs[songsById[songId]];
-  renderSheet(song.lyrics, song.melody);
 
-  const vueApp = new Vue({
+  vueApp = new Vue({
     el: '.songdata',
     data: {
-      song: song
+      song: song,
+      keySignature: 'D',
+      signatures: Object.keys(VF.keySignature.keySpecs)
+    },
+    watch: {
+      keySignature: function(oldSignature, newSignature) {
+        vexflowContext.clear();
+        renderSheet(song.lyrics, song.melody);
+      }
     }
   });
+  renderSheet(song.lyrics, song.melody);
 }
