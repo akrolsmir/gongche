@@ -281,13 +281,11 @@ function renderSheet(lyrics, melody) {
     // Automatically beam the notes.
     const beams = VF.Beam.generateBeams(melodyVoice.getTickables());
 
-    // Format and justify the notes.
-    const formatter = new VF.Formatter()
-      .joinVoices(voiceGroup)
-      .format(voiceGroup, 700);
-
-    // Make the stave and draw voices on it.
+    // Make the stave, then format and draw voices on it.
     const vexflowStave = makeStave(i, timeSignature);
+    new VF.Formatter()
+      .joinVoices(voiceGroup)
+      .formatToStave(voiceGroup, vexflowStave);
     for (voice of voiceGroup) {
       voice.draw(vexflowContext, vexflowStave);
     }
