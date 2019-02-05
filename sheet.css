@@ -11,6 +11,13 @@ h1 {
 
 p {
   text-align: right;
+  font-family: 'Noto Serif TC', serif;
+  font-size: 16px;
+  line-height: 0.7;
+}
+
+select {
+  font-family: 'Noto Serif TC', serif;
 }
 
 .songdata {

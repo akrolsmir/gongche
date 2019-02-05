@@ -15,8 +15,13 @@ class Note {
     let jianpu = gongcheToJianpu[this.gongche];
     const key = jianpuToKey(jianpu, vueApp.keySignature);
 
+    const lyricFont = {
+      family: "Noto Serif TC",
+      size: '14',
+    };
+
     this.melodyNote = makeStaveNote(key, this.duration);
-    this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration);
+    this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration, lyricFont);
 
     // If shifted by an octave, add a dot above or below.
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
@@ -28,6 +33,7 @@ class Note {
     }
 
     // Append dashes, or (double) underline to indicate note length.
+    const lengthFont = {size: '16'};
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     jianpu = jianpu.replace('.', '');
     if (this.duration == '1') {
@@ -35,11 +41,11 @@ class Note {
     } else if (this.duration == '2') {
       jianpu = jianpu + ' -';
     } else if (this.duration == '8') {
-      this.jianpuLength = makeTextNote('_', 12, this.duration);
+      this.jianpuLength = makeTextNote('_', 12, this.duration, lengthFont);
     } else if (this.duration == '16') {
-      this.jianpuLength = makeTextNote('‗', 12, this.duration);
+      this.jianpuLength = makeTextNote('‗', 12, this.duration, lengthFont);
     }
-    this.jianpuNote = makeTextNote(jianpu, 12, this.duration);
+    this.jianpuNote = makeTextNote(jianpu, 12, this.duration, lyricFont);
   }
   getCopy() {
     const copy = new Note(this.gongche);
@@ -62,7 +68,10 @@ class RestNote {
   setDuration(duration) {
     this.duration = duration;
     this.melodyNote = makeStaveNote("b/4", this.duration + 'r');
-    this.jianpuNote = makeTextNote('0', 12, this.duration);
+    this.jianpuNote = makeTextNote('0', 12, this.duration, {
+      family: "Noto Serif TC",
+      size: '14',
+    });
     this.lyricsNote = makeTextNote(' ', 16, this.duration);
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
@@ -176,10 +185,11 @@ function makeStaveNote(key, duration) {
   return new VF.StaveNote({clef: "treble", keys: [key], duration: duration});
 }
 
-function makeTextNote(text, line, duration) {
+function makeTextNote(text, line, duration, font) {
   return new VF.TextNote({
     text: text,
-    duration: duration
+    duration: duration,
+    font: font
   })
     .setLine(line)
     .setContext(vexflowContext);
