@@ -293,19 +293,25 @@ function getTimeSignature(melody) {
 }
 
 function playback(rhythmized) {
-  const synth = new Tone.Synth().toMaster()
-  console.log(rhythmized);
   let elapsed = Tone.Time('4n'); // Start after quarter beat
+  const events = [];
   for (note of rhythmized) {
+    // TODO Ugly code, figure out better class semantics
     if (note != BAR) {
-      // TODO Respect note length
-      // TODO Respect rests
-      // TODO Playback button
-      const toneNote = note.getTone();
-      synth.triggerAttackRelease(toneNote, '4n', elapsed)
-      elapsed = elapsed + Tone.Time('4n');
+      const duration = note.duration + 'n';
+      if (note instanceof Note) {
+        const toneNote = note.getTone();
+        events.push({ tone: toneNote, duration: duration, time: elapsed });
+      }
+      elapsed = elapsed + Tone.Time(duration);
     }
   }
+  const synth = new Tone.Synth().toMaster()
+  const part = new Tone.Part(function(time, event) {
+    // Tone.Part extracts `event.time` into the `time` parameter
+    synth.triggerAttackRelease(event.tone, event.duration, time, 0.1);
+  }, events);
+  part.start(0);
 }
 
 function renderSheet(lyrics, melody) {
@@ -383,7 +389,19 @@ async function main() {
     data: {
       song: song,
       keySignature: 'D',
-      signatures: Object.keys(VF.keySignature.keySpecs)
+      signatures: Object.keys(VF.keySignature.keySpecs),
+      toggle: 'Play'
+    },
+    methods: {
+      toggleMusic: function(event) {
+        if (this.toggle == 'Play') {
+          Tone.Transport.start();
+          this.toggle = 'Stop';
+        } else if (this.toggle == 'Stop') {
+          Tone.Transport.stop();
+          this.toggle = 'Play';
+        }
+      }
     },
     watch: {
       keySignature: function(oldSignature, newSignature) {
