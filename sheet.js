@@ -57,6 +57,21 @@ class Note {
     }
     return copy;
   }
+  /** Return the note for Tone.js to play, adding #/b based on key signature. */
+  getTone() {
+    const keySpec = VF.keySignature.keySpecs[vueApp.keySignature];
+    let scale = '';
+    if (keySpec.acc == '#') {
+      const SHARPS_ORDER = 'fcgdaeb';
+      scale = SHARPS_ORDER.substring(0, keySpec.num);
+    } else if (keySpec.acc == 'b') {
+      const FLATS_ORDER = 'beadgcf';
+      scale = FLATS_ORDER.substring(0, keySpec.num);
+    }
+    const noteKey = this.melodyNote.keys[0]; // e.g. 'e/4'
+    const accidental = scale.includes(noteKey[0]) ? keySpec.acc : '';
+    return noteKey.replace('/', accidental);
+  }
 }
 
 class RestNote {
@@ -277,12 +292,30 @@ function getTimeSignature(melody) {
   return TimeSignature.FREE;
 }
 
+function playback(rhythmized) {
+  const synth = new Tone.Synth().toMaster()
+  console.log(rhythmized);
+  let elapsed = Tone.Time('4n'); // Start after quarter beat
+  for (note of rhythmized) {
+    if (note != BAR) {
+      // TODO Respect note length
+      // TODO Respect rests
+      // TODO Playback button
+      const toneNote = note.getTone();
+      synth.triggerAttackRelease(toneNote, '4n', elapsed)
+      elapsed = elapsed + Tone.Time('4n');
+    }
+  }
+}
+
 function renderSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
   const rhythmized = rhythmize(quarters, timeSignature);
   const modelStaves = splitStaves(rhythmized, timeSignature);
   const voices = makeVoices(modelStaves);
+
+  playback(rhythmized);
 
   for (let i = 0; i < voices.length; i++) {
     const voiceGroup = voices[i];
