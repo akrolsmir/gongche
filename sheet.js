@@ -292,7 +292,8 @@ function getTimeSignature(melody) {
   return TimeSignature.FREE;
 }
 
-function playback(rhythmized) {
+function schedulePlayback(rhythmized) {
+  Tone.Transport.cancel(); // Remove preexisting notes scheduled in Tone.js.
   let elapsed = Tone.Time('4n'); // Start after quarter beat
   const events = [];
   for (note of rhythmized) {
@@ -309,7 +310,7 @@ function playback(rhythmized) {
   const synth = new Tone.Synth().toMaster()
   const part = new Tone.Part(function(time, event) {
     // Tone.Part extracts `event.time` into the `time` parameter
-    synth.triggerAttackRelease(event.tone, event.duration, time, 0.1);
+    synth.triggerAttackRelease(event.tone, event.duration, time);
   }, events);
   part.start(0);
 }
@@ -321,7 +322,7 @@ function renderSheet(lyrics, melody) {
   const modelStaves = splitStaves(rhythmized, timeSignature);
   const voices = makeVoices(modelStaves);
 
-  playback(rhythmized);
+  schedulePlayback(rhythmized);
 
   for (let i = 0; i < voices.length; i++) {
     const voiceGroup = voices[i];
