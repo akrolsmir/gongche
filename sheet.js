@@ -219,29 +219,36 @@ function makeTextNote(text, line, duration, font) {
 }
 
 // Output: [ [Note, Note, BarNote, Note, ...], ... ]
-function splitStaves(notes, timeSignature) {
-  const BARS_PER_STAVE = {};
-  BARS_PER_STAVE[TimeSignature.FOUR_FOUR] = 4;
-  BARS_PER_STAVE[TimeSignature.EIGHT_FOUR] = 4;
-  BARS_PER_STAVE[TimeSignature.FREE] = 2;
-
+function splitStaves(notes) {
+  // Ensure the notes end with a BAR, as needed by the split algorithm.
+  if (notes[notes.length - 1] != BAR) {
+    notes.push(BAR);
+  }
+  const MAX_NOTES_PER_STAVE = 24;
+  const staves = [];
+  let measure = [];
   let stave = [];
-  let staves = [];
-  let barCount = 0;
   for (note of notes) {
     if (note == BAR) {
-      barCount++;
-      if (barCount == BARS_PER_STAVE[timeSignature]) {
-        // We reached our max number of bars in this stave, so tart a new one.
-        barCount = 0;
+      if (measure.length + stave.length > MAX_NOTES_PER_STAVE) {
+        // This measure should start a new stave
         staves.push(stave);
-        stave = [];
+        stave = measure;
+        if (measure.length > MAX_NOTES_PER_STAVE) {
+          // This measure should also end its stave 
+          staves.push(stave);
+          stave = [];
+        }
       } else {
-        // Mark a new measure
-        stave.push(new VF.BarNote());
+        // This measure should continue current stave.
+        if (stave.length > 0) {
+          stave.push(new VF.BarNote());
+        }
+        stave = stave.concat(measure);
       }
+      measure = [];
     } else {
-      stave.push(note);
+      measure.push(note);
     }
   }
   // Include the final stave if it's not empty.
@@ -327,7 +334,7 @@ function renderSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
   const rhythmized = rhythmize(quarters, timeSignature);
-  const modelStaves = splitStaves(rhythmized, timeSignature);
+  const modelStaves = splitStaves(rhythmized);
   const voices = makeVoices(modelStaves);
 
   schedulePlayback(rhythmized);
