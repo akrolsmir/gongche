@@ -23,6 +23,13 @@ class Note {
     this.melodyNote = makeStaveNote(key, this.duration);
     this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration, lyricFont);
 
+    this.pronounceNote = makeTextNote(' ', 18, this.duration);
+    if (this.getLyric() != ' ' && this.getLyric() in RHYME_MAP) {
+      const rhyme = RHYME_MAP[this.getLyric()];
+      const font = { family: "Noto Serif TC", size: '10'};
+      this.pronounceNote = makeTextNote(rhyme[2], 18, this.duration, font);
+    }
+
     // If shifted by an octave, add a dot above or below.
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
     if (jianpu.startsWith('.')) {
@@ -87,6 +94,7 @@ class RestNote {
       family: "Noto Serif TC",
       size: '14',
     });
+    this.pronounceNote = makeTextNote(' ', 16, this.duration);
     this.lyricsNote = makeTextNote(' ', 16, this.duration);
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
@@ -272,7 +280,7 @@ function makeVoices(staves) {
     const beats = countQuarters(getTickables(stave, 'melodyNote'));
 
     const voiceGroup =
-      ["melodyNote", "jianpuNote", "jianpuOctave", "jianpuLength", "lyricsNote"]
+      ["melodyNote", "jianpuNote", "jianpuOctave", "jianpuLength", "lyricsNote", "pronounceNote"]
         .map(voiceName => 
           new VF.Voice({ num_beats: beats, beat_value: 4 })
             .addTickables(getTickables(stave, voiceName)));
