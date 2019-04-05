@@ -33,7 +33,7 @@ const bookOffsets = [
 
 function getRawTable() {
   const rawTable = [];
-  for (row of mulu) {
+  for (const row of mulu) {
     if (row.length != 3) {
       continue;
     }

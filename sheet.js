@@ -406,13 +406,13 @@ async function main() {
   vueApp = new Vue({
     el: '.songdata',
     data: {
-      song: song,
+      song,
       keySignature: 'D',
       signatures: Object.keys(VF.keySignature.keySpecs),
       toggle: 'Play'
     },
     methods: {
-      toggleMusic: function(event) {
+      toggleMusic(event) {
         if (this.toggle == 'Play') {
           Tone.Transport.start();
           this.toggle = 'Stop';
@@ -423,7 +423,7 @@ async function main() {
       }
     },
     watch: {
-      keySignature: function(oldSignature, newSignature) {
+      keySignature(oldSignature, newSignature) {
         vexflowContext.clear();
         renderSheet(song.lyrics, song.melody);
       }

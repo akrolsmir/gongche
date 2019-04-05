@@ -33,18 +33,18 @@ function configSongData() {
       editedLyrics: 'Placeholder lyrics',
       editedMelody: 'Placeholder melody',
       editedRegion: 'North',
-      keyboardToGongche: keyboardToGongche,
+      keyboardToGongche,
     },
     computed: {
       // If the song's lyrics or melody were edited, color the field yellow.
-      lyricsStyle: function () {
+      lyricsStyle() {
         const yellow = 'rgba(256, 256, 0, 0.4)';
         const color = this.song.lyrics == this.editedLyrics ? 'white' : yellow;
         return {
           backgroundColor: color,
         }
       },
-      melodyStyle: function () {
+      melodyStyle() {
         const yellow = 'rgba(256, 256, 0, 0.4)';
         const color = this.song.melody == this.editedMelody ? 'white' : yellow;
         return {
@@ -52,7 +52,7 @@ function configSongData() {
         }
       },
       // Show the current lyric, based on the spaces in the melody field.
-      lyricPreview: function () {
+      lyricPreview() {
         const melodySpaces = this.editedMelody.split(' ').length - 1;
         const unspacedLyrics = this.editedLyrics.replace(/\s/g, '');
         if (0 <= melodySpaces && melodySpaces < unspacedLyrics.length) {
@@ -62,10 +62,10 @@ function configSongData() {
       },
       // Rewrite melody text with Gongche, and mark the character on the canvas.
       melodyGongche: {
-        get: function () {
+        get() {
           return this.editedMelody;
         },
-        set: function (input) {
+        set(input) {
           let output = "";
           for (char of input) {
             const gongche = keyboardToGongche[char];
