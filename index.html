@@ -26,6 +26,12 @@
       Composer
       <textarea name="composer" id="composer" rows="1" cols="20"
           placeholder="Composer" v-model="song.composer"></textarea>
+      Region
+      <select v-model="editedRegion">
+        <option v-for="r in regions">
+          {{ r }}
+        </option>
+      </select>
       Lyrics
       <small>(Ctrl + D to highlight melody)</small>
       <textarea name="lyrics" id="lyrics" rows="5" cols="20"

@@ -27,7 +27,8 @@ class Note {
     if (this.getLyric() != ' ' && this.getLyric() in RHYME_MAP) {
       const rhyme = RHYME_MAP[this.getLyric()];
       const font = { family: "Noto Serif TC", size: '10'};
-      this.pronounceNote = makeTextNote(rhyme[2], 18, this.duration, font);
+      const index = vueApp.song.region == 'North' ? 3 : 2;
+      this.pronounceNote = makeTextNote(rhyme[index], 18, this.duration, font);
     }
 
     // If shifted by an octave, add a dot above or below.

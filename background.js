@@ -29,8 +29,10 @@ function configSongData() {
     el: '.songdata',
     data: {
       song: '',
+      regions: ['North', 'South'],
       editedLyrics: 'Placeholder lyrics',
       editedMelody: 'Placeholder melody',
+      editedRegion: 'North',
       keyboardToGongche: keyboardToGongche,
     },
     computed: {
@@ -89,6 +91,10 @@ function saveLyricsAndMelody() {
     song.melody = songDataApp.editedMelody;
     saveSong(song);
   }
+  if (song.region != songDataApp.editedRegion) {
+    song.region = songDataApp.editedRegion;
+    saveSong(song);
+  }
 }
 
 function nextSong() {
@@ -111,6 +117,7 @@ function renderSong() {
   songDataApp.song = song;
   songDataApp.editedLyrics = song.lyrics;
   songDataApp.editedMelody = song.melody;
+  songDataApp.editedRegion = song.region;
 }
 
 function loadImage(src) {
