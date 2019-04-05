@@ -1,4 +1,6 @@
-VF = Vex.Flow;
+const VF = Vex.Flow;
+import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
+import { rhythmize } from "./rhythmize.js";
 
 class Note {
   constructor(gongche) {
@@ -82,7 +84,7 @@ class Note {
   }
 }
 
-class RestNote {
+export class RestNote {
   constructor() {
   }
   getLyric() {
@@ -113,13 +115,13 @@ class LyricGroup {
   }
 }
 
-const TimeSignature = {
+export const TimeSignature = {
   FOUR_FOUR: "four_four",
   EIGHT_FOUR: "eight_four",
   FREE: "free",
 }
 
-const BAR = '|';
+export const BAR = '|';
 
 const gongcheToJianpu = {
   "合": "5.",
@@ -178,7 +180,7 @@ function assignLyrics(melody, lyrics) {
   let lyricIndex = 0;
   let currentLyric = new LyricGroup(unspacedLyrics[lyricIndex]);
   const result = [];
-  for (char of melody) {
+  for (const char of melody) {
     if (char == ' ') {
       lyricIndex++;
       currentLyric = new LyricGroup(unspacedLyrics[lyricIndex]);
@@ -229,7 +231,7 @@ function splitStaves(notes) {
   const staves = [];
   let measure = [];
   let stave = [];
-  for (note of notes) {
+  for (const note of notes) {
     if (note == BAR) {
       if (measure.length + stave.length > MAX_NOTES_PER_STAVE) {
         // This measure should start a new stave
@@ -270,7 +272,7 @@ function countQuarters(notes) {
     '1': 4
   }
   let count = 0;
-  for (note of notes) {
+  for (const note of notes) {
     count += durationToQuarters[note.duration];
   }
   return Math.round(count);
@@ -312,7 +314,7 @@ function schedulePlayback(rhythmized) {
   Tone.Transport.cancel(); // Remove preexisting notes scheduled in Tone.js.
   let elapsed = Tone.Time('4n'); // Start after quarter beat
   const events = [];
-  for (note of rhythmized) {
+  for (const note of rhythmized) {
     // TODO Ugly code, figure out better class semantics
     if (note != BAR) {
       const duration = note.duration + 'n';
@@ -352,7 +354,7 @@ function renderSheet(lyrics, melody) {
     new VF.Formatter()
       .joinVoices(voiceGroup)
       .formatToStave(voiceGroup, vexflowStave);
-    for (voice of voiceGroup) {
+    for (const voice of voiceGroup) {
       voice.draw(vexflowContext, vexflowStave);
     }
 

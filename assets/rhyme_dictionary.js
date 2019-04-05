@@ -1,6 +1,6 @@
 function getRhymeMap(dictionary) {
   const map = {};
-  for (entry of dictionary) {
+  for (const entry of dictionary) {
     map[entry[1]] = entry;
   }
   return map;
@@ -7306,4 +7306,4 @@ const RHYME_DICTIONARY = [
 ["鳩由韻","衄","ȵ.yo(k)","ȵ.y","陽","入/去"],
 ["鳩由韻","恧","ȵ.yo(k)","ȵ.y","陽","入/去"],
 ]
-const RHYME_MAP = getRhymeMap(RHYME_DICTIONARY);
+export const RHYME_MAP = getRhymeMap(RHYME_DICTIONARY);

@@ -1,4 +1,6 @@
-function rhythmize(input, timeSignature) {
+import { TimeSignature, BAR, RestNote } from "./sheet.js";
+
+export function rhythmize(input, timeSignature) {
   switch (timeSignature) {
     case TimeSignature.FOUR_FOUR:
       return rhythmizeFixed(input, timeSignature);
@@ -59,7 +61,7 @@ function rhythmizeFixed(input, timeSignature) {
     if (getBeatForSymbol(symbol, timeSignature, lastBeat)) {
       if (firstBlock) {
         // Treat the very first block as free rhythm.
-        for (note of block) {
+        for (const note of block) {
           note.setDuration('4');
           output.push(note);
         }
