@@ -409,7 +409,8 @@ async function main() {
       song,
       keySignature: 'D',
       signatures: Object.keys(VF.keySignature.keySpecs),
-      toggle: 'Play'
+      toggle: 'Play',
+      bpm: '120'
     },
     methods: {
       toggleMusic(event) {
@@ -426,6 +427,9 @@ async function main() {
       keySignature(oldSignature, newSignature) {
         vexflowContext.clear();
         renderSheet(song.lyrics, song.melody);
+      },
+      bpm(oldBpm, newBpm) {
+        Tone.Transport.bpm.value = newBpm;
       }
     }
   });

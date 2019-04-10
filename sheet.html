@@ -8,13 +8,15 @@
   <p>Composer: {{ song.composer }}
   <p>Song ID: {{ song.id }}
   <p>Key Signature: 
-  <select v-model="keySignature">
-    <option v-for="s in signatures">
-      {{ s }}
-    </option>
-  </select>
+    <select v-model="keySignature">
+      <option v-for="s in signatures">
+        {{ s }}
+      </option>
+    </select>
   <p>Playback: 
-  <button v-on:click='toggleMusic()'>{{ toggle }}</button>
+    <button v-on:click='toggleMusic()'>{{ toggle }}</button>
+  <p>BPM: {{ bpm }} 
+    <input type="range" v-model='bpm' min='30' max='150' value='120'>
 </div>
 <div id="vexflow"></div>
 <script src="https://unpkg.com/vexflow@1.2.87/releases/vexflow-debug.js"></script>
