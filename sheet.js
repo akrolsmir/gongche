@@ -409,18 +409,22 @@ async function main() {
       song,
       keySignature: 'D',
       signatures: Object.keys(VF.keySignature.keySpecs),
-      toggle: 'Play',
+      toggle: '▶️',
       bpm: '120'
     },
     methods: {
       toggleMusic(event) {
-        if (this.toggle == 'Play') {
+        if (this.toggle == '▶️') {
           Tone.Transport.start();
-          this.toggle = 'Stop';
-        } else if (this.toggle == 'Stop') {
-          Tone.Transport.stop();
-          this.toggle = 'Play';
+          this.toggle = '⏸️';
+        } else if (this.toggle == '⏸️') {
+          Tone.Transport.pause();
+          this.toggle = '▶️';
         }
+      },
+      stopMusic(event) {
+        Tone.Transport.stop();
+        this.toggle = '▶️';
       }
     },
     watch: {
