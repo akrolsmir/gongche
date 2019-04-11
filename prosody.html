@@ -7,12 +7,13 @@
   <h1>{{ song.title }}</h1>
   <p>Composer: {{ song.composer }}
   <p>Song ID: {{ song.id }}
-  <template v-for="line in poem">
+  <template v-for="(line, index) in poem">
+  <p> Line {{ index + 1 }}
   <table>
     <tbody>
-      <template v-for='attribute in ["lyric", "south", "tone", "yinyang", "beats", "melody"]'>
+      <template v-for='(header, attribute) in rowHeaders'>
         <tr>
-          <td>{{ attribute }}</td>
+          <th>{{ header }}</th>
           <template v-for="word in line">
             <td>{{ word[attribute] }}</td>
           </template>

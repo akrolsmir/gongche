@@ -28,6 +28,15 @@ const gongcheToJianpu = {
 
 const beatSymbols = [ "、", "。"];
 
+const rowHeaders = {
+  'lyric': '詞',
+  'south': '字音',
+  'tone': '聲調',
+  'yinyang': '陰陽',
+  'beats': '板眼',
+  'melody': '簡譜音高'
+}
+
 function parseMelodyChunk(melodyChunk) {
   const melody = [];
   const beats = [];
@@ -79,6 +88,7 @@ async function main() {
     el: '.songdata',
     data: {
       song,
+      rowHeaders,
       poem: buildPoem(song.melody, song.lyrics)
     }
   });
