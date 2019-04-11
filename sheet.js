@@ -67,21 +67,22 @@ class Note {
     }
     return copy;
   }
-  /** Return the note for Tone.js to play, adding #/b based on key signature. */
-  getTone() {
-    const keySpec = VF.keySignature.keySpecs[vueApp.keySignature];
-    let scale = '';
-    if (keySpec.acc == '#') {
-      const SHARPS_ORDER = 'fcgdaeb';
-      scale = SHARPS_ORDER.substring(0, keySpec.num);
-    } else if (keySpec.acc == 'b') {
-      const FLATS_ORDER = 'beadgcf';
-      scale = FLATS_ORDER.substring(0, keySpec.num);
-    }
-    const noteKey = this.melodyNote.keys[0]; // e.g. 'e/4'
-    const accidental = scale.includes(noteKey[0]) ? keySpec.acc : '';
-    return noteKey.replace('/', accidental);
+}
+
+/** Return the note for Tone.js to play, adding #/b based on key signature. */
+function convertTone(melodyNote) {
+  const keySpec = VF.keySignature.keySpecs[vueApp.keySignature];
+  let scale = '';
+  if (keySpec.acc == '#') {
+    const SHARPS_ORDER = 'fcgdaeb';
+    scale = SHARPS_ORDER.substring(0, keySpec.num);
+  } else if (keySpec.acc == 'b') {
+    const FLATS_ORDER = 'beadgcf';
+    scale = FLATS_ORDER.substring(0, keySpec.num);
   }
+  const noteKey = melodyNote.keys[0]; // e.g. 'e/4'
+  const accidental = scale.includes(noteKey[0]) ? keySpec.acc : '';
+  return noteKey.replace('/', accidental);
 }
 
 export class RestNote {
@@ -310,27 +311,49 @@ function getTimeSignature(melody) {
   return TimeSignature.FREE;
 }
 
-function schedulePlayback(rhythmized) {
+function schedulePlayback(voices) {
   Tone.Transport.cancel(); // Remove preexisting notes scheduled in Tone.js.
-  let elapsed = Tone.Time('4n'); // Start after quarter beat
+  let elapsed = Tone.Time('4n'); // Start after quarter beat.
+  const svgSuperGroup = {children: []}; // Parent of all svg notes.
   const events = [];
-  for (const note of rhythmized) {
-    // TODO Ugly code, figure out better class semantics
-    if (note != BAR) {
-      const duration = note.duration + 'n';
-      if (note instanceof Note) {
-        const toneNote = note.getTone();
-        events.push({ tone: toneNote, duration: duration, time: elapsed });
+  for (const voiceGroup of voices) {
+    const melodyVoice = voiceGroup[0];
+    for (const note of melodyVoice.tickables) {
+      if (note instanceof VF.StaveNote) {
+        const duration = note.duration + 'n';
+        events.push({ duration, time: elapsed, note });
+        svgSuperGroup.children.push(note.svgGroup);
+        elapsed = elapsed + Tone.Time(duration);
       }
-      elapsed = elapsed + Tone.Time(duration);
     }
   }
   const synth = new Tone.Synth().toMaster()
-  const part = new Tone.Part(function(time, event) {
-    // Tone.Part extracts `event.time` into the `time` parameter
-    synth.triggerAttackRelease(event.tone, event.duration, time);
-  }, events);
-  part.start(0);
+  for (const event of events) {
+    Tone.Transport.schedule(function(time) {
+      if (event.note.noteType == 'n') {
+        // Play the tone for non-rest stave notes.
+        const tone = convertTone(event.note);
+        synth.triggerAttackRelease(tone, event.duration, time);
+      }
+      colorSvgGroup(svgSuperGroup, 'black');
+      colorSvgGroup(event.note.svgGroup, 'red');
+    }, event.time)
+  }
+}
+
+function colorSvgGroup(svgGroup, color) {
+  if (svgGroup.getAttribute) {
+    // Could also include stroke for stems, but the middle C ledger is Gray.
+    const fill = svgGroup.getAttribute('fill');
+    if (fill && fill != 'none') {
+      svgGroup.setAttribute('fill', color);
+    }
+  }
+  if (svgGroup.children) {
+    for (const child of svgGroup.children) {
+      colorSvgGroup(child, color);
+    }
+  }
 }
 
 function renderSheet(lyrics, melody) {
@@ -339,8 +362,6 @@ function renderSheet(lyrics, melody) {
   const rhythmized = rhythmize(quarters, timeSignature);
   const modelStaves = splitStaves(rhythmized);
   const voices = makeVoices(modelStaves);
-
-  schedulePlayback(rhythmized);
 
   for (let i = 0; i < voices.length; i++) {
     const voiceGroup = voices[i];
@@ -355,12 +376,23 @@ function renderSheet(lyrics, melody) {
       .joinVoices(voiceGroup)
       .formatToStave(voiceGroup, vexflowStave);
     for (const voice of voiceGroup) {
-      voice.draw(vexflowContext, vexflowStave);
+      if (voice != melodyVoice) {
+        voice.draw(vexflowContext, vexflowStave);
+      }
     }
-
+    // Draw the melody voice separately, to keep references to the SVG groups.
+    for (const melodyNote of melodyVoice.tickables) {
+      melodyNote.svgGroup = vexflowContext.openGroup();
+      melodyNote.setStave(vexflowStave);
+      melodyNote.setContext(vexflowContext);
+      melodyNote.draw();
+      vexflowContext.closeGroup();
+    }
     // Draw the beams
     beams.forEach(beam => beam.setContext(vexflowContext).draw());
   }
+
+  schedulePlayback(voices);
 
   // Find all lyric groups in order
   const allLyricGroups = [];
