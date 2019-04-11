@@ -10,7 +10,7 @@
   <template v-for="line in poem">
   <table>
     <tbody>
-      <template v-for='attribute in ["lyric", "south", "tone", "yinyang", "melodyChunk"]'>
+      <template v-for='attribute in ["lyric", "south", "tone", "yinyang", "beats", "melody"]'>
         <tr>
           <td>{{ attribute }}</td>
           <template v-for="word in line">

@@ -9,6 +9,39 @@ import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
       - Melody
 */
 
+// TODO deduplicate from sheet.js
+const gongcheToJianpu = {
+  "合": "5.",
+  "四": "6.",
+  "一": "7.",
+  "上": "1",
+  "尺": "2",
+  "工": "3",
+  "凡": "4",
+  "六": "5",
+  "五": "6",
+  "乙": "7",
+  "仩": ".1",
+  "伬": ".2",
+  "仜": ".3",
+}
+
+const beatSymbols = [ "、", "。"];
+
+function parseMelodyChunk(melodyChunk) {
+  const melody = [];
+  const beats = [];
+  for (const char of melodyChunk) {
+    if (beatSymbols.includes(char)) {
+      beats.push(char);
+    }
+    else if (char in gongcheToJianpu) {
+      melody.push(gongcheToJianpu[char]);
+    }
+  }
+  return { beats: beats.join(' '), melody: melody.join(' ') };
+}
+
 function buildPoem(melody, lyrics) {
   let melodyIndex = 0;
   let melodyChunks = melody.split(' ');
@@ -19,7 +52,8 @@ function buildPoem(melody, lyrics) {
       const rhyme = RHYME_MAP[lyric] ? RHYME_MAP[lyric] : [,,,,,];
       const [file, char, south, north, yinyang, tone] = rhyme;
       const word = { lyric, south, north, yinyang, tone };
-      word.melodyChunk = melodyChunks[melodyIndex];
+      // Parse the beats and jianpu, and copy into word object.
+      Object.assign(word, parseMelodyChunk(melodyChunks[melodyIndex]));
       melodyIndex++;
       line.push(word);
     }
