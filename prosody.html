@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Prosody</title>
+<link rel="stylesheet" href="prosody.css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
+<div class="songdata">
+  <h1>{{ song.title }}</h1>
+  <p>Composer: {{ song.composer }}
+  <p>Song ID: {{ song.id }}
+  <template v-for="line in poem">
+  <table>
+    <tbody>
+      <template v-for='attribute in ["lyric", "south", "tone", "yinyang", "melodyChunk"]'>
+        <tr>
+          <td>{{ attribute }}</td>
+          <template v-for="word in line">
+            <td>{{ word[attribute] }}</td>
+          </template>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+  </template>
+</div>
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="models/song.js"></script>
+<Script src="database.js"></Script>
+<script src="assets/mulu.js"></script>
+<script type="module" src="prosody.js"></script>

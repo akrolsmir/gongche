@@ -6,6 +6,7 @@ function getRhymeMap(dictionary) {
   return map;
 }
 
+// Format: File, Char, South Pronounce, North, Yin/Yang, Middle Chinese Tone
 const RHYME_DICTIONARY = [
 ["侵尋韻","侵","ts`.i.m","ts`.i.m","陰","平"],
 ["侵尋韻","骎","ts`.i.m","ts`.i.m","陰","平"],
