@@ -11,6 +11,11 @@
   <p> Line {{ index + 1 }}
   <table>
     <tbody>
+      <tr>
+        <td style='text-align: center' v-bind:colspan='line.length + 1'>
+          《{{ song.title }}》 - 《{{ song.composer }}》
+        </td>
+      </tr>
       <template v-for='(header, attribute) in rowHeaders'>
         <tr>
           <th>{{ header }}</th>
