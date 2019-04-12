@@ -51,17 +51,17 @@ function parseMelodyChunk(melodyChunk) {
   return { beats: beats.join(' '), melody: melody.join(' ') };
 }
 
-function buildPoem(melody, lyrics, region) {
+function buildPoem(song) {
   let melodyIndex = 0;
-  let melodyChunks = melody.split(' ');
+  let melodyChunks = song.melody.split(' ');
   const lines = [];
   let line = [];
-  for (const lyric of lyrics) {
+  for (const lyric of song.lyrics) {
     if (lyric != '\n') {
       const rhyme = RHYME_MAP[lyric] ? RHYME_MAP[lyric] : [,,,,,];
       const [file, char, south, north, yinyang, tone] = rhyme;
       const word = { lyric, yinyang, tone };
-      word.pronounce = region == 'North' ? north : south;
+      word.pronounce = song.region == 'North' ? north : south;
       // Parse the beats and jianpu, and copy into word object.
       Object.assign(word, parseMelodyChunk(melodyChunks[melodyIndex]));
       melodyIndex++;
@@ -90,7 +90,7 @@ async function main() {
     data: {
       song,
       rowHeaders,
-      poem: buildPoem(song.melody, song.lyrics, song.region)
+      poem: buildPoem(song)
     }
   });
 }
