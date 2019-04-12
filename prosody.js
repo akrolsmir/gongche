@@ -28,14 +28,14 @@ const gongcheToJianpu = {
 
 const beatSymbols = [ "、", "。"];
 
-const rowHeaders = {
-  'lyric': '詞',
-  'pronounce': '字音',
-  'tone': '聲調',
-  'yinyang': '陰陽',
-  'beats': '板眼',
-  'melody': '簡譜音高'
-}
+const rowHeaders = [
+  {id: 'lyric', display: '詞'},
+  {id: 'pronounce', display: '字音'},
+  {id: 'tone', display: '聲調'},
+  {id: 'yinyang', display: '陰陽'},
+  {id: 'beats', display: '板眼'},
+  {id: 'melody', display: '簡譜音高'}
+]
 
 function parseMelodyChunk(melodyChunk) {
   const melody = [];
@@ -90,7 +90,14 @@ async function main() {
     data: {
       song,
       rowHeaders,
-      poem: buildPoem(song)
+      poem: buildPoem(song),
+      checkedHeaders: rowHeaders.map(function (h) { return h.id; })
+    },
+    computed: {
+      filteredHeaders () {
+        const check = this.checkedHeaders;
+        return rowHeaders.filter(function (h) { return check.includes(h.id); });
+      }
     }
   });
 }

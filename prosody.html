@@ -7,6 +7,11 @@
   <h1>{{ song.title }}</h1>
   <p>Composer: {{ song.composer }}
   <p>Song ID: {{ song.id }}
+  <p>
+  <template v-for="header in rowHeaders">
+    <input type="checkbox" v-bind:id="header.id" v-bind:value="header.id" v-model="checkedHeaders">
+    <label v-bind:for="header.id">{{ header.display }}</label>
+  </template>
   <template v-for="(line, index) in poem">
   <p> Line {{ index + 1 }}
   <table>
@@ -16,11 +21,11 @@
           《{{ song.title }}》 - 《{{ song.composer }}》
         </td>
       </tr>
-      <template v-for='(header, attribute) in rowHeaders'>
+      <template v-for='header in filteredHeaders'>
         <tr>
-          <th>{{ header }}</th>
+          <th>{{ header.display }}</th>
           <template v-for="word in line">
-            <td>{{ word[attribute] }}</td>
+            <td>{{ word[header.id] }}</td>
           </template>
         </tr>
       </template>
