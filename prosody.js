@@ -91,12 +91,11 @@ async function main() {
       song,
       rowHeaders,
       poem: buildPoem(song),
-      checkedHeaders: rowHeaders.map(function (h) { return h.id; })
+      checkedHeaders: rowHeaders.map(h => h.id)
     },
     computed: {
       filteredHeaders () {
-        const check = this.checkedHeaders;
-        return rowHeaders.filter(function (h) { return check.includes(h.id); });
+        return rowHeaders.filter(h => this.checkedHeaders.includes(h.id));
       }
     }
   });
