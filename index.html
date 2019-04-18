@@ -21,11 +21,11 @@
     </div>
     <div class="songdata">
       Title
-      <textarea name="title" id="title" rows="1" cols="20"
+      <textarea readonly name="title" id="title" rows="1" cols="20"
           placeholder="Title" v-model="song.title"></textarea>
       Composer
-      <textarea name="composer" id="composer" rows="1" cols="20"
-          placeholder="Composer" v-model="song.composer"></textarea>
+      <textarea readonly name="composer" id="composer" rows="1" cols="20"
+          placeholder="Source" v-model="song.composer"></textarea>
       Region
       <select v-model="editedRegion">
         <option v-for="r in regions">
