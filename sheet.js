@@ -402,11 +402,11 @@ async function main() {
       }
     },
     watch: {
-      keySignature(oldSignature, newSignature) {
+      keySignature() {
         vexflowContext.clear();
         renderSheet(song.lyrics, song.melody);
       },
-      bpm(oldBpm, newBpm) {
+      bpm(newBpm) {
         Tone.Transport.bpm.value = newBpm;
       }
     }
