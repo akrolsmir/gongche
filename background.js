@@ -33,6 +33,7 @@ function configSongData() {
       editedLyrics: 'Placeholder lyrics',
       editedMelody: 'Placeholder melody',
       editedRegion: 'North',
+      editedId: '123.4',
       keyboardToGongche,
     },
     computed: {
@@ -77,6 +78,20 @@ function configSongData() {
           drawUiLayer(spaceCount, /* showAnnotations = */ false);
         }
       }
+    },
+    watch: {
+      editedId (newId) {
+        if (songsById[newId]) {
+          if (songsById[newId] != songIndex) {
+            saveLyricsAndMelody();
+            songIndex = songsById[newId];
+            renderSong();
+          }
+        } else {
+          // TODO: Consider debouncing this
+          alert(`No song at ${newId}`);
+        }
+      }
     }
   });
 }
@@ -118,6 +133,7 @@ function renderSong() {
   songDataApp.editedLyrics = song.lyrics;
   songDataApp.editedMelody = song.melody;
   songDataApp.editedRegion = song.region;
+  songDataApp.editedId = song.id;
 }
 
 function loadImage(src) {
