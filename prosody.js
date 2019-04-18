@@ -29,7 +29,7 @@ const gongcheToJianpu = {
 const beatSymbols = [ "、", "。"];
 
 const rowHeaders = [
-  {id: 'lyric', display: '詞'},
+  {id: 'lyric', display: '字'},
   {id: 'pronounce', display: '字音'},
   {id: 'tone', display: '聲調'},
   {id: 'yinyang', display: '陰陽'},
