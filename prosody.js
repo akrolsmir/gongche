@@ -47,6 +47,9 @@ const rowHeaders = [
 ]
 
 function parseMelodyChunk(melodyChunk, lastOffset) {
+  if (!melodyChunk) {
+    return [{}, 0];
+  }
   const melody = [];
   const beats = [];
   const differences = [];
