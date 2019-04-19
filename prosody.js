@@ -103,6 +103,7 @@ async function main() {
   const vueApp = new Vue({
     el: '.songdata',
     data: {
+      randomColor,
       rowHeaders,
       rawSongs,
       interleave: true,

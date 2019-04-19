@@ -12,7 +12,7 @@
     <label v-bind:for="header.id">{{ header.display }}</label>
   </template>
   <template v-for="line in lines">
-  <table>
+  <table v-bind:style="`background-color: ${randomColor({ luminosity: 'light', seed: line.song.id })}`">
     <tbody>
       <tr>
         <td style='text-align: center' v-bind:colspan='line.words.length + 1'>
@@ -33,6 +33,7 @@
 </div>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.5.4/randomColor.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="models/song.js"></script>
 <Script src="database.js"></Script>
