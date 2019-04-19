@@ -198,7 +198,7 @@ function printSong() {
       if (!songBreaks.includes(symbol)) {
         output += symbol.text;
       } else {
-        output += "\n";
+        output += ".\n";
       }
     }
   }

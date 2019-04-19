@@ -40,7 +40,7 @@ function configSongData() {
       // If the song's lyrics or melody were edited, color the field yellow.
       lyricsStyle() {
         const yellow = 'rgba(256, 256, 0, 0.4)';
-        const color = this.song.lyrics == this.editedLyrics ? 'white' : yellow;
+        const color = this.song.fullLyrics == this.editedLyrics ? 'white' : yellow;
         return {
           backgroundColor: color,
         }
@@ -55,7 +55,7 @@ function configSongData() {
       // Show the current lyric, based on the spaces in the melody field.
       lyricPreview() {
         const melodySpaces = this.editedMelody.split(' ').length - 1;
-        const unspacedLyrics = this.editedLyrics.replace(/\s/g, '');
+        const unspacedLyrics = this.strippedLyrics.replace(/\s/g, '');
         if (0 <= melodySpaces && melodySpaces < unspacedLyrics.length) {
           return unspacedLyrics[melodySpaces];
         }
@@ -77,6 +77,10 @@ function configSongData() {
           const spaceCount = output.split(' ').length - 1;
           drawUiLayer(spaceCount, /* showAnnotations = */ false);
         }
+      },
+      strippedLyrics() {
+        // Remove all rhyme and padding markers.
+        return this.editedLyrics.replace(/[.,_]/g, '');
       }
     },
     watch: {
@@ -98,8 +102,12 @@ function configSongData() {
 
 function saveLyricsAndMelody() {
   const song = songs[songIndex];
-  if (song.lyrics != songDataApp.editedLyrics) {
-    song.lyrics = songDataApp.editedLyrics;
+  if (song.fullLyrics != songDataApp.editedLyrics) {
+    song.fullLyrics = songDataApp.editedLyrics;
+    saveSong(song);
+  }
+  if (song.lyrics != songDataApp.strippedLyrics) {
+    song.lyrics = songDataApp.strippedLyrics;
     saveSong(song);
   }
   if (song.melody != songDataApp.editedMelody) {
@@ -130,7 +138,7 @@ function renderSong() {
   renderPdfPage();
 
   songDataApp.song = song;
-  songDataApp.editedLyrics = song.lyrics;
+  songDataApp.editedLyrics = song.fullLyrics;
   songDataApp.editedMelody = song.melody;
   songDataApp.editedRegion = song.region;
   songDataApp.editedId = song.id;
