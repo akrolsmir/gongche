@@ -125,13 +125,23 @@ function buildLines(song) {
 main();
 
 async function main() {
+  const [songs, songsById] = await getSongTables();
+
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1,6584.2";
   const ids = songId.split(',')
 
-  const [songs, songsById] = await getSongTables();
-  const rawSongs = ids.map(i => songs[songsById[i]]);
+  let songTitle = urlParams.get('songTitle');
+  let rawSongs;
+  let pageTitle;
+  if (songTitle) {
+    rawSongs = songs.filter(song => song.title == songTitle);
+    pageTitle = songTitle;
+  } else {
+    rawSongs = ids.map(id => songs[songsById[id]]);
+    pageTitle = 'IDs: ' + ids;
+  }
 
   const vueApp = new Vue({
     el: '.songdata',
@@ -139,6 +149,7 @@ async function main() {
       randomColor,
       rowHeaders,
       rawSongs,
+      pageTitle,
       interleave: true,
       checkedHeaders: rowHeaders.map(h => h.id)
     },
