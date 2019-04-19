@@ -4,27 +4,25 @@
 <link rel="stylesheet" href="prosody.css">
 <link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
 <div class="songdata">
-  <h1>{{ song.title }}</h1>
-  <p>Composer: {{ song.composer }}
-  <p>Song ID: {{ song.id }}
+  <input type="checkbox" id="interleave" v-model="interleave">
+  <label for="interleave">Interleaved</label>
   <p>
   <template v-for="header in rowHeaders">
     <input type="checkbox" v-bind:id="header.id" v-bind:value="header.id" v-model="checkedHeaders">
     <label v-bind:for="header.id">{{ header.display }}</label>
   </template>
-  <template v-for="(line, index) in poem">
-  <p> Line {{ index + 1 }}
+  <template v-for="line in lines">
   <table>
     <tbody>
       <tr>
-        <td style='text-align: center' v-bind:colspan='line.length + 1'>
-          《{{ song.title }}》 - 《{{ song.composer }}》
+        <td style='text-align: center' v-bind:colspan='line.words.length + 1'>
+          Line {{ line.index }} of {{ line.song.id }} 《{{ line.song.title }} - {{ line.song.composer }}》
         </td>
       </tr>
       <template v-for='header in filteredHeaders'>
         <tr>
           <th>{{ header.display }}</th>
-          <template v-for="word in line">
+          <template v-for="word in line.words">
             <td>{{ word[header.id] }}</td>
           </template>
         </tr>

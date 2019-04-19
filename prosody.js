@@ -1,14 +1,5 @@
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 
-/*
-- Poem
-  - Lines
-    - Words
-      - Dict: Pronounce, YinYang, Tone
-      - Beat
-      - Melody
-*/
-
 // TODO deduplicate from sheet.js
 const gongcheToJianpu = {
   "合": "5.",
@@ -51,11 +42,33 @@ function parseMelodyChunk(melodyChunk) {
   return { beats: beats.join(' '), melody: melody.join(' ') };
 }
 
-function buildPoem(song) {
+/** @returns the lines of these songs, zipped (all line 1s, then 2s, 3s...) */
+function interleaveLines(songs) {
+  const result = [];
+  const unzippedLines = songs.map(buildLines);
+  const maxLength = Math.max(...unzippedLines.map(batch => batch.length));
+  for (let i = 0; i < maxLength; i++) {
+    for (const lines of unzippedLines) {
+      if (lines[i]) {
+        result.push(lines[i]);
+      }
+    }
+  }
+  return result;
+}
+
+/**
+  @returns an array of lines for the input song.
+  Line object: { song: {...}, index: 0, words: [
+    {lyric, pronounce, tone, yinyang, beats, melody}, ...
+  ]}
+*/
+function buildLines(song) {
   let melodyIndex = 0;
   let melodyChunks = song.melody.split(' ');
   const lines = [];
-  let line = [];
+  let lineCount = 1;
+  let line = { words: [], song, index: lineCount };
   for (const lyric of song.lyrics) {
     if (lyric != '\n') {
       const rhyme = RHYME_MAP[lyric] ? RHYME_MAP[lyric] : [,,,,,];
@@ -65,11 +78,12 @@ function buildPoem(song) {
       // Parse the beats and jianpu, and copy into word object.
       Object.assign(word, parseMelodyChunk(melodyChunks[melodyIndex]));
       melodyIndex++;
-      line.push(word);
+      line.words.push(word);
     }
     else {
       lines.push(line);
-      line = [];
+      lineCount++;
+      line = { words: [], song, index: lineCount };
     }
   }
   return lines;
@@ -80,22 +94,27 @@ main();
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
-  songId = songId ? songId : "6584.1";
+  songId = songId ? songId : "6584.1,6584.2";
+  const ids = songId.split(',')
 
   const [songs, songsById] = await getSongTables();
-  const song = songs[songsById[songId]];
+  const rawSongs = ids.map(i => songs[songsById[i]]);
 
   const vueApp = new Vue({
     el: '.songdata',
     data: {
-      song,
       rowHeaders,
-      poem: buildPoem(song),
+      rawSongs,
+      interleave: true,
       checkedHeaders: rowHeaders.map(h => h.id)
     },
     computed: {
       filteredHeaders () {
         return rowHeaders.filter(h => this.checkedHeaders.includes(h.id));
+      },
+      lines() {
+        return this.interleave 
+          ? interleaveLines(this.rawSongs) : this.rawSongs.flatMap(buildLines);
       }
     }
   });
