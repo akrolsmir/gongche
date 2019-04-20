@@ -13,7 +13,7 @@
     <label v-bind:for="header.id">{{ header.display }}</label>
   </template>
   <template v-for="line in lines">
-  <table v-bind:style="`background-color: ${randomColor({ luminosity: 'light', seed: line.song.id })}`">
+  <table v-bind:style="tableStyle(line.song)">
     <tbody>
       <tr>
         <td style='text-align: center' v-bind:colspan='line.words.length + 1'>

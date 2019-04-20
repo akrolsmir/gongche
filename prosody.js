@@ -122,6 +122,24 @@ function buildLines(song) {
   return lines;
 }
 
+function tableStyle(song) {
+  // From https://stackoverflow.com/a/7616484/1222351
+  function hashString(str) {
+    var hash = 0, i, chr;
+    if (str.length === 0) return hash;
+    for (i = 0; i < str.length; i++) {
+      chr = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  }
+  // Reverse the string, to generate wider color ranges over small sigdigits.
+  const seed = hashString(song.id.split('').reverse().join(''));
+  // Set opacity to be #66 to keep text readable.
+  return `background-color: ${randomColor({ seed }) + '66'}`;
+}
+
 main();
 
 async function main() {
@@ -146,7 +164,7 @@ async function main() {
   const vueApp = new Vue({
     el: '.songdata',
     data: {
-      randomColor,
+      tableStyle,
       rowHeaders,
       rawSongs,
       pageTitle,
