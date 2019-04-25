@@ -119,6 +119,10 @@ function buildLines(song) {
       line = { words: [], song, index: lineCount };
     }
   }
+  if (line.words.length > 0) {
+    // Add the last line even if there's no terminating newline
+    lines.push(line);
+  }
   return lines;
 }
 
