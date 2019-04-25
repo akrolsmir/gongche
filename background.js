@@ -93,7 +93,7 @@ function configSongData() {
           }
         } else {
           // TODO: Consider debouncing this
-          alert(`No song at ${newId}`);
+          // alert(`No song at ${newId}`);
         }
       }
     }
