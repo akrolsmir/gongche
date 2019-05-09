@@ -2,13 +2,16 @@
 <meta charset="utf-8">
 <title>Query</title>
 <div class="songdata">
-  <input type="text" id="searchbox" v-model="searchbox"> {{ matches.length }} pieces
-  <ul>
-    <li v-for='song in matches'>
-      {{ song.id }} 《{{ song.title }} - {{ song.composer }}》
-      <a v-bind:href='`sheet.html?id=${song.id}`'>Sheet Music</a>
-    </li>
-  </ul>
+  <input type="text" id="searchbox" v-model="searchbox">
+  <p> {{ matches.length }} pieces
+  <div id="results" style="overflow:auto; height:200px; background:lightgrey">
+    <ul>
+      <li v-for='song in matches'>
+        {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
+        <a v-bind:href='`sheet.html?id=${song.id}`'>Sheet Music</a>
+      </li>
+    </ul>
+  </div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
