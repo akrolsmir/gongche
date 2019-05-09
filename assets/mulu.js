@@ -31,23 +31,32 @@ const bookOffsets = [
   [18, 6535 - 4]
 ];
 
-function getRawTable() {
-  const rawTable = [];
+/** @returns a table of mode keys and their final page numbers. */
+function parseModeKeys() {
+  const modeKeys = [];
+  const rangeRegex = /^頁\d+-(\d+)$/;
   for (const row of mulu) {
-    if (row.length != 3) {
-      continue;
+    if (rangeRegex.test(row[row.length - 1])) {
+      const [fullMatch, end] = rangeRegex.exec(row[row.length - 1]);
+      const modeKey = row[row.length - 2];
+      modeKeys.push([end, modeKey]);
     }
-    if (!/^頁\d+$/.test(row[2])) {
-      // TODO: Remember play names from ranges (e.g. 頁287-314)
-      continue;
-    }
-    rawTable.push(row);
   }
-  return rawTable;
+  return modeKeys;
+}
+
+function getModeKey(pageNum, modeKeys) {
+  for (const [end, modeKey] of modeKeys) {
+    if (pageNum <= end) {
+      return modeKey;
+    }
+  }
+  return 'default_mode_key';
 }
 
 async function getSongTables() {
-  const table = getRawTable();
+  const table = mulu.filter(row => row.length == 3 && /^頁\d+$/.test(row[2]));
+  const modeKeys = parseModeKeys();
   const songsById = {};
   const songsMap = await loadSongs();
   const fullTable = [];
@@ -65,11 +74,10 @@ async function getSongTables() {
       orderInPage = (lastSong.pageNum != pageNum) ? 1 : orderInPage + 1;
     }
     const id = `${pageNum}.${orderInPage}`
-    if (songsMap.has(id)) {
-      fullTable.push(Song.fromJson(songsMap.get(id)));
-    } else {
-      fullTable.push(new Song(id, title, composer, pageNum));
-    }
+    const song = songsMap.has(id) ? Song.fromJson(songsMap.get(id))
+      : new Song(id, title, composer, pageNum);
+    song.modeKey = getModeKey(pageNum, modeKeys);
+    fullTable.push(song);
     songsById[id] = i;
   }
   return [fullTable, songsById];
