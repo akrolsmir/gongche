@@ -16,6 +16,12 @@ function checkMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.mode) {
+    // Song mode key must contain the specified string.
+    if (!song.modeKey.includes(searchParams.mode)) {
+      return false;
+    }
+  }
   return true;
 }
 
