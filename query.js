@@ -1,4 +1,4 @@
-import { buildLines } from "./prosody.js"
+import { buildLines } from "./lines.js"
 
 main();
 
