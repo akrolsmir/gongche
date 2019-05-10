@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Query</title>
+<link rel="stylesheet" href="prosody.css">
 <div class="songdata">
-  <input type="text" id="searchbox" v-model="searchbox">
+  Select songs: <input type="text" id="searchbox" v-model="searchbox">
   <p> {{ matches.length }} pieces
   <div id="results" style="overflow:auto; height:200px; background:lightgrey">
     <ul>
@@ -12,6 +13,27 @@
       </li>
     </ul>
   </div>
+  <p> Filter lines: <input type="text" id="filterbox" v-model="filterbox">
+  <p> Showing lines from the first 10 songs:
+  <template v-for="line in lines">
+    <table>
+      <tbody>
+        <tr>
+          <td style='text-align: center' v-bind:colspan='line.words.length + 1'>
+            Line {{ line.index }} of {{ line.song.id }} 《{{ line.song.title }} - {{ line.song.composer }}》
+          </td>
+        </tr>
+        <template v-for='header in headers'>
+          <tr>
+            <th>{{ header.display }}</th>
+            <template v-for="word in line.words">
+              <td>{{ word[header.id] }}</td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </template>
 </div>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>

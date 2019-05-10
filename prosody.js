@@ -93,7 +93,7 @@ function interleaveLines(songs) {
     {lyric, pronounce, tone, yinyang, beats, melody}, ...
   ]}
 */
-function buildLines(song) {
+export function buildLines(song) {
   let melodyIndex = 0;
   let melodyChunks = song.melody.split(' ');
   const lines = [];
@@ -144,7 +144,7 @@ function tableStyle(song) {
   return `background-color: ${randomColor({ seed }) + '66'}`;
 }
 
-main();
+// main();
 
 async function main() {
   const [songs, songsById] = await getSongTables();

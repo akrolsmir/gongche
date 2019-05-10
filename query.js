@@ -1,4 +1,4 @@
-import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
+import { buildLines } from "./prosody.js"
 
 main();
 
@@ -31,14 +31,20 @@ function checkMatch(song, searchParams) {
   return true;
 }
 
+const rowHeaders = [
+  { id: 'lyric', display: '字' },
+  { id: 'melody', display: '簡譜音高' },
+]
+
 async function main() {
   const [songs, songsById] = await getSongTables();
 
   const vueApp = new Vue({
     el: '.songdata',
     data: {
+      songs,
       searchbox: '',
-      songs
+      headers: rowHeaders
     },
     computed: {
       matches() {
@@ -65,6 +71,9 @@ async function main() {
           searchParams[keyword] = param;
         }
         return songs.filter(song => checkMatch(song, searchParams))
+      },
+      lines() {
+        return this.matches.slice(0, 10).flatMap(buildLines);
       }
     }
   });
