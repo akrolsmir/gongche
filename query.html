@@ -3,8 +3,12 @@
 <title>Query</title>
 <link rel="stylesheet" href="prosody.css">
 <div class="songdata">
-  Select songs: <input type="text" id="songsQuery" v-model="songsQuery">
-  <p> {{ matches.length }} pieces
+  <h1>Query Engine</h1>
+  <div style="background:lightgrey">
+    <p> Select songs: <input type="text" id="songsQuery" v-model="songsQuery"> 
+    <p> (Examples: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code>)
+    <h3>{{ matches.length }} pieces</h3>
+  </div>
   <div id="results" style="overflow:auto; height:200px; background:lightgrey">
     <ul>
       <li v-for='song in matches'>
