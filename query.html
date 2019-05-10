@@ -3,7 +3,7 @@
 <title>Query</title>
 <link rel="stylesheet" href="prosody.css">
 <div class="songdata">
-  Select songs: <input type="text" id="searchbox" v-model="searchbox">
+  Select songs: <input type="text" id="songsQuery" v-model="songsQuery">
   <p> {{ matches.length }} pieces
   <div id="results" style="overflow:auto; height:200px; background:lightgrey">
     <ul>
@@ -13,9 +13,9 @@
       </li>
     </ul>
   </div>
-  <p> Filter lines: <input type="text" id="filterbox" v-model="filterbox">
-  <p> Showing lines from the first 10 songs:
-  <template v-for="line in lines">
+  <p> Filter lines: <input type="text" id="linesQuery" v-model="linesQuery">
+  <p> Showing first 50 matches:
+  <template v-for="line in matchedLines">
     <table>
       <tbody>
         <tr>

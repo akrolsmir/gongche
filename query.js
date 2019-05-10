@@ -31,6 +31,18 @@ function checkMatch(song, searchParams) {
   return true;
 }
 
+function addJianpuString(line) {
+  line.jianpuString = line.words
+    .map(word => word.melody)
+    .join(' ')
+    .replace(/ /g, '');
+  return line;
+}
+
+function checkLineMatch(line, query) {
+  return line.jianpuString.includes(query);
+}
+
 const rowHeaders = [
   { id: 'lyric', display: '字' },
   { id: 'melody', display: '簡譜音高' },
@@ -43,7 +55,8 @@ async function main() {
     el: '.songdata',
     data: {
       songs,
-      searchbox: '',
+      songsQuery: '',
+      linesQuery: '',
       headers: rowHeaders
     },
     computed: {
@@ -56,7 +69,7 @@ async function main() {
           'mode': ''
         }
         // Example format: 'id:123.4 title:hello region:north'
-        const terms = this.searchbox.split(' ');
+        const terms = this.songsQuery.split(' ');
         for (const term of terms) {
           const termSplit = term.split(':');
           if (termSplit.length != 2) {
@@ -73,7 +86,12 @@ async function main() {
         return songs.filter(song => checkMatch(song, searchParams))
       },
       lines() {
-        return this.matches.slice(0, 10).flatMap(buildLines);
+        return this.matches.flatMap(buildLines).map(addJianpuString);
+      },
+      matchedLines() {
+        return this.lines
+          .filter(line => checkLineMatch(line, this.linesQuery))
+          .slice(0, 50);
       }
     }
   });
