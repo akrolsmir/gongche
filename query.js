@@ -22,6 +22,12 @@ function checkMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.region) {
+    // Song region must contain the specified string (case-blind).
+    if (!song.region.toLowerCase().includes(searchParams.region.toLowerCase())) {
+      return false;
+    }
+  }
   return true;
 }
 
