@@ -89,8 +89,9 @@ async function main() {
         return this.matches.flatMap(buildLines).map(addJianpuString);
       },
       matchedLines() {
+        const query = this.linesQuery.replace(/ /g, '');
         return this.lines
-          .filter(line => checkLineMatch(line, this.linesQuery))
+          .filter(line => checkLineMatch(line, query))
           .slice(0, 50);
       }
     }
