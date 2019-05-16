@@ -15,9 +15,12 @@ function rhythmizeFree(input) {
   let output = [];
   for (const symbol of input) {
     if (symbol == "_") {
+      // Last note in a measure is a whole note.
+      output[output.length - 1].setDuration('1');
       output.push(BAR);
     } else {
-      symbol.setDuration('4'); // All notes in free rhythm are quarter notes.
+      // All other notes in free rhythm are quarter notes.
+      symbol.setDuration('4');
       output.push(symbol);
     }
   }
