@@ -1,4 +1,4 @@
-import { buildLines } from "./lines.js"
+import { buildLines, encodeJianpu, decodeToJianpu } from "./lines.js"
 
 main();
 
@@ -45,13 +45,10 @@ function checkLineMatch(line, query) {
 
 function findMotifs(lines) {
   const motifs = new Map();
-  // Count the occurences of each motif (aka line substring >= 4 chars.)
-  // TODO: Adjust for jianpu strings longer than 1 character
+  // Count the occurences of each motif (any line substring >= 4 chars).
+  // TODO: Possibly speed up with suffix tree?
   for (const line of lines) {
-    const jianpu = line.jianpuString;
-    if (jianpu.length <= 3) {
-      continue;
-    }
+    const jianpu = encodeJianpu(line.jianpuString);
     const MIN_LENGTH = 4;
     for (let end = jianpu.length; end >= MIN_LENGTH; end--) {
       for (let start = 0; start <= end - MIN_LENGTH; start++) {
@@ -73,7 +70,7 @@ function findMotifs(lines) {
     const longerMotifs = finalMotifs
       .filter(([m, c]) => m.includes(motif) && c >= count);
     if (longerMotifs.length == 0) {
-      finalMotifs.push([motif, count]);
+      finalMotifs.push([decodeToJianpu(motif), count]);
     }
   }
   return finalMotifs;

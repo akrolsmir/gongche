@@ -12,9 +12,9 @@ const gongcheToJianpu = {
   "六": "5",
   "五": "6",
   "乙": "7",
-  "仩": ".1",
-  "伬": ".2",
-  "仜": ".3",
+  "仩": "'1",
+  "伬": "'2",
+  "仜": "'3",
 }
 
 const jianpuToOffset = {
@@ -28,9 +28,57 @@ const jianpuToOffset = {
   "5": 4,
   "6": 5,
   "7": 6,
-  ".1": 7,
-  ".2": 8,
-  ".3": 9,
+  "'1": 7,
+  "'2": 8,
+  "'3": 9,
+}
+
+// Mapping from jianpu to single char for string manipulation.
+const jianpuToChar = {
+  "5.": "g",
+  "6.": "a",
+  "7.": "b",
+  "1": "1",
+  "2": "2",
+  "3": "3",
+  "4": "4",
+  "5": "5",
+  "6": "6",
+  "7": "7",
+  "'1": "C",
+  "'2": "D",
+  "'3": "E",
+}
+
+const charToJianpu = {};
+for (let jianpu in jianpuToChar) {
+  const char = jianpuToChar[jianpu];
+  charToJianpu[char] = jianpu;
+}
+
+export function encodeJianpu(jianpu) {
+  let result = "";
+  for (let i = 0; i < jianpu.length; i++) {
+    if (i + 1 < jianpu.length) {
+      const two = jianpu[i] + jianpu[i + 1];
+      if (two in jianpuToChar) {
+        result += jianpuToChar[two]
+        i++;
+        continue;
+      }
+    }
+    const one = jianpu[i];
+    result += one in jianpuToChar ? jianpuToChar[one] : one;
+  }
+  return result;
+}
+
+export function decodeToJianpu(chars) {
+  let result = '';
+  for (const char of chars) {
+    result += char in charToJianpu ? charToJianpu[char] : char;
+  }
+  return result;
 }
 
 const beatSymbols = ["、", "。"];
