@@ -43,6 +43,43 @@ function checkLineMatch(line, query) {
   return line.jianpuString.includes(query);
 }
 
+function findMotifs(lines) {
+  const motifs = new Map();
+  // Count the occurences of each motif (aka line substring >= 4 chars.)
+  // TODO: Adjust for jianpu strings longer than 1 character
+  for (const line of lines) {
+    const jianpu = line.jianpuString;
+    if (jianpu.length <= 3) {
+      continue;
+    }
+    const MIN_LENGTH = 4;
+    for (let end = jianpu.length; end >= MIN_LENGTH; end--) {
+      for (let start = 0; start <= end - MIN_LENGTH; start++) {
+        const motif = jianpu.slice(start, end);
+        if (motifs.has(motif)) {
+          motifs.set(motif, motifs.get(motif) + 1);
+        } else {
+          motifs.set(motif, 1);
+        }
+      }
+    }
+  }
+  // Identify the unique longest motifs occuring more than once.
+  const sortedMotifs = Array.from(motifs)
+    .filter(([motif, count]) => count > 1)
+    .sort(([m1, c1], [m2, c2]) => m2.length - m1.length);
+  const finalMotifs = []
+  for (const [motif, count] of sortedMotifs) {
+    const longerMotifs = finalMotifs
+      .filter(([m, c]) => m.includes(motif) && c >= count);
+    if (longerMotifs.length == 0) {
+      finalMotifs.push([motif, count]);
+    }
+  }
+  return finalMotifs;
+}
+
+
 const rowHeaders = [
   { id: 'lyric', display: '字' },
   { id: 'melody', display: '簡譜音高' },
