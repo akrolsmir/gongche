@@ -81,7 +81,7 @@ export function decodeToJianpu(chars) {
   return result;
 }
 
-const beatSymbols = ["、", "。"];
+const beatSymbols = ["、", "。", "_",  "▯",  "L",  "﹆",  "╚"];
 
 
 function parseMelodyChunk(melodyChunk, lastOffset) {

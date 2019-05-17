@@ -129,6 +129,7 @@ async function main() {
       songs,
       songsQuery: '',
       linesQuery: '',
+      rhythmQuery: '',
       motifs: [],
       headers: rowHeaders
     },
@@ -164,6 +165,23 @@ async function main() {
         const params = parseQuery(this.linesQuery, lineParams);
         return this.lines.filter(line => checkLineMatch(line, params))
           .slice(0, 50);
+      },
+      matchedRhythms() {
+        const rhythms = {};
+        for (const line of this.lines) {
+          for (let i = 0; i < line.words.length; i++) {
+            const word = line.words[i];
+            if (word.beats && word.beats.includes(this.rhythmQuery)) {
+              const key = `${i + 1}`;
+              if (key in rhythms) {
+                rhythms[key]++;
+              } else {
+                rhythms[key] = 1;
+              }
+            }
+          }
+        }
+        return rhythms;
       }
     }
   });

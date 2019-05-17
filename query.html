@@ -54,9 +54,21 @@
     <v-tab title="Tone">
       Tone
     </v-tab>
-    <v-tab title="Rhythm">
-      Rhythm
-    </v-tab>
+    <v-tab title="Rhythm"><div>
+      <p> Find symbol: <input type="text" id="rhythmQuery" v-model="rhythmQuery">
+      <p> (Examples: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)
+      <p><div v-if="rhythmQuery">
+        Found "{{ rhythmQuery }}" at the following line positions:
+      </div>
+      <div v-else>
+        Total word counts:
+      </div>
+      <ul>
+        <li v-for='(count, index) in matchedRhythms'>
+          Position {{ index }}: {{ count }}
+        </li>
+      </ul>
+    </div></v-tab>
   </vue-tabs>
 </div>
 <script src="https://unpkg.com/vue-nav-tabs/dist/vue-tabs.js"></script>
