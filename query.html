@@ -24,7 +24,7 @@
     <ul>
       <li v-for='motif in motifs'>
         {{ motif[1] }} instances of
-        <a href='#results' v-on:click="setLinesQuery(motif[0])">{{ motif[0] }}</a>
+        <a href='#results' v-on:click="setLinesQuery(`melody:${motif[0]}`)">{{ motif[0] }}</a>
       </li>
     </ul>
   </div>
