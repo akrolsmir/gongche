@@ -2,6 +2,7 @@
 <meta charset="utf-8">
 <title>Query</title>
 <link rel="stylesheet" href="prosody.css">
+<link rel="stylesheet" href="https://unpkg.com/vue-nav-tabs/themes/vue-tabs.css">
 <div class="songdata">
   <h1>Query Engine</h1>
   <div style="background:lightgrey">
@@ -17,7 +18,7 @@
       </li>
     </ul>
   </div>
-  <h2>Motifs</h2> 
+  <vue-tabs><v-tab title="Motifs"><div>
   <button v-on:click="findAllMotifs">Find motifs</button>
   <div id="results" style="overflow:auto; max-height:200px; background:lightblue">
     <ul>
@@ -49,7 +50,16 @@
       </tbody>
     </table>
   </template>
+  </div></v-tab>
+    <v-tab title="Tone">
+      Tone
+    </v-tab>
+    <v-tab title="Rhythm">
+      Rhythm
+    </v-tab>
+  </vue-tabs>
 </div>
+<script src="https://unpkg.com/vue-nav-tabs/dist/vue-tabs.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>

@@ -1,4 +1,5 @@
 import { buildLines, encodeJianpu, decodeToJianpu } from "./lines.js"
+Vue.use(vueTabs.default);
 
 main();
 
