@@ -91,7 +91,16 @@ async function main() {
       songs,
       songsQuery: '',
       linesQuery: '',
+      motifs: [],
       headers: rowHeaders
+    },
+    methods: {
+      findAllMotifs() {
+        this.motifs = findMotifs(this.lines);
+      },
+      setLinesQuery(query) {
+        this.linesQuery = query;
+      }
     },
     computed: {
       matches() {
@@ -120,6 +129,7 @@ async function main() {
         return songs.filter(song => checkMatch(song, searchParams))
       },
       lines() {
+        this.motifs = [];
         return this.matches.flatMap(buildLines).map(addJianpuString);
       },
       matchedLines() {
