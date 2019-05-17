@@ -76,6 +76,25 @@ function findMotifs(lines) {
   return finalMotifs;
 }
 
+// Parse the search query for the keywords specified in params.
+// Example format: 'id:123.4 title:hello region:north'
+function parseQuery(query, params) {
+  const terms = query.split(' ');
+  for (const term of terms) {
+    const termSplit = term.split(':');
+    if (termSplit.length != 2) {
+      console.log(`Invalid syntax: ${term}`);
+      continue;
+    }
+    const [keyword, param] = termSplit;
+    if (!keyword in params) {
+      console.log(`Invalid keyword: ${term}`);
+      continue;
+    }
+    params[keyword] = param;
+  }
+  return params;
+}
 
 const rowHeaders = [
   { id: 'lyric', display: '字' },
@@ -103,34 +122,19 @@ async function main() {
       }
     },
     computed: {
-      matches() {
-        // Parse the search query for specific keywords
-        const searchParams = {
+      matchedSongs() {
+        const validParams = {
           'id': '',
           'title': '',
           'region': '',
           'mode': ''
         }
-        // Example format: 'id:123.4 title:hello region:north'
-        const terms = this.songsQuery.split(' ');
-        for (const term of terms) {
-          const termSplit = term.split(':');
-          if (termSplit.length != 2) {
-            console.log(`Invalid syntax: ${term}`);
-            continue;
-          }
-          const [keyword, param] = termSplit;
-          if (!keyword in searchParams) {
-            console.log(`Invalid keyword: ${term}`);
-            continue;
-          }
-          searchParams[keyword] = param;
-        }
-        return songs.filter(song => checkMatch(song, searchParams))
+        const params = parseQuery(this.songsQuery, validParams);
+        return songs.filter(song => checkMatch(song, params));
       },
       lines() {
         this.motifs = [];
-        return this.matches.flatMap(buildLines).map(addJianpuString);
+        return this.matchedSongs.flatMap(buildLines).map(addJianpuString);
       },
       matchedLines() {
         const query = this.linesQuery.replace(/ /g, '');
