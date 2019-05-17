@@ -1,7 +1,7 @@
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 
 // TODO deduplicate from sheet.js
-const gongcheToJianpu = {
+export const gongcheToJianpu = {
   "合": "5.",
   "四": "6.",
   "一": "7.",
@@ -12,9 +12,9 @@ const gongcheToJianpu = {
   "六": "5",
   "五": "6",
   "乙": "7",
-  "仩": "'1",
-  "伬": "'2",
-  "仜": "'3",
+  "仩": "1'",
+  "伬": "2'",
+  "仜": "3'",
 }
 
 export const jianpuToOffset = {
@@ -28,9 +28,9 @@ export const jianpuToOffset = {
   "5": 4,
   "6": 5,
   "7": 6,
-  "'1": 7,
-  "'2": 8,
-  "'3": 9,
+  "1'": 7,
+  "2'": 8,
+  "3'": 9,
 }
 
 // Mapping from jianpu to single char for string manipulation.
@@ -45,9 +45,9 @@ const jianpuToChar = {
   "5": "5",
   "6": "6",
   "7": "7",
-  "'1": "C",
-  "'2": "D",
-  "'3": "E",
+  "1'": "C",
+  "2'": "D",
+  "3'": "E",
 }
 
 const charToJianpu = {};

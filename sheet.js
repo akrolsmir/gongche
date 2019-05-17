@@ -2,6 +2,7 @@ const VF = Vex.Flow;
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 import { rhythmize } from "./rhythmize.js";
 import { schedulePlayback } from "./playback.js";
+import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
 
 class Note {
   constructor(gongche) {
@@ -36,7 +37,7 @@ class Note {
 
     // If shifted by an octave, add a dot above or below.
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
-    if (jianpu.startsWith('.')) {
+    if (jianpu.endsWith("'")) {
       this.jianpuOctave = makeTextNote('•', 10.5, this.duration);
     }
     if (jianpu.endsWith('.')) {
@@ -46,7 +47,7 @@ class Note {
     // Append dashes, or (double) underline to indicate note length.
     const lengthFont = {size: '16'};
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
-    jianpu = jianpu.replace('.', '');
+    jianpu = jianpu.replace(/[\.']/g, '');
     if (this.duration == '1') {
       jianpu = jianpu + ' - - -';
     } else if (this.duration == '2') {
@@ -108,38 +109,6 @@ export const TimeSignature = {
 }
 
 export const BAR = '|';
-
-const gongcheToJianpu = {
-  "合": "5.",
-  "四": "6.",
-  "一": "7.",
-  "上": "1",
-  "尺": "2",
-  "工": "3",
-  "凡": "4",
-  "六": "5",
-  "五": "6",
-  "乙": "7",
-  "仩": ".1",
-  "伬": ".2",
-  "仜": ".3",
-}
-
-const jianpuToOffset = {
-  "5.": -3,
-  "6.": -2,
-  "7.": -1,
-  "1": 0,
-  "2": 1,
-  "3": 2,
-  "4": 3,
-  "5": 4,
-  "6": 5,
-  "7": 6,
-  ".1": 7,
-  ".2": 8,
-  ".3": 9,
-}
 
 function jianpuToKey(jianpu, keySignature) {
   const PITCHES = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
