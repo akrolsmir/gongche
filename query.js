@@ -2,7 +2,7 @@ import { buildLines, encodeJianpu, decodeToJianpu } from "./lines.js"
 
 main();
 
-function checkMatch(song, searchParams) {
+function checkSongMatch(song, searchParams) {
   if (searchParams.id) {
     // Song id must be an exact match of one in the comma-separated list.
     const ids = searchParams.id.split(',');
@@ -31,16 +31,34 @@ function checkMatch(song, searchParams) {
   return true;
 }
 
+function checkLineMatch(line, params) {
+  if (params.melody) {
+    // Line melody must exactly contain the specified string.
+    if (!line.jianpuString.includes(params.melody)) {
+      return false;
+    }
+  }
+  if (params.fuzzy) {
+    // Line melody must contain the string with at most 3 intervening chars.
+    const encodedQuery = encodeJianpu(params.fuzzy);
+    const fuzzyQuery = encodedQuery.split('').join('.{0,3}?');
+    const regex = new RegExp(fuzzyQuery);
+    if (!regex.test(encodeJianpu(line.jianpuString))) {
+      return false;
+    }
+  }
+  if (params.tone) {
+    // TODO
+  }
+  return true;
+}
+
 function addJianpuString(line) {
   line.jianpuString = line.words
     .map(word => word.melody)
     .join(' ')
     .replace(/ /g, '');
   return line;
-}
-
-function checkLineMatch(line, query) {
-  return line.jianpuString.includes(query);
 }
 
 function findMotifs(lines) {
@@ -123,23 +141,27 @@ async function main() {
     },
     computed: {
       matchedSongs() {
-        const validParams = {
+        const songParams = {
           'id': '',
           'title': '',
           'region': '',
           'mode': ''
         }
-        const params = parseQuery(this.songsQuery, validParams);
-        return songs.filter(song => checkMatch(song, params));
+        const params = parseQuery(this.songsQuery, songParams);
+        return songs.filter(song => checkSongMatch(song, params));
       },
       lines() {
         this.motifs = [];
         return this.matchedSongs.flatMap(buildLines).map(addJianpuString);
       },
       matchedLines() {
-        const query = this.linesQuery.replace(/ /g, '');
-        return this.lines
-          .filter(line => checkLineMatch(line, query))
+        const lineParams = {
+          'melody': '',
+          'fuzzy': '',
+          'tone': ''
+        }
+        const params = parseQuery(this.linesQuery, lineParams);
+        return this.lines.filter(line => checkLineMatch(line, params))
           .slice(0, 50);
       }
     }
