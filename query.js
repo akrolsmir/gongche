@@ -177,7 +177,7 @@ async function main() {
         for (const line of this.lines) {
           for (let i = 0; i < line.words.length; i++) {
             const word = line.words[i];
-            if (word.beats && word.beats.includes(this.rhythmQuery)) {
+            if (word.beats != null && word.beats.includes(this.rhythmQuery)) {
               const key = `${i + 1}`;
               if (key in rhythms) {
                 rhythms[key]++;
