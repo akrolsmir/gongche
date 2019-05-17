@@ -199,7 +199,7 @@ async function main() {
               // Only count contours of 2 or more notes
               if (melodyArray.length > 1) {
                 const firstNote = melodyArray[0];
-                const lastNote = melodyArray[1];
+                const lastNote = melodyArray[melodyArray.length - 1];
                 const contour = jianpuToOffset[lastNote] - jianpuToOffset[firstNote];
                 const key = `${contour}`;
                 if (!(key in tones)) {
