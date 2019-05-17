@@ -11,7 +11,7 @@ class Note {
   }
   getLyric() {
     const index = this.lyricGroup.children.indexOf(this);
-    return index == 0 ? this.lyricGroup.lyric : ' ';
+    return index == 0 && this.lyricGroup.lyric ? this.lyricGroup.lyric : ' ';
   }
   setDuration(duration) {
     this.duration = duration;
