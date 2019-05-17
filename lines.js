@@ -17,7 +17,7 @@ const gongcheToJianpu = {
   "仜": "'3",
 }
 
-const jianpuToOffset = {
+export const jianpuToOffset = {
   "5.": -3,
   "6.": -2,
   "7.": -1,

@@ -1,4 +1,4 @@
-import { buildLines, encodeJianpu, decodeToJianpu } from "./lines.js"
+import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js"
 Vue.use(vueTabs.default);
 
 main();
@@ -117,6 +117,8 @@ function parseQuery(query, params) {
 
 const rowHeaders = [
   { id: 'lyric', display: '字' },
+  { id: 'tone', display: '聲調' },
+  { id: 'yinyang', display: '陰陽' },
   { id: 'melody', display: '簡譜音高' },
 ]
 
@@ -129,6 +131,7 @@ async function main() {
       songs,
       songsQuery: '',
       linesQuery: '',
+      toneQuery: '',
       rhythmQuery: '',
       motifs: [],
       headers: rowHeaders
@@ -139,6 +142,9 @@ async function main() {
       },
       setLinesQuery(query) {
         this.linesQuery = query;
+      },
+      showAlert(text) {
+        alert(text);
       }
     },
     computed: {
@@ -182,6 +188,30 @@ async function main() {
           }
         }
         return rhythms;
+      },
+      matchedToneContours() {
+        // Maps contours to [count, [song names...]]
+        const tones = {};
+        for (const line of this.lines) {
+          for (const word of line.words) {
+            if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
+              const melodyArray = word.melody.split(' ');
+              // Only count contours of 2 or more notes
+              if (melodyArray.length > 1) {
+                const firstNote = melodyArray[0];
+                const lastNote = melodyArray[1];
+                const contour = jianpuToOffset[lastNote] - jianpuToOffset[firstNote];
+                const key = `${contour}`;
+                if (!(key in tones)) {
+                  tones[key] = {count: 0, titles: new Set()};
+                }
+                tones[key].count++;
+                tones[key].titles.add(line.song.title);
+              }
+            }
+          }
+        }
+        return tones;
       }
     }
   });

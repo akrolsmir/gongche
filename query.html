@@ -52,7 +52,30 @@
   </template>
   </div></v-tab>
     <v-tab title="Tone">
-      Tone
+      <p> Find tone: <input type="text" id="toneQuery" v-model="toneQuery">
+      <p> (Examples: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)
+      <p>
+        <div v-if="toneQuery">
+          Found all contours for "{{ toneQuery }}":<br>
+          (Positive contours indicate the song ended on a higher note.)
+        </div>
+        <div v-else>
+          All contours for words with 2 or more notes:<br>
+          (Positive contours indicate the song ended on a higher note.)
+        </div>
+      <ul>
+        <li v-for='(values, contour) in matchedToneContours'>
+          Contour {{ contour }}: {{ values.count }}
+          <ul>
+            <li v-for='title in Array.from(values.titles).splice(0, 10)'>
+              {{ title }}
+            </li>
+            <li v-if='values.titles.size > 10'>
+              <a href="#" v-on:click="showAlert(Array.from(values.titles).join(', '))">...</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </v-tab>
     <v-tab title="Rhythm"><div>
       <p> Find symbol: <input type="text" id="rhythmQuery" v-model="rhythmQuery">
@@ -61,7 +84,7 @@
         Found "{{ rhythmQuery }}" at the following line positions:
       </div>
       <div v-else>
-        Total word counts:
+        Total word counts across all lines:
       </div>
       <ul>
         <li v-for='(count, index) in matchedRhythms'>
