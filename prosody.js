@@ -7,8 +7,9 @@ const rowHeaders = [
   {id: 'yinyang', display: '陰陽'},
   {id: 'beats', display: '板眼'},
   {id: 'melody', display: '簡譜音高'},
+  {id: 'lastNote', display: 'Last Note'},
   // How much a note is offset relative to previous note.
-  {id: 'difference', display: 'difference'} 
+  {id: 'difference', display: 'Contour'},
 ]
 
 /** @returns the lines of these songs, zipped (all line 1s, then 2s, 3s...) */

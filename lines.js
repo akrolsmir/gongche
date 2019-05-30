@@ -106,7 +106,8 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
   return [{
     beats: beats.join(' '),
     melody: melody.join(' '),
-    difference: differences.map(r => (r <= 0 ? '' : '+') + r).join(' ')
+    difference: differences.map(r => (r <= 0 ? '' : '+') + r).join(' '),
+    lastNote: melody[melody.length - 1]
   }, lastOffset];
 }
 
