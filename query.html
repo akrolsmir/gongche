@@ -13,7 +13,8 @@
       <ul>
         <li v-for='song in matchedSongs'>
           {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
-          <a v-bind:href='`sheet.html?songId=${song.id}`'>Sheet Music</a>
+          <a v-bind:href='`sheet.html?songId=${song.id}`'>Sheet</a> | 
+          <a v-bind:href='`prosody.html?songTitle=${song.title}`'>Prosody</a>
         </li>
       </ul>
     </div>
