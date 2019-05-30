@@ -86,11 +86,7 @@
       <div v-else>
         Total word counts across all lines:
       </div>
-      <ul>
-        <li v-for='(count, index) in matchedRhythms'>
-          Position {{ index }}: {{ count }}
-        </li>
-      </ul>
+      <canvas ref="rhythmChart" id="rhythmChart" width="400" height="400"></canvas>
     </div></v-tab>
   </vue-tabs>
 </div>
@@ -98,6 +94,7 @@
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
 <script src="models/song.js"></script>
 <Script src="database.js"></Script>
 <script src="assets/mulu.js"></script>

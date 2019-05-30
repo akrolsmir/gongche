@@ -1,4 +1,5 @@
-import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js"
+import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js";
+import { renderChart } from "./chart.js";
 Vue.use(vueTabs.default);
 
 main();
@@ -145,6 +146,16 @@ async function main() {
       },
       showAlert(text) {
         alert(text);
+      }
+    },
+    // To reference canvas, we have to use $refs and lifestyle hooks.
+    // See also https://stackoverflow.com/a/42606029/1222351
+    mounted() {
+      renderChart(this.matchedRhythms, this.$refs.rhythmChart);
+    },
+    watch: {
+      matchedRhythms(newRhythms) {
+        renderChart(newRhythms, this.$refs.rhythmChart);        
       }
     },
     computed: {
