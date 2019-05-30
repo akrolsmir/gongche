@@ -9,24 +9,26 @@
     <p> Select songs: <input type="text" id="songsQuery" v-model="songsQuery"> 
     <p> (Examples: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code>)
     <h3>{{ matchedSongs.length }} pieces</h3>
-  </div>
-  <div id="results" style="overflow:auto; max-height:200px; background:lightgrey">
-    <ul>
-      <li v-for='song in matchedSongs'>
-        {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
-        <a v-bind:href='`sheet.html?songId=${song.id}`'>Sheet Music</a>
-      </li>
-    </ul>
+    <div id="results" style="overflow:auto; max-height:200px; background:lightgrey">
+      <ul>
+        <li v-for='song in matchedSongs'>
+          {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
+          <a v-bind:href='`sheet.html?songId=${song.id}`'>Sheet Music</a>
+        </li>
+      </ul>
+    </div>
   </div>
   <vue-tabs><v-tab title="Motifs"><div>
-  <button v-on:click="findAllMotifs">Find motifs</button>
-  <div id="results" style="overflow:auto; max-height:200px; background:lightblue">
-    <ul>
-      <li v-for='motif in motifs'>
-        {{ motif[1] }} instances of
-        <a href='#results' v-on:click="setLinesQuery(`melody:${motif[0]}`)">{{ motif[0] }}</a>
-      </li>
-    </ul>
+  <div style="background:lightblue">
+    <button v-on:click="findAllMotifs">Find motifs</button>
+    <div id="results" style="overflow:auto; max-height:200px;">
+      <ul>
+        <li v-for='motif in motifs'>
+          {{ motif[1] }} instances of
+          <a href='#results' v-on:click="setLinesQuery(`melody:${motif[0]}`)">{{ motif[0] }}</a>
+        </li>
+      </ul>
+    </div>
   </div>
   <p> Filter lines: <input type="text" id="linesQuery" v-model="linesQuery">
   <p> (Examples: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code>)
