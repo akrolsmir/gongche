@@ -1,4 +1,4 @@
-let chart;
+const charts = {};
 export function renderChart(labelsToData, canvas) {
   const labels = Object.keys(labelsToData);
   const values = labels.map(label => labelsToData[label]);
@@ -9,20 +9,21 @@ export function renderChart(labelsToData, canvas) {
   gradient.addColorStop(0, '#45a247');
   gradient.addColorStop(1, '#283c86');
 
-  if (!chart) {
+  if (canvas.id in charts) {
+    const chart = charts[canvas.id];
+    replaceData(chart, labels, values);
+  } else {
     const dataset = {
       data: values,
       backgroundColor: gradient,
-      label: 'Line Position'
+      label: 'Count'
     };
     const data = { labels, datasets: [dataset] };
-    chart = new Chart(canvas, {
+    charts[canvas.id] = new Chart(canvas, {
       type: 'bar',
       data,
       options: { responsive: false }
     });
-  } else {
-    replaceData(chart, labels, values);
   }
 }
 

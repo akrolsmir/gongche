@@ -152,10 +152,14 @@ async function main() {
     // See also https://stackoverflow.com/a/42606029/1222351
     mounted() {
       renderChart(this.matchedRhythms, this.$refs.rhythmChart);
+      renderChart(this.matchedLineLengths, this.$refs.lengthChart);
     },
     watch: {
       matchedRhythms(newRhythms) {
         renderChart(newRhythms, this.$refs.rhythmChart);        
+      },
+      matchedLineLengths(newLengths) {
+        renderChart(newLengths, this.$refs.lengthChart);
       }
     },
     computed: {
@@ -184,21 +188,16 @@ async function main() {
           .slice(0, 50);
       },
       matchedRhythms() {
-        const rhythms = {};
+        const counter = new KeyCounter();
         for (const line of this.lines) {
           for (let i = 0; i < line.words.length; i++) {
             const word = line.words[i];
             if (word.beats != null && word.beats.includes(this.rhythmQuery)) {
-              const key = `${i + 1}`;
-              if (key in rhythms) {
-                rhythms[key]++;
-              } else {
-                rhythms[key] = 1;
-              }
+              counter.count(`${i + 1}`);
             }
           }
         }
-        return rhythms;
+        return counter.map;
       },
       matchedToneContours() {
         // Maps contours to [count, [song names...]]
@@ -223,7 +222,39 @@ async function main() {
           }
         }
         return tones;
+      },
+      matchedLineLengths() {
+        const counter = new KeyCounter();
+        for (const line of this.lines) {
+          counter.count(`${ line.words.length }`);
+        }
+        return counter.map;
       }
     }
   });
+}
+
+/**
+ * Tracks the number of keys, with the guarantee that
+ * e.g. if key 9 is present, so are keys 1 to 8.
+ */
+class KeyCounter {
+  constructor() {
+    this.map = {};
+  }
+
+  /** @param key a positive integer to count.  */
+  count(key) {
+    if (key in this.map) {
+      this.map[key]++;
+    } else {
+      this.map[key] = 1;
+      for (let i = key - 1; i > 0; i--) {
+        if (!(`${i}` in this.map)) {
+          this.map[`${i}`] = 0;
+        }
+      }
+    }
+    return this.map;
+  }
 }
