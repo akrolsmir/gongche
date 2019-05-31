@@ -353,7 +353,7 @@ function renderSheet(lyrics, melody) {
 const vexflowDiv = document.getElementById("vexflow")
 const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 // Size our svg:
-vexflowRenderer.resize(900, 2500);
+vexflowRenderer.resize(850, 2500);
 // And get a drawing context:
 const vexflowContext = vexflowRenderer.getContext();
 let vueApp;

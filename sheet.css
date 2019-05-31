@@ -4,13 +4,26 @@ body {
   align-items: center;
 }
 
+#metadata {
+  display: flex;
+  flex-direction: row;
+}
+
+#left {
+  flex-grow: 1;
+}
+
+#right {
+  flex-grow: 1;
+  text-align: right;
+}
+
 h1 {
   font-size: 300%;
   text-align: center;
 }
 
 p {
-  text-align: right;
   font-family: 'Noto Serif TC', serif;
   font-size: 16px;
   line-height: 0.7;
@@ -21,5 +34,5 @@ select {
 }
 
 .songdata {
-  width: 700px;
+  width: 750px;
 }
