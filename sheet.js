@@ -343,8 +343,7 @@ async function main() {
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1";
 
-  const [songs, songsById] = await getSongTables();
-  const song = songs[songsById[songId]];
+  const song = await loadSong(songId);
 
   vueApp = new Vue({
     el: '.songdata',

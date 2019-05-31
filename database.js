@@ -24,3 +24,13 @@ async function loadSongs() {
   });
   return songsMap;
 }
+
+async function loadSong(id) {
+  const doc = await db.collection("songs").doc(id).get();
+  if (doc.exists) {
+    return doc.data();
+  } else {
+    alert(`No song data was found for id '${id}'.`);
+    throw `No song data was found for id '${id}'.`;
+  }
+}
