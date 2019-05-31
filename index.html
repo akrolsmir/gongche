@@ -82,9 +82,11 @@
       <textarea name="melody" id="melody" rows="10" cols="20"
           placeholder="Type melody" v-bind:style="melodyStyle" v-model="melodyGongche"></textarea>
       <a target="_blank" rel="noopener noreferrer" 
-          v-bind:href="'sheet.html?songId=' + song.id">Generate Sheet Music</a>
+          v-bind:href="'sheet.html?songId=' + song.id">Sheet Music</a>
       <a target="_blank" rel="noopener noreferrer" 
-          v-bind:href="'prosody.html?songTitle=' + song.title">Generate Prosody Analysis</a>
+          v-bind:href="'prosody.html?songTitle=' + song.title">Prosody Analysis</a>
+      <a target="_blank" rel="noopener noreferrer" 
+          href="query.html">Query Engine</a>
     </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
