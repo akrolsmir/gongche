@@ -69,6 +69,15 @@ class Note {
     }
     return copy;
   }
+  skeletonize() {
+    // Fix this note's melody to be equal to the last note in its lyric group.
+    const index = this.lyricGroup.children.indexOf(this);
+    if (index != this.lyricGroup.children.length - 1) {
+      const lastNote = this.lyricGroup.children[this.lyricGroup.children.length - 1];
+      this.gongche = lastNote.gongche;
+      this.setDuration(this.duration);
+    }
+  }
 }
 
 export class RestNote {
@@ -89,6 +98,7 @@ export class RestNote {
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
   }
+  skeletonize() {}
 }
 
 class LyricGroup {
@@ -265,10 +275,22 @@ function getTimeSignature(melody) {
   return TimeSignature.FREE;
 }
 
+function skeletonize(rhythmized) {
+  for (const note of rhythmized) {
+    if (note != BAR) {
+      note.skeletonize();
+    }
+  }
+  return rhythmized;
+}
+
 function renderSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
-  const rhythmized = rhythmize(quarters, timeSignature);
+  let rhythmized = rhythmize(quarters, timeSignature);
+  if (vueApp.skeletal) {
+    rhythmized = skeletonize(rhythmized);
+  }
   const modelStaves = splitStaves(rhythmized);
   const voices = makeVoices(modelStaves);
   const playbackNotes = [];
@@ -352,7 +374,8 @@ async function main() {
       keySignature: 'D',
       signatures: Object.keys(VF.keySignature.keySpecs),
       toggle: '▶️',
-      bpm: '120'
+      bpm: '120',
+      skeletal: false,
     },
     methods: {
       toggleMusic(event) {
@@ -376,6 +399,10 @@ async function main() {
       },
       bpm(newBpm) {
         Tone.Transport.bpm.value = newBpm;
+      },
+      skeletal() {
+        vexflowContext.clear();
+        renderSheet(song.lyrics, song.melody);
       }
     }
   });
