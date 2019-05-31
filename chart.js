@@ -1,14 +1,29 @@
+export class KeyCounter {
+  constructor(minKey = '0') {
+    this.map = {};
+    this.map[minKey] = 0;
+  }
+
+  /** @param key a positive integer to count.  */
+  count(key) {
+    if (key in this.map) {
+      this.map[key]++;
+    } else {
+      this.map[key] = 1;
+    }
+    return this.map;
+  }
+}
+
 const charts = {};
 export function renderChart(labelsToData, canvas) {
-  const labels = Object.keys(labelsToData);
-  const values = labels.map(label => labelsToData[label]);
-
   // Generate a nice green-to-blue gradient. From https://uigradients.com/#Meridian.
   const ctx = canvas.getContext("2d");
   const gradient = ctx.createLinearGradient(0, 0, 400, 0);
   gradient.addColorStop(0, '#45a247');
   gradient.addColorStop(1, '#283c86');
 
+  const [labels, values] = cleanLabels(labelsToData);
   if (canvas.id in charts) {
     const chart = charts[canvas.id];
     replaceData(chart, labels, values);
@@ -22,9 +37,25 @@ export function renderChart(labelsToData, canvas) {
     charts[canvas.id] = new Chart(canvas, {
       type: 'bar',
       data,
-      options: { responsive: false }
+      options: {
+        responsive: false,
+        scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+      }
     });
   }
+}
+
+function cleanLabels(labelsToData) {
+  // Ensure that the chart is continuously labeled from min to max.
+  const intLabels = Object.keys(labelsToData).map(Number);
+  const minLabel = Math.min(...intLabels);
+  const maxLabel = Math.max(...intLabels);
+  const labels = [];
+  for (let i = minLabel; i <= maxLabel; i++) {
+    labels.push(i);
+  }
+  const values = labels.map(label => label in labelsToData ? labelsToData[label] : 0);
+  return [labels, values];
 }
 
 function replaceData(chart, labels, data) {

@@ -66,6 +66,7 @@
           All contours for words with 2 or more notes:<br>
           (Positive contours indicate the song ended on a higher note.)
         </div>
+      <canvas ref="contourChart" id="contourChart" width="400" height="400"></canvas>
       <ul>
         <li v-for='(values, contour) in matchedToneContours'>
           Contour {{ contour }}: {{ values.count }}
