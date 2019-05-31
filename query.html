@@ -33,8 +33,14 @@
   </div>
   <p> Filter lines: <input type="text" id="linesQuery" v-model="linesQuery">
   <p> (Examples: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平去</code> | <code>tone:平平仄</code> | <code>tone:平陰平陽仄陰</code>)
-  <p> Showing first 50 matches:
-  <template v-for="line in matchedLines">
+  <p>
+    <div v-if="matchedLines.length > 50">
+      Showing first 50 of {{matchedLines.length}} matches:
+    </div>
+    <div v-else>
+      Showing {{matchedLines.length}} matches:
+    </div>
+  <template v-for="line in matchedLines.slice(0, 50)">
     <table>
       <tbody>
         <tr>

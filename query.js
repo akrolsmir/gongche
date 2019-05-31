@@ -214,8 +214,7 @@ async function main() {
           'tone': ''
         }
         const params = parseQuery(this.linesQuery, lineParams);
-        return this.lines.filter(line => checkLineMatch(line, params))
-          .slice(0, 50);
+        return this.lines.filter(line => checkLineMatch(line, params));
       },
       matchedRhythms() {
         const counter = new KeyCounter('1');
