@@ -131,6 +131,11 @@ export function buildLines(song) {
       const [file, char, south, north, yinyang, tone] = rhyme;
       const word = { lyric, yinyang, tone };
       word.pronounce = song.region == 'North' ? north : south;
+      if (tone != null && tone.includes('/')) {
+        // Tones of the form "入/上" should be chosen based on region ("S/N")
+        const [southTone, northTone] = tone.split('/');
+        word.tone = song.region == 'North' ? northTone : southTone;
+      }
       // Parse the beats and jianpu, and copy into word object.
       [melodyObject, lastOffset] = parseMelodyChunk(melodyChunks[melodyIndex], lastOffset);
       Object.assign(word, melodyObject);
