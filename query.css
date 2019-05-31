@@ -1,0 +1,25 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Open Sans', sans-serif;
+}
+
+div#selectsongs {
+  background: lightgrey;
+  padding: 10px;
+}
+
+div#motifs {
+  background: lightblue;
+  padding: 10px;
+}
+
+div.songdata {
+  width: 850px;
+}
+
+div.results {
+  overflow: auto;
+  max-height: 200px;
+}
