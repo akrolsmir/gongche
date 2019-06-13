@@ -265,6 +265,7 @@ function getTimeSignature(melody) {
 }
 
 function renderSheet(lyrics, melody) {
+  vexflowContext.clear();
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
   let rhythmized = rhythmize(quarters, timeSignature);
@@ -375,21 +376,12 @@ async function main() {
       }
     },
     watch: {
-      keySignature() {
-        vexflowContext.clear();
-        renderSheet(song.lyrics, song.melody);
-      },
       bpm(newBpm) {
         Tone.Transport.bpm.value = newBpm;
       },
-      skeletalFirst() {
-        vexflowContext.clear();
-        renderSheet(song.lyrics, song.melody);
-      },
-      skeletalLast() {
-        vexflowContext.clear();
-        renderSheet(song.lyrics, song.melody);
-      }
+      keySignature: () => { renderSheet(song.lyrics, song.melody); },
+      skeletalFirst: () => { renderSheet(song.lyrics, song.melody); },
+      skeletalLast: () => { renderSheet(song.lyrics, song.melody); },
     }
   });
   renderSheet(song.lyrics, song.melody);
