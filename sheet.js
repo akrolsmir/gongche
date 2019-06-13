@@ -1,10 +1,11 @@
 const VF = Vex.Flow;
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 import { rhythmize } from "./rhythmize.js";
+import { skeletonize, countSixteenths } from "./skeletonize.js";
 import { schedulePlayback } from "./playback.js";
 import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
 
-class Note {
+export class Note {
   constructor(gongche) {
     this.gongche = gongche;
     this.duration;
@@ -101,7 +102,7 @@ export class RestNote {
   skeletonize() {}
 }
 
-class LyricGroup {
+export class LyricGroup {
   constructor(lyric) {
     this.lyric = lyric;
     this.children = [];
@@ -228,19 +229,7 @@ function splitStaves(notes) {
 
 // Return the number of quarter notes
 function countQuarters(notes) {
-  const durationToQuarters = {
-    'b': 0, // Bar note has 0 length
-    '16': 0.25,
-    '8': 0.5,
-    '4': 1,
-    '2': 2,
-    '1': 4
-  }
-  let count = 0;
-  for (const note of notes) {
-    count += durationToQuarters[note.duration];
-  }
-  return Math.round(count);
+  return Math.round(countSixteenths(notes) / 4);
 }
 
 // Output: [ [melodyVoice1, jianpuVoice1, lyricsVoice1], ...]
@@ -273,15 +262,6 @@ function getTimeSignature(melody) {
     return TimeSignature.FOUR_FOUR;
   }
   return TimeSignature.FREE;
-}
-
-function skeletonize(rhythmized) {
-  for (const note of rhythmized) {
-    if (note != BAR) {
-      note.skeletonize();
-    }
-  }
-  return rhythmized;
 }
 
 function renderSheet(lyrics, melody) {
