@@ -51,13 +51,18 @@ function checkLineMatch(line, params) {
   }
   if (params.tone) {
     // Valid tonal search patterns:
-    // YinYang - 陰平陽平陰去
+    // YinYang - 陰平陽平陰去, 平陽平去
     // Basic - 平平去
     // Two-way - 平平仄
     let query = params.tone;
     if (query.includes('陰') || query.includes('陽')) {
+      // If a tone does not have a preceding yinyang, accept either of yin/yang.
+      // e.g. "平陽平去" => "y平陽平y去"
+      query = query.replace(/(?<![陰陽])[平上去入仄]/g, 'y$&');
       // Accept missing dictionary entries (underscores)
       query = query.split('').map(char => `[${char}_]`).join('');
+      // Expand 'y' with either of yin/yang.
+      query = query.replace(/y/g, '陰陽');
     } else {
       // Accept underscores and either of yin/yang.
       query = query.split('').map(tone => `.[${tone}_]`).join('');
