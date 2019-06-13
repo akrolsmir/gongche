@@ -7,25 +7,26 @@
   <h1>{{ song.title }}</h1>
   <div id="metadata">
     <div id="left">
-      <p>Key Signature: 
-        <select v-model="keySignature">
-          <option v-for="s in signatures">
-            {{ s }}
-          </option>
-        </select>
       <p>Playback: 
         <button v-on:click='stopMusic()'>⏹️</button>
         <button v-on:click='toggleMusic()'>{{ toggle }}</button>
       <p>BPM: {{ bpm }} 
         <input type="range" v-model='bpm' min='30' max='150' value='120'>
+      <p><label for="skeletalFirst">Skeletal - First: </label>
+        <input type="checkbox" id="skeletalFirst" v-model="skeletalFirst">
+        <label for="skeletalLast">Last: </label>
+        <input type="checkbox" id="skeletalLast" v-model="skeletalLast">
     </div>
     <div id="right">
       <p>Source: {{ song.composer }}
       <p>Song ID: {{ song.id }}
       <p>Region: {{ song.region }}
-      <p><label for="skeletalCheck">Skeletal: </label>
-        <input type="checkbox" id="skeletalCheck" v-model="skeletal">
-    </div>
+      <p>Key Signature:
+        <select v-model="keySignature">
+          <option v-for="s in signatures">
+            {{ s }}
+          </option>
+        </select>    </div>
   </div>
 </div>
 <div id="vexflow"></div>
