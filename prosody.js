@@ -7,6 +7,7 @@ const rowHeaders = [
   {id: 'yinyang', display: '陰陽'},
   {id: 'beats', display: '板眼'},
   {id: 'melody', display: '簡譜音高'},
+  {id: 'firstNote', display: 'First Note'},
   {id: 'lastNote', display: 'Last Note'},
   // How much a note is offset relative to previous note.
   {id: 'difference', display: 'Contour'},
