@@ -51,7 +51,7 @@ function checkLineMatch(line, params) {
   }
   if (params.tone) {
     // Valid tonal search patterns:
-    // YinYang - 平陰平陽去陰
+    // YinYang - 陰平陽平陰去
     // Basic - 平平去
     // Two-way - 平平仄
     let query = params.tone;
@@ -60,7 +60,7 @@ function checkLineMatch(line, params) {
       query = query.split('').map(char => `[${char}_]`).join('');
     } else {
       // Accept underscores and either of yin/yang.
-      query = query.split('').map(tone => `[${tone}_].`).join('');
+      query = query.split('').map(tone => `.[${tone}_]`).join('');
     }
     // Expand the not-平 character (仄)
     query = query.replace(/仄/g, '上去入');
@@ -82,7 +82,7 @@ function addJianpuString(line) {
 
 function addToneString(line) {
   line.toneString = line.words
-    .map(word => word.tone + word.yinyang)
+    .map(word => word.yinyang + word.tone)
     // Mark missing dictionary entries with two underscores.
     .map(token => token ? token : '__')
     .join('');
@@ -144,8 +144,8 @@ function parseQuery(query, params) {
 
 const rowHeaders = [
   { id: 'lyric', display: '字' },
-  { id: 'tone', display: '聲調' },
   { id: 'yinyang', display: '陰陽' },
+  { id: 'tone', display: '聲調' },
   { id: 'melody', display: '簡譜音高' },
 ]
 
