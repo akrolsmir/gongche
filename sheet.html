@@ -12,9 +12,9 @@
         <button v-on:click='toggleMusic()'>{{ toggle }}</button>
       <p>BPM: {{ bpm }} 
         <input type="range" v-model='bpm' min='30' max='150' value='120'>
-      <p><label for="skeletalFirst">Skeletal - First: </label>
+      <p>Skeletal: <label for="skeletalFirst">First</label>
         <input type="checkbox" id="skeletalFirst" v-model="skeletalFirst">
-        <label for="skeletalLast">Last: </label>
+        <label for="skeletalLast">Last</label>
         <input type="checkbox" id="skeletalLast" v-model="skeletalLast">
     </div>
     <div id="right">
@@ -26,7 +26,8 @@
           <option v-for="s in signatures">
             {{ s }}
           </option>
-        </select>    </div>
+        </select>
+    </div>
   </div>
 </div>
 <div id="vexflow"></div>
