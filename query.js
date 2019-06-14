@@ -74,6 +74,12 @@ function checkLineMatch(line, params) {
       return false;
     }
   }
+  if (params.tonemelody) {
+    // Line tone melody must exactly match.
+    if (!line.tonemelodyString.includes(params.tonemelody)) {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -92,6 +98,15 @@ function addToneString(line) {
     .map(token => token ? token : '__')
     .join('');
   return line;
+}
+
+/** Joint combination to match both tone and melody. TODO: rename. */
+function addTonemelodyString(line) {
+  line.tonemelodyString = line.words
+    .map(word => word.tone + word.melody)
+    .join('')
+    .replace(/ /g, '');
+    return line;
 }
 
 function findMotifs(lines) {
@@ -210,13 +225,14 @@ async function main() {
       },
       lines() {
         this.motifs = [];
-        return this.matchedSongs.flatMap(buildLines).map(addJianpuString).map(addToneString);
+        return this.matchedSongs.flatMap(buildLines).map(addJianpuString).map(addToneString).map(addTonemelodyString);
       },
       matchedLines() {
         const lineParams = {
           'melody': '',
           'fuzzy': '',
-          'tone': ''
+          'tone': '',
+          'tonemelody': '',
         }
         const params = parseQuery(this.linesQuery, lineParams);
         return this.lines.filter(line => checkLineMatch(line, params));
