@@ -70,15 +70,6 @@ export class Note {
     }
     return copy;
   }
-  skeletonize() {
-    // Fix this note's melody to be equal to the last note in its lyric group.
-    const index = this.lyricGroup.children.indexOf(this);
-    if (index != this.lyricGroup.children.length - 1) {
-      const lastNote = this.lyricGroup.children[this.lyricGroup.children.length - 1];
-      this.gongche = lastNote.gongche;
-      this.setDuration(this.duration);
-    }
-  }
 }
 
 export class RestNote {
@@ -99,7 +90,6 @@ export class RestNote {
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     this.jianpuOctave = makeTextNote(' ', 12, this.duration);
   }
-  skeletonize() {}
 }
 
 export class LyricGroup {
