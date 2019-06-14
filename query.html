@@ -75,19 +75,33 @@
           (Positive contours indicate the song ended on a higher note.)
         </div>
       <canvas ref="contourChart" id="contourChart" width="400" height="400"></canvas>
-      <ul>
-        <li v-for='(values, contour) in matchedToneContours'>
-          Contour {{ contour }}: {{ values.count }}
+      <div class="toneRow">
+        <div class="toneColumn">
+          <h3>Songs with contour</h3>
           <ul>
-            <li v-for='title in Array.from(values.titles).splice(0, 10)'>
-              {{ title }}
-            </li>
-            <li v-if='values.titles.size > 10'>
-              <a href="#" v-on:click="showAlert(Array.from(values.titles).join(', '))">...</a>
+            <li v-for='(values, contour) in matchedToneContours'>
+              Contour {{ contour }}: {{ values.count }}
+              <ul>
+                <li v-for='title in Array.from(values.titles).splice(0, 10)'>
+                  {{ title }}
+                </li>
+                <li v-if='values.titles.size > 10'>
+                  <a href="#" v-on:click="showAlert(Array.from(values.titles).join(', '))">See all...</a>
+                </li>
+              </ul>
             </li>
           </ul>
-        </li>
-      </ul>
+        </div>
+        <div class="toneColumn">
+          <h3>Exact contour breakdown</h3>
+          Total matches: {{ matchedContourBreakdown[1] }}
+          <ul>
+            <li v-for='[count, contour] in matchedContourBreakdown[0]'>
+              {{ count }} matches of {{ contour }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </v-tab>
     <v-tab title="Rhythm"><div>
       <p> Find symbol: <input type="text" id="rhythmQuery" v-model="rhythmQuery">

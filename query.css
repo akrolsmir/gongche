@@ -23,3 +23,11 @@ div.results {
   overflow: auto;
   max-height: 200px;
 }
+
+div.toneRow {
+  display: flex;
+}
+
+div.toneColumn {
+  flex: 50%;
+}

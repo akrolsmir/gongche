@@ -257,6 +257,30 @@ async function main() {
         }
         return tones;
       },
+      /** Return the exact breakdown of contours and counts. */
+      matchedContourBreakdown() {
+        const tones = {};
+        for (const line of this.lines) {
+          for (const word of line.words) {
+            if (word.tone && word.difference && word.tone.includes(this.toneQuery)) {
+              const key = word.difference;
+              if (!(key in tones)) {
+                tones[key] = { count: 0, titles: new Set() };
+              }
+              tones[key].count++;
+              tones[key].titles.add(line.song.title);
+            }
+          }
+        }
+        let breakdown = [];
+        for (const key of Object.keys(tones)) {
+          breakdown.push([tones[key].count, key]);
+        }
+        const total = breakdown.map(b => b[0]).reduce((a, b) => a + b);
+        // Sort by count, desc (largest first)
+        breakdown = breakdown.sort((a, b) => b[0] - a[0]);
+        return [breakdown, total];
+      },
       matchedContourGraph() {
         const result = {};
         for (const key of Object.keys(this.matchedToneContours)) {
