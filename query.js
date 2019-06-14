@@ -136,10 +136,11 @@ function findMotifs(lines) {
     const longerMotifs = finalMotifs
       .filter(([m, c]) => m.includes(motif) && c >= count);
     if (longerMotifs.length == 0) {
-      finalMotifs.push([decodeToJianpu(motif), count]);
+      finalMotifs.push([motif, count]);
     }
   }
-  return finalMotifs;
+  // Convert the final result back to jianpu notation.
+  return finalMotifs.map(([m, c]) => [decodeToJianpu(m), c]);
 }
 
 // Parse the search query for the keywords specified in params.
