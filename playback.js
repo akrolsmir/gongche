@@ -1,17 +1,40 @@
 const VF = Vex.Flow;
 
+/** For slur/tied notes, add a parent pointer to the lyric group. */
+function buildParentLinks(lyricGroups) {
+  for (const lyricGroup of lyricGroups) {
+    if (lyricGroup.children.length > 1) {
+      for (const note of lyricGroup.children) {
+        note.melodyNote.lyricGroup = lyricGroup;
+      }
+    }
+  }
+}
+
 /**
  * @param playbackNotes An array of notes to play while coloring red.
  * @param keySignature A VexFlow key specification, e.g. 'G', 'C#m'
  */
-export function schedulePlayback(playbackNotes, keySignature) {
+export function schedulePlayback(playbackNotes, lyricGroups, keySignature) {
+  buildParentLinks(lyricGroups);
   Tone.Transport.cancel(); // Remove preexisting notes scheduled in Tone.js.
   let elapsed = Tone.Time('4n'); // Start after quarter beat.
   const svgSuperGroup = {children: []}; // Parent of all svg notes.
   const events = [];
-  for (const note of playbackNotes) {
+  for (let i = 0; i < playbackNotes.length; i++) {
+    const note = playbackNotes[i];
     if (note instanceof VF.StaveNote) {
-      const duration = note.duration + 'n';
+      // Two notes are tied if they share the same key and lyric group.
+      const tied = note.lyricGroup
+        && i + 1 < playbackNotes.length
+        && note.lyricGroup == playbackNotes[i + 1].lyricGroup
+        && note.keys[0] == playbackNotes[i + 1].keys[0];
+      let duration = Tone.Time(note.duration + 'n');
+      if (tied) {
+        // Extend this note by the tie. TODO: this fails for multiple ties.
+        duration = duration + Tone.Time(playbackNotes[i + 1].duration + 'n');
+        i++;
+      }
       events.push({ duration, time: elapsed, note });
       svgSuperGroup.children.push(note.svgGroup);
       elapsed = elapsed + Tone.Time(duration);

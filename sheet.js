@@ -297,15 +297,11 @@ function renderSheet(lyrics, melody) {
     beams.forEach(beam => beam.setContext(vexflowContext).draw());
   }
 
-  schedulePlayback(playbackNotes, vueApp.keySignature);
-
   // Find all lyric groups in order
   const allLyricGroups = [];
-  for (const modelStave of modelStaves) {
-    for (const note of modelStave) {
-      if (note.lyricGroup && !allLyricGroups.includes(note.lyricGroup)) {
-        allLyricGroups.push(note.lyricGroup);
-      }
+  for (const note of rhythmized) {
+    if (note.lyricGroup && !allLyricGroups.includes(note.lyricGroup)) {
+      allLyricGroups.push(note.lyricGroup);
     }
   }
 
@@ -317,6 +313,8 @@ function renderSheet(lyrics, melody) {
       lg.children[lg.children.length - 1].melodyNote,
     ));
   curves.forEach(curve => curve.setContext(vexflowContext).draw());
+
+  schedulePlayback(playbackNotes, allLyricGroups, vueApp.keySignature);
 }
 
 // We do this globally because TextNote needs a global context.
