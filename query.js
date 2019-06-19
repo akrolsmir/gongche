@@ -18,6 +18,12 @@ function checkSongMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.source) {
+    // Song source (aka composer) must contain the specified string.
+    if (!song.composer.includes(searchParams.source)) {
+      return false;
+    }
+  }
   if (searchParams.mode) {
     // Song mode key must contain the specified string.
     if (!song.modeKey.includes(searchParams.mode)) {
@@ -218,6 +224,7 @@ async function main() {
         const songParams = {
           'id': '',
           'title': '',
+          'source': '',
           'region': '',
           'mode': ''
         }
