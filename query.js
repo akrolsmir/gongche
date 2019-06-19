@@ -300,6 +300,9 @@ async function main() {
         for (const key of Object.keys(tones)) {
           breakdown.push([tones[key].count, key]);
         }
+        if (breakdown.length == 0) {
+          return [[], 0];
+        }
         const total = breakdown.map(b => b[0]).reduce((a, b) => a + b);
         // Sort by count, desc (largest first)
         breakdown = breakdown.sort((a, b) => b[0] - a[0]);
