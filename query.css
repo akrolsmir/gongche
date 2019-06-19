@@ -5,6 +5,10 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+button {
+  font-family: 'Open Sans', sans-serif;
+}
+
 div#selectsongs {
   background: lightgrey;
   padding: 10px;
