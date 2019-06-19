@@ -1,6 +1,7 @@
 import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js";
 import { renderChart, KeyCounter } from "./chart.js";
 Vue.use(vueTabs.default);
+Vue.config.performance = true;
 
 main();
 
@@ -194,6 +195,7 @@ async function main() {
     data: {
       songs,
       songsQuery: '',
+      songsQueryBuffer: '',
       linesQuery: '',
       toneQuery: '',
       rhythmQuery: '',
@@ -210,6 +212,14 @@ async function main() {
       },
       showAlert(text) {
         alert(text);
+      },
+      querySongs() {
+        // Note: this doens't quite remove all the latency. Seems like
+        // Vue is re-rendering root component even when only the buffer
+        // is changing. Some ideas:
+        // - Remove songsQueryBuffer from vue entirely, extract on button click
+        // - Debounce (wait for user to stop typing)
+        this.songsQuery = this.songsQueryBuffer;
       }
     },
     // To reference canvas, we have to use $refs and lifestyle hooks.
@@ -242,6 +252,7 @@ async function main() {
           'melody': '',
         }
         const params = parseQuery(this.songsQuery, songParams);
+        // TODO: Consider v-show for performance https://stackoverflow.com/a/43920347/1222351
         return songs.filter(song => checkSongMatch(song, params));
       },
       lines() {
