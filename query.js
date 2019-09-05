@@ -36,6 +36,16 @@ function checkSongMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.lyrics) {
+    if (!song.fullLyrics.includes(searchParams.lyrics)) {
+      return false;
+    }
+  }
+  if (searchParams.melody) {
+    if (!song.melody.includes(searchParams.melody)) {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -227,7 +237,9 @@ async function main() {
           'title': '',
           'source': '',
           'region': '',
-          'mode': ''
+          'mode': '',
+          'lyrics': '',
+          'melody': '',
         }
         const params = parseQuery(this.songsQuery, songParams);
         return songs.filter(song => checkSongMatch(song, params));
