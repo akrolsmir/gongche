@@ -106,6 +106,8 @@
     <v-tab title="Rhythm"><div>
       <p> Find symbol: <input type="text" id="rhythmQuery" v-model="rhythmQuery">
       <p> (Examples: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)
+      <p> <input type="checkbox" id="rhythmPercent" v-model="rhythmPercent">
+      <label for="rhythmPercent">Show as percent</label>
       <p><div v-if="rhythmQuery">
         Found "{{ rhythmQuery }}" at the following line positions:
       </div>

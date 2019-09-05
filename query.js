@@ -187,6 +187,7 @@ async function main() {
       linesQuery: '',
       toneQuery: '',
       rhythmQuery: '',
+      rhythmPercent: false,
       motifs: [],
       headers: rowHeaders
     },
@@ -246,16 +247,28 @@ async function main() {
         return this.lines.filter(line => checkLineMatch(line, params));
       },
       matchedRhythms() {
-        const counter = new KeyCounter('1');
+        const matchCounter = new KeyCounter('1');
+        const totalCounter = new KeyCounter('1');
         for (const line of this.lines) {
           for (let i = 0; i < line.words.length; i++) {
             const word = line.words[i];
-            if (word.beats != null && word.beats.includes(this.rhythmQuery)) {
-              counter.count(`${i + 1}`);
+            if (word.beats != null) {
+              totalCounter.count(`${i + 1}`);
+              if (word.beats.includes(this.rhythmQuery)) {
+                matchCounter.count(`${i + 1}`);
+              }
             }
           }
         }
-        return counter.map;
+        if (this.rhythmPercent) {
+          // Display the rhythm matches as a percent of chars at this length.
+          const percentMap = {};
+          for (const key in matchCounter.map) {
+            percentMap[key] = matchCounter.map[key] / totalCounter.map[key] * 100;
+          }
+          return percentMap;
+        }
+        return matchCounter.map;
       },
       matchedToneContours() {
         // Maps contours to [count, [song names...]]
