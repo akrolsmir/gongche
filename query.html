@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Query</title>
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="prosody.css">
 <link rel="stylesheet" href="query.css">
 <link rel="stylesheet" href="https://unpkg.com/vue-nav-tabs/themes/vue-tabs.css">
@@ -16,8 +17,8 @@
       <ul>
         <li v-for='song in matchedSongs'>
           {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
-          <a target="_blank" rel="noopener noreferrer" v-bind:href='`sheet.html?songId=${song.id}`'>Sheet</a> | 
-          <a target="_blank" rel="noopener noreferrer" v-bind:href='`prosody.html?songTitle=${song.title}`'>Prosody</a>
+          <a v-bind:href='`sheet.html?songId=${song.id}`'>Sheet</a> | 
+          <a v-bind:href='`prosody.html?songTitle=${song.title}`'>Prosody</a>
         </li>
       </ul>
     </div>
