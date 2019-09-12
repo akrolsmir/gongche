@@ -17,7 +17,7 @@ let songDataApp;
 
 async function main() {
   // TODO: Consider parallelizing these async calls.
-  await loadPdf('assets/book (18).pdf');
+  await loadPdf('../assets/book (18).pdf');
   [songs, songsById] = await getSongTables();
   songDataApp = configSongData();
   renderSong();
@@ -164,7 +164,7 @@ async function renderPdfPage() {
   pdfOffset = offset;
   if (bookIndex != currentBook) {
     currentBook = bookIndex;
-    await loadPdf(`assets/book (${bookIndex}).pdf`);
+    await loadPdf(`../assets/book (${bookIndex}).pdf`);
   }
 
   resetSong();

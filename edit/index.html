@@ -82,11 +82,11 @@
       <textarea name="melody" id="melody" rows="10" cols="20"
           placeholder="Type melody" v-bind:style="melodyStyle" v-model="melodyGongche"></textarea>
       <a target="_blank" rel="noopener noreferrer" 
-          v-bind:href="'sheet.html?songId=' + song.id">Sheet Music</a>
+          v-bind:href="'../sheet.html?songId=' + song.id">Sheet Music</a>
       <a target="_blank" rel="noopener noreferrer" 
-          v-bind:href="'prosody.html?songTitle=' + song.title">Prosody Analysis</a>
+          v-bind:href="'../prosody.html?songTitle=' + song.title">Prosody Analysis</a>
       <a target="_blank" rel="noopener noreferrer" 
-          href="query.html">Query Engine</a>
+          href="../query.html">Query Engine</a>
     </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
@@ -96,9 +96,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-<script src="models/song.js"></script>
-<script src="database.js"></script>
-<script src="assets/mulu.js"></script>
+<script src="../models/song.js"></script>
+<script src="../database.js"></script>
+<script src="../assets/mulu.js"></script>
 <script src="ocr.js"></script>
 <script src="separator.js"></script>
 <script src="background.js"></script>
