@@ -25,7 +25,23 @@ db.enablePersistence({ experimentalTabSynchronization: true })
     }
   });
 
+const EDIT_PASSWORD = 'swordfish';
 function saveSong(song) {
+  if (Cookies.get('editpassword') != EDIT_PASSWORD) {
+    const attempt = window.prompt('Enter the password to save changes:');
+    if (!attempt) {
+      // User hit "Cancel"; do not save.
+      return;
+    }
+    if (attempt != EDIT_PASSWORD) {
+      // Incorrect password; recursively retry.
+      alert('Incorrect password, try again.');
+      saveSong(song);
+      return;
+    }
+    // Persist password into cookie and proceed.
+    Cookies.set('editpassword', attempt);
+  }
   db.collection("songs").doc(song.id).set(song.toJson());
 }
 
