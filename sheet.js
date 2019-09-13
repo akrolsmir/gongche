@@ -267,6 +267,10 @@ function renderSheet(lyrics, melody) {
   const voices = makeVoices(modelStaves);
   const playbackNotes = [];
 
+  // Now that we know the number of staves, resize the canvas.
+  const canvasHeight = modelStaves.length * 200 + 100;
+  vexflowRenderer.resize(850, canvasHeight);
+
   for (let i = 0; i < voices.length; i++) {
     const voiceGroup = voices[i];
     const melodyVoice = voiceGroup[0];
@@ -322,8 +326,6 @@ function renderSheet(lyrics, melody) {
 // Create an SVG renderer and attach it to the DIV element named "vexflow".
 const vexflowDiv = document.getElementById("vexflow")
 const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
-// Size our svg:
-vexflowRenderer.resize(850, 2500);
 // And get a drawing context:
 const vexflowContext = vexflowRenderer.getContext();
 let vueApp;
