@@ -84,7 +84,7 @@ function configSongData() {
       }
     },
     watch: {
-      editedId (newId) {
+      editedId(newId) {
         if (songsById[newId]) {
           if (songsById[newId] != songIndex) {
             saveLyricsAndMelody();
@@ -102,19 +102,17 @@ function configSongData() {
 
 function saveLyricsAndMelody() {
   const song = songs[songIndex];
-  if (song.fullLyrics != songDataApp.editedLyrics) {
+  if (song.fullLyrics != songDataApp.editedLyrics
+    || song.lyrics != songDataApp.strippedLyrics
+    || song.melody != songDataApp.editedMelody
+    || song.region != songDataApp.editedRegion) {
+
+    if (!hasEditPermission()) {
+      return;
+    }
     song.fullLyrics = songDataApp.editedLyrics;
-    saveSong(song);
-  }
-  if (song.lyrics != songDataApp.strippedLyrics) {
     song.lyrics = songDataApp.strippedLyrics;
-    saveSong(song);
-  }
-  if (song.melody != songDataApp.editedMelody) {
     song.melody = songDataApp.editedMelody;
-    saveSong(song);
-  }
-  if (song.region != songDataApp.editedRegion) {
     song.region = songDataApp.editedRegion;
     saveSong(song);
   }
@@ -225,7 +223,7 @@ function jumpToPage() {
 }
 
 /** Use Ctrl + D shortcut to jump to corresponding melody. */
-document.onkeydown = function(event) {
+document.onkeydown = function (event) {
   if (event.ctrlKey || event.metaKey) {
     switch (String.fromCharCode(event.which).toLowerCase()) {
       case 'd':
