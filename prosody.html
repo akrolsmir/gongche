@@ -33,20 +33,12 @@
   </table>
   </template>
 </div>
-<script>
-    // Check that service workers are supported
-    if ('serviceWorker' in navigator) {
-      // Use the window load event to keep the page load performant
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
-      });
-    }
-</script>
+<script src="load-service-worker.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.5.4/randomColor.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="models/song.js"></script>
-<Script src="database.js"></Script>
+<script src="database.js"></Script>
 <script src="assets/mulu.js"></script>
 <script type="module" src="prosody.js"></script>
