@@ -5,20 +5,24 @@ const img = new Image();
 
 let pdf;
 let pdfOffset; // Delta between pdf and printed page num
-let pageNum = 6608; // Printed page number
+let pageNum; // Printed page number
 
 let songs;
 let songsById;
-let songIndex = 6288;
+let songIndex;
 
-let currentBook = 1;
+let currentBook;
 
 let songDataApp;
 
 async function main() {
-  // TODO: Consider parallelizing these async calls.
-  await loadPdf('../assets/book (18).pdf');
+  // If songId is provided as a URL param, focus on that song.
+  const urlParams = new URLSearchParams(window.location.search);
+  let urlSongId = urlParams.get('songId');
+  urlSongId = urlSongId ? urlSongId : "6584.1";
+
   [songs, songsById] = await getSongTables();
+  songIndex = songsById[urlSongId];
   songDataApp = configSongData();
   renderSong();
 }
