@@ -2,6 +2,22 @@ import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./line
 import { renderChart, KeyCounter } from "./chart.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
+Vue.component('pwa-a', {
+  props: ['href'],
+  template: `<a :target='target' :rel='rel' :href='href'><slot></slot></a>`,
+  computed: {
+    // In PWA desktop app, open in same window. Otherwise, new tab.
+    isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches;
+    },
+    target() {
+      return this.isStandalone ? '' : '_blank';
+    },
+    rel() {
+      return this.isStandalone ? '' : 'noopener noreferrer';
+    },
+  }
+})
 
 main();
 
