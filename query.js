@@ -241,6 +241,16 @@ async function main() {
       }
     },
     computed: {
+      // In PWA desktop app, open in same window. Otherwise, new tab.
+      isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches;
+      },
+      target() {
+        return this.isStandalone ? '' : '_blank';
+      },
+      rel() {
+        return this.isStandalone ? '' : 'noopener noreferrer';
+      },
       matchedSongs() {
         const songParams = {
           'id': '',
