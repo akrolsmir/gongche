@@ -126,11 +126,17 @@ export function buildLines(song) {
   let line = { words: [], song, index: lineCount };
   let lastOffset;
   let melodyObject;
-  for (const lyric of song.lyrics) {
-    if (lyric != '\n') {
+  let padding = false;
+  for (const lyric of song.fullLyrics) {
+    if (lyric == '_') {
+      // Remember that next character is padding.
+      padding = true;
+    }
+    else if (lyric != '\n' && lyric != ',' && lyric != '.') {
       const rhyme = RHYME_MAP[lyric] ? RHYME_MAP[lyric] : [, , , , ,];
       const [file, char, south, north, yinyang, tone] = rhyme;
-      const word = { lyric, yinyang, tone };
+      const word = { lyric, yinyang, tone, padding };
+      padding = false;
       word.pronounce = song.region == 'North' ? north : south;
       if (tone != null && tone.includes('/')) {
         // Tones of the form "入/上" should be chosen based on region ("S/N")
