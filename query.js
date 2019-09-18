@@ -47,6 +47,22 @@ function checkSongMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.padding) {
+    let query = searchParams.padding;
+    const paddingCount = (song.fullLyrics.match(/_/g) || []).length;
+    if (query.endsWith('+')) {
+      // Song must have at least this many padding chars
+      query = query.substring(0, query.length - 1);
+      if (query > paddingCount) {
+        return false;
+      }
+    } else {
+      // Song must have exactly this many padding chars
+      if (query != paddingCount) {
+        return false;
+      }
+    }
+  }
   return true;
 }
 
@@ -95,6 +111,22 @@ function checkLineMatch(line, params) {
     // Line tone melody must exactly match.
     if (!line.tonemelodyString.includes(params.tonemelody)) {
       return false;
+    }
+  }
+  if (params.padding) {
+    let query = params.padding;
+    const paddingCount = line.words.filter(word => word.padding).length;
+    if (query.endsWith('+')) {
+      // Line must have at least this many padding chars
+      query = query.substring(0, query.length - 1);
+      if (query > paddingCount) {
+        return false;
+      }
+    } else {
+      // Line must have exactly this many padding chars
+      if (query != paddingCount) {
+        return false;
+      }
     }
   }
   return true;
@@ -260,6 +292,7 @@ async function main() {
           'mode': '',
           'lyrics': '',
           'melody': '',
+          'padding': '',
         }
         const params = parseQuery(this.songsQuery, songParams);
         // TODO: Consider v-show for performance https://stackoverflow.com/a/43920347/1222351
@@ -275,6 +308,7 @@ async function main() {
           'fuzzy': '',
           'tone': '',
           'tonemelody': '',
+          'padding': '',
         }
         const params = parseQuery(this.linesQuery, lineParams);
         return this.lines.filter(line => checkLineMatch(line, params));

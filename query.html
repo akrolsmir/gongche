@@ -11,7 +11,7 @@
   <div id="selectsongs">
     <p> Select songs: <input type="text" id="songsQuery" v-model="songsQueryBuffer" v-on:keyup.enter="querySongs"> 
       <button v-on:click="querySongs">Search</button>
-    <p> (Examples: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code> | <code>source:法宮</code> | <code>lyrics:春</code> | <code>melody:。</code>)
+    <p> (Examples: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code> | <code>source:法宮</code> | <code>lyrics:春</code> | <code>melody:。</code> | <code>padding:2+</code>)
     <h3>{{ matchedSongs.length }} pieces</h3>
     <div class="results">
       <ul>
@@ -37,7 +37,7 @@
     </div>
   </div>
   <p> Filter lines: <input type="text" id="linesQuery" v-model="linesQuery">
-  <p> (Examples: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code>)
+  <p> (Examples: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code> | <code>padding:1</code>)
   <p>
     <div v-if="matchedLines.length > 50">
       Showing first 50 of {{matchedLines.length}} matches:
