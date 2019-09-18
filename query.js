@@ -322,7 +322,7 @@ async function main() {
       matchedRhythms() {
         const matchCounter = new KeyCounter('1');
         const totalCounter = new KeyCounter('1');
-        for (const line of this.lines) {
+        for (const line of this.matchedLines) {
           for (let i = 0; i < line.words.length; i++) {
             const word = line.words[i];
             if (word.beats != null) {
@@ -346,7 +346,7 @@ async function main() {
       matchedToneContours() {
         // Maps contours to [count, [song names...]]
         const tones = {};
-        for (const line of this.lines) {
+        for (const line of this.matchedLines) {
           for (const word of line.words) {
             if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
               const melodyArray = word.melody.split(' ');
@@ -370,7 +370,7 @@ async function main() {
       /** Return the exact breakdown of contours and counts. */
       matchedContourBreakdown() {
         const tones = {};
-        for (const line of this.lines) {
+        for (const line of this.matchedLines) {
           for (const word of line.words) {
             if (word.tone && word.difference && word.tone.includes(this.toneQuery)) {
               const key = word.difference;
@@ -403,7 +403,7 @@ async function main() {
       },
       matchedLineLengths() {
         const counter = new KeyCounter();
-        for (const line of this.lines) {
+        for (const line of this.matchedLines) {
           counter.count(`${ line.words.length }`);
         }
         return counter.map;
