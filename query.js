@@ -129,6 +129,11 @@ function checkLineMatch(line, params) {
       }
     }
   }
+  if (params.length) {
+    if (line.words.length != params.length) {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -309,6 +314,7 @@ async function main() {
           'tone': '',
           'tonemelody': '',
           'padding': '',
+          'length': '',
         }
         const params = parseQuery(this.linesQuery, lineParams);
         return this.lines.filter(line => checkLineMatch(line, params));
