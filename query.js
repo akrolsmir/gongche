@@ -232,7 +232,6 @@ async function main() {
     data: {
       songs,
       songsQuery: '',
-      songsQueryBuffer: '',
       linesQuery: '',
       toneQuery: '',
       rhythmQuery: '',
@@ -250,14 +249,12 @@ async function main() {
       showAlert(text) {
         alert(text);
       },
-      querySongs() {
-        // Note: this doens't quite remove all the latency. Seems like
-        // Vue is re-rendering root component even when only the buffer
-        // is changing. Some ideas:
-        // - Remove songsQueryBuffer from vue entirely, extract on button click
-        // - Debounce (wait for user to stop typing)
-        this.songsQuery = this.songsQueryBuffer;
-      }
+      submitLinesQuery(value) {
+        this.linesQuery = value;
+      },
+      submitSongsQuery(value) {
+        this.songsQuery = value;
+      },
     },
     // To reference canvas, we have to use $refs and lifestyle hooks.
     // See also https://stackoverflow.com/a/42606029/1222351
@@ -265,6 +262,11 @@ async function main() {
       renderChart(this.matchedRhythms, this.$refs.rhythmChart);
       renderChart(this.matchedContourGraph, this.$refs.contourChart);
       renderChart(this.matchedLineLengths, this.$refs.lengthChart);
+    },
+    created() {
+      // See also https://stackoverflow.com/a/53022397/1222351
+      this.debouncedSongsQuery = _.debounce(this.submitSongsQuery, 300);
+      this.debouncedLinesQuery = _.debounce(this.submitLinesQuery, 300);
     },
     watch: {
       matchedRhythms(newRhythms) {
