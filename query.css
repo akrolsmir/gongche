@@ -2,15 +2,30 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+body, button, input[type='text'] {
   font-family: 'Open Sans', sans-serif;
 }
 
-button {
-  font-family: 'Open Sans', sans-serif;
+input#songsQuery,
+input#linesQuery {
+  width: 20em;
+  padding-left: 5px;
+}
+
+input#songsQuery[type='text'],
+input#linesQuery[type='text'] {
+  font-size: 20px;
 }
 
 div#selectsongs {
   background: lightgrey;
+  padding: 10px;
+}
+
+div#filterlines {
+  background: whitesmoke;
   padding: 10px;
 }
 
