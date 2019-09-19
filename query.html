@@ -26,6 +26,8 @@
   <div id="filterlines">
   <p> Filter lines: <input type="text" id="linesQuery" v-bind:value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)">
   <p> (Examples: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code> | <code>padding:1</code> | <code>length:4</code>)</p>
+  <p> <input type="checkbox" id="padded" v-model="padded">
+    <label for="padded">Count padding characters</label></p>
   <vue-tabs><v-tab title="Motifs"><div>
   <div id="motifs">
     <button v-on:click="findAllMotifs">Find motifs</button>

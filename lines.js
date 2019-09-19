@@ -112,18 +112,30 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
   }, lastOffset];
 }
 
+class Line {
+  constructor(song, index, padded = true) {
+    // Array of {lyric, pronounce, tone, yinyang, beats, melody, padding}
+    this.words = [];
+    this.song = song;
+    this.index = index;
+    // Whether to count padding words in analysis
+    this.padded = padded;
+  }
+
+  getWords() {
+    return this.padded ? this.words : this.words.filter(word => !word.padding);
+  }
+}
+
 /**
   @returns an array of lines for the input song.
-  Line object: { song: {...}, index: 0, words: [
-    {lyric, pronounce, tone, yinyang, beats, melody}, ...
-  ]}
 */
-export function buildLines(song) {
+export function buildLines(song, padded = true) {
   let melodyIndex = 0;
   let melodyChunks = song.melody.split(' ');
   const lines = [];
   let lineCount = 1;
-  let line = { words: [], song, index: lineCount };
+  let line = new Line(song, lineCount, padded);
   let lastOffset;
   let melodyObject;
   let padding = false;
@@ -152,7 +164,7 @@ export function buildLines(song) {
     else {
       lines.push(line);
       lineCount++;
-      line = { words: [], song, index: lineCount };
+      line = new Line(song, lineCount, padded);
     }
   }
   if (line.words.length > 0) {

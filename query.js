@@ -115,6 +115,7 @@ function checkLineMatch(line, params) {
   }
   if (params.padding) {
     let query = params.padding;
+    // Directly access line.words so padding is always included
     const paddingCount = line.words.filter(word => word.padding).length;
     if (query.endsWith('+')) {
       // Line must have at least this many padding chars
@@ -130,7 +131,7 @@ function checkLineMatch(line, params) {
     }
   }
   if (params.length) {
-    if (line.words.length != params.length) {
+    if (line.getWords().length != params.length) {
       return false;
     }
   }
@@ -138,7 +139,7 @@ function checkLineMatch(line, params) {
 }
 
 function addJianpuString(line) {
-  line.jianpuString = line.words
+  line.jianpuString = line.getWords()
     .map(word => word.melody)
     .join(' ')
     .replace(/ /g, '');
@@ -146,7 +147,7 @@ function addJianpuString(line) {
 }
 
 function addToneString(line) {
-  line.toneString = line.words
+  line.toneString = line.getWords()
     .map(word => word.yinyang + word.tone)
     // Mark missing dictionary entries with two underscores.
     .map(token => token ? token : '__')
@@ -156,7 +157,7 @@ function addToneString(line) {
 
 /** Joint combination to match both tone and melody. TODO: rename. */
 function addTonemelodyString(line) {
-  line.tonemelodyString = line.words
+  line.tonemelodyString = line.getWords()
     .map(word => word.tone + word.melody)
     .join('')
     .replace(/ /g, '');
@@ -237,7 +238,8 @@ async function main() {
       rhythmQuery: '',
       rhythmPercent: false,
       motifs: [],
-      headers: rowHeaders
+      headers: rowHeaders,
+      padded: false,
     },
     methods: {
       findAllMotifs() {
@@ -307,7 +309,10 @@ async function main() {
       },
       lines() {
         this.motifs = [];
-        return this.matchedSongs.flatMap(buildLines).map(addJianpuString).map(addToneString).map(addTonemelodyString);
+        return this.matchedSongs.flatMap(song => buildLines(song, this.padded))
+          .map(addJianpuString)
+          .map(addToneString)
+          .map(addTonemelodyString);
       },
       matchedLines() {
         const lineParams = {
@@ -325,8 +330,8 @@ async function main() {
         const matchCounter = new KeyCounter('1');
         const totalCounter = new KeyCounter('1');
         for (const line of this.matchedLines) {
-          for (let i = 0; i < line.words.length; i++) {
-            const word = line.words[i];
+          for (let i = 0; i < line.getWords().length; i++) {
+            const word = line.getWords()[i];
             if (word.beats != null) {
               totalCounter.count(`${i + 1}`);
               if (word.beats.includes(this.rhythmQuery)) {
@@ -349,7 +354,7 @@ async function main() {
         // Maps contours to [count, [song names...]]
         const tones = {};
         for (const line of this.matchedLines) {
-          for (const word of line.words) {
+          for (const word of line.getWords()) {
             if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
               const melodyArray = word.melody.split(' ');
               // Only count contours of 2 or more notes
@@ -373,7 +378,7 @@ async function main() {
       matchedContourBreakdown() {
         const tones = {};
         for (const line of this.matchedLines) {
-          for (const word of line.words) {
+          for (const word of line.getWords()) {
             if (word.tone && word.difference && word.tone.includes(this.toneQuery)) {
               const key = word.difference;
               if (!(key in tones)) {
@@ -406,7 +411,7 @@ async function main() {
       matchedLineLengths() {
         const counter = new KeyCounter();
         for (const line of this.matchedLines) {
-          counter.count(`${ line.words.length }`);
+          counter.count(`${ line.getWords().length }`);
         }
         return counter.map;
       }
