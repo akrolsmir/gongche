@@ -55,7 +55,7 @@ function outputNotes(sixteenths, newGroup, gongche) {
 export function skeletonize(rhythmized, first = true) {
   let result = [];
   let lastGroup = rhythmized[0].lyricGroup; // The lyric group of the previous note.
-  let newGroup = new LyricGroup(lastGroup.lyric); // The new group for the merged notes.
+  let newGroup = new LyricGroup(lastGroup.lyric, lastGroup.padding); // The new group for the merged notes.
   let toMerge = [];
   for (const note of rhythmized) {
     if (note == BAR || note.getLyric() == 'R') {
@@ -75,7 +75,7 @@ export function skeletonize(rhythmized, first = true) {
       // Start a new note
       toMerge = [note];
       lastGroup = note.lyricGroup;
-      newGroup = new LyricGroup(lastGroup.lyric);
+      newGroup = new LyricGroup(lastGroup.lyric, lastGroup.padding);
     }
   }
   if (toMerge.length >= 1) {
