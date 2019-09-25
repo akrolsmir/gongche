@@ -25,3 +25,7 @@ th {
 td {
   width: 65px;
 }
+
+td.padding {
+  background: aliceblue;
+}

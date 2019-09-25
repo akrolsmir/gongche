@@ -50,7 +50,3 @@ div.toneRow {
 div.toneColumn {
   flex: 50%;
 }
-
-td.padding {
-  background: aliceblue;
-}
