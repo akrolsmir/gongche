@@ -267,8 +267,8 @@ async function main() {
     },
     created() {
       // See also https://stackoverflow.com/a/53022397/1222351
-      this.debouncedSongsQuery = _.debounce(this.submitSongsQuery, 300);
-      this.debouncedLinesQuery = _.debounce(this.submitLinesQuery, 300);
+      this.debouncedSongsQuery = _.debounce(this.submitSongsQuery, 500);
+      this.debouncedLinesQuery = _.debounce(this.submitLinesQuery, 500);
     },
     watch: {
       matchedRhythms(newRhythms) {
