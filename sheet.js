@@ -291,9 +291,12 @@ function renderSheet(lyrics, melody) {
   const voices = makeVoices(modelStaves);
   const playbackNotes = [];
 
-  // Now that we know the number of staves, resize the canvas.
-  const canvasHeight = modelStaves.length * 200 + 100;
-  vexflowRenderer.resize(850, canvasHeight);
+  // Size the canvas now that we have a stave count.
+  // Note: Only on first render call; resizing causes weird Vexflow behavior.
+  if (!vexflowRenderer.ctx.width) {
+    const canvasHeight = modelStaves.length * 200 + 100;
+    vexflowRenderer.resize(850, canvasHeight);  
+  }
 
   for (let i = 0; i < voices.length; i++) {
     const voiceGroup = voices[i];
