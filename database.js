@@ -1,3 +1,5 @@
+const ENV = "songs"
+
 firebase.initializeApp({
   apiKey: 'AIzaSyCKjEsP_YFyT45ULNihdDkDptXHcapoXLE',
   authDomain: 'minotaur-153205.firebaseapp.com',
@@ -26,7 +28,7 @@ db.enablePersistence({ experimentalTabSynchronization: true })
   });
 
 function saveSong(song) {
-  db.collection("songs").doc(song.id).set(song.toJson());
+  db.collection(ENV).doc(song.id).set(song.toJson());
 }
 
 const EDIT_PASSWORD = 'swordfish';
@@ -51,7 +53,7 @@ function hasEditPermission() {
 
 async function loadSongs() {
   const songsMap = new Map();
-  const songsQuery = await db.collection("songs").get();
+  const songsQuery = await db.collection(ENV).get();
   songsQuery.forEach(doc => {
     songsMap.set(doc.id, doc.data());
   });
@@ -59,7 +61,7 @@ async function loadSongs() {
 }
 
 async function loadSong(id) {
-  const doc = await db.collection("songs").doc(id).get();
+  const doc = await db.collection(ENV).doc(id).get();
   if (doc.exists) {
     return doc.data();
   } else {
