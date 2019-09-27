@@ -39,6 +39,7 @@ function configSongData() {
       editedRegion: 'North',
       editedId: '123.4',
       keyboardToGongche,
+      downloadSongs: downloadSongsAsCsv,
     },
     computed: {
       // If the song's lyrics or melody were edited, color the field yellow.

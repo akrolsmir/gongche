@@ -87,6 +87,7 @@
           v-bind:href="'../prosody.html?songTitle=' + song.title">Prosody Analysis</a>
       <a target="_blank" rel="noopener noreferrer" 
           href="../query.html">Query Engine</a>
+      <a v-on:click="downloadSongs" href="javascript:;">Download database as CSV</a>
     </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
