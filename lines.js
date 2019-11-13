@@ -161,7 +161,7 @@ export function buildLines(song, padded = true) {
       melodyIndex++;
       line.words.push(word);
     }
-    else {
+    else if (lyric == '\n') {
       lines.push(line);
       lineCount++;
       line = new Line(song, lineCount, padded);
