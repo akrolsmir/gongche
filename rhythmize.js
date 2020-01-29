@@ -13,14 +13,19 @@ export function rhythmize(input, timeSignature) {
 
 function rhythmizeFree(input) {
   let output = [];
-  for (const symbol of input) {
+  for (let i = 0; i < input.length; i++) {
+    const symbol = input[i];
     if (symbol == "_") {
       // Last note in a measure is a whole note.
       output[output.length - 1].setDuration('1');
       output.push(BAR);
     } else {
       // All other notes in free rhythm are quarter notes.
-      symbol.setDuration('4');
+      try {
+        symbol.setDuration('4');
+      } catch (e) {
+        throw `Invalid symbol "${symbol}" in free rhythm piece at position ${i + 1}.`;
+      }
       output.push(symbol);
     }
   }
@@ -125,12 +130,23 @@ function processBlock(block, output, lastBeat, symbol, timeSignature) {
 
 function assignDurations(block, quarters) {
   if (block.length > 8) {
-    throw `Invalid block length ${block.length}`
+    throw `Found ${block.length} notes in one fixed rhythm block (max is 8). ` + 
+    `Is there a mistaken character in a free rhythm piece? ${formatBlock(block)}`;
   }
   const fractions = divideBlock[block.length];
   for (let i = 0; i < block.length; i++) {
-    block[i].setDuration(convertToDuration(fractions[i] * quarters));
+    try {
+      block[i].setDuration(convertToDuration(fractions[i] * quarters));
+    } catch (e) {
+      throw `Invalid symbol "${block[i]}" in fixed rhythm piece (Position ${i + 1} in ${formatBlock(block)}).`;
+    }
   }
+}
+
+function formatBlock(block) {
+  return "[" + block
+    .map(note => note.gongche ? note.gongche : note)
+    .join(", ") + "]";
 }
 
 /**
