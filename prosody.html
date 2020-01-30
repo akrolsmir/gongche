@@ -25,7 +25,7 @@
         <tr>
           <th>{{ header.display }}</th>
           <template v-for="word in line.words">
-            <td v-bind:class='{padding: word.padding}'>{{ word[header.id] }}</td>
+            <td v-bind:class='{padding: word.padding, rhyme: word.rhyme}'>{{ word[header.id] }}</td>
           </template>
         </tr>
       </template>
