@@ -1,5 +1,6 @@
 import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js";
 import { renderChart, KeyCounter } from "./chart.js";
+import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
 
@@ -39,6 +40,11 @@ function checkSongMatch(song, searchParams) {
   }
   if (searchParams.lyrics) {
     if (!song.fullLyrics.includes(searchParams.lyrics)) {
+      return false;
+    }
+  }
+  if (searchParams.rhyme) {
+    if (!song.hasRhymeCategory(searchParams.rhyme, RHYME_MAP)) {
       return false;
     }
   }
@@ -132,6 +138,18 @@ function checkLineMatch(line, params) {
   }
   if (params.length) {
     if (line.getWords().length != params.length) {
+      return false;
+    }
+  }
+  if (params.rhyme) {
+    // Some word in this line must match this rhyming scheme.
+    let hasRhyme = false;
+    for (const word of line.getWords()) {
+      if (word.rhyme && word.rhyme.includes(params.rhyme)) {
+        hasRhyme = true;
+      }
+    }
+    if (!hasRhyme) {
       return false;
     }
   }

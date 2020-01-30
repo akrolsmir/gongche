@@ -357,14 +357,13 @@ const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 const vexflowContext = vexflowRenderer.getContext();
 let vueApp;
 
-main();
-
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1";
 
-  const song = await loadSong(songId);
+  const song = urlParams.get('debugz')
+    ? {fullLyrics: '', melody: ''} : await loadSong(songId);
 
   vueApp = new Vue({
     el: '.songdata',
@@ -376,6 +375,7 @@ async function main() {
       bpm: '120',
       skeletalFirst: false,
       skeletalLast: false,
+      showDebug: urlParams.get('debugz'),
     },
     methods: {
       toggleMusic(event) {
@@ -401,5 +401,66 @@ async function main() {
       skeletalLast: () => { renderSheet(song.fullLyrics, song.melody); },
     }
   });
-  renderSheet(song.fullLyrics, song.melody);
+  try {
+    renderSheet(song.fullLyrics, song.melody);
+  } catch (e) {
+    alert(e);
+  }
 }
+
+Vue.component('debug-sheet', {
+  props: ['showDebug'],
+  data() {
+    return {
+      errors: {}
+    }
+  },
+  async mounted() {
+    if (!this.showDebug) {
+      console.log('Skipping');
+      return;
+    }
+    const [songs, songsById] = await getSongTables();
+    const start = new Date();
+
+    for (const song of songs) {
+      try {
+        debugSheet(song.fullLyrics, song.melody);
+      } catch (e) {
+        // Reactive equivalent to "this.errors[song.id] = e;"
+        this.$set(this.errors, song.id, e);
+      }
+    }
+    console.log(`${new Date() - start}ms elapsed`);
+  },
+  template:
+  `
+  <div>
+    <div v-if="Object.keys(errors).length > 0">
+      Found {{ Object.keys(errors).length }} songs with errors:
+    </div>
+    <div v-else>
+      Checking all songs, please wait...
+    </div>
+    <ul v-for="(error, songId) in errors">
+      <li>
+        <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
+          {{ songId }}
+        </a> -- 
+        {{ error }}
+      </li>
+    </ul>
+  </div>
+  `
+});
+
+export function debugSheet(lyrics, melody) {
+  const timeSignature = getTimeSignature(melody);
+  const quarters = assignLyrics(melody, lyrics)
+  let rhythmized = rhythmize(quarters, timeSignature);
+  const modelStaves = splitStaves(rhythmized);
+  const voices = makeVoices(modelStaves);
+  return voices;
+}
+
+main();

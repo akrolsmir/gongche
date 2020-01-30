@@ -5,6 +5,10 @@
 <link rel="stylesheet" href="sheet.css">
 <link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
 <div class="songdata">
+  <div v-if="showDebug">
+    <debug-sheet :show-debug="showDebug"></debug-sheet>
+  </div>
+  <div v-else>
   <h1>{{ song.title }}</h1>
   <div id="metadata">
     <div id="left">
@@ -29,6 +33,7 @@
           </option>
         </select>
     </div>
+  </div>
   </div>
 </div>
 <div id="vexflow" />

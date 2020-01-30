@@ -30,4 +30,23 @@ class Song {
     return new Song(json.id, json.title, json.composer, json.pageNum, 
       json.lyrics, json.melody, json.region, json.fullLyrics, json.modeKey);
   }
+  // Return the locations of all rhyming lyrics (lyrics followed by '.');
+  getRhymeIndices() {
+    return this.fullLyrics.split('')
+      .flatMap((char, i) => (char == '.' && i > 0) ? i - 1 : []);
+  }
+  hasRhymeCategory(query, rhymeMap) {
+    for (const index of this.getRhymeIndices()) {
+      const lyric = this.fullLyrics[index];
+      if (!rhymeMap[lyric]) {
+        console.log(`No entry in rhyme dictionary for ${lyric}`);
+        continue;
+      }
+      const category = rhymeMap[lyric][0];
+      if (category.includes(query)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
