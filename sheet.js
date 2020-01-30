@@ -402,7 +402,11 @@ async function main() {
       skeletalLast: () => { renderSheet(song.fullLyrics, song.melody); },
     }
   });
-  renderSheet(song.fullLyrics, song.melody);
+  try {
+    renderSheet(song.fullLyrics, song.melody);
+  } catch (e) {
+    alert(e);
+  }
 }
 
 Vue.component('debug-sheet', {
