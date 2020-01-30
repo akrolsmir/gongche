@@ -141,6 +141,18 @@ function checkLineMatch(line, params) {
       return false;
     }
   }
+  if (params.rhyme) {
+    // Some word in this line must match this rhyming scheme.
+    let hasRhyme = false;
+    for (const word of line.getWords()) {
+      if (word.rhyme && word.rhyme.includes(params.rhyme)) {
+        hasRhyme = true;
+      }
+    }
+    if (!hasRhyme) {
+      return false;
+    }
+  }
   return true;
 }
 

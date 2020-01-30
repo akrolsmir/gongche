@@ -139,7 +139,8 @@ export function buildLines(song, padded = true) {
   let lastOffset;
   let melodyObject;
   let padding = false;
-  for (const lyric of song.fullLyrics) {
+  for (let i = 0; i < song.fullLyrics.length; i++) {
+    const lyric = song.fullLyrics[i];
     if (lyric == '_') {
       // Remember that next character is padding.
       padding = true;
@@ -155,13 +156,17 @@ export function buildLines(song, padded = true) {
         const [southTone, northTone] = tone.split('/');
         word.tone = song.region == 'North' ? northTone : southTone;
       }
+      // Lyrics followed by '.' are rhymes.
+      if (i < song.fullLyrics.length - 1 && song.fullLyrics[i + 1] == '.') {
+        word.rhyme = file ? file : 'MISSING_RHYME_ENTRY';
+      }
       // Parse the beats and jianpu, and copy into word object.
       [melodyObject, lastOffset] = parseMelodyChunk(melodyChunks[melodyIndex], lastOffset);
       Object.assign(word, melodyObject);
       melodyIndex++;
       line.words.push(word);
     }
-    else {
+    else if (lyric == '\n') {
       lines.push(line);
       lineCount++;
       line = new Line(song, lineCount, padded);
