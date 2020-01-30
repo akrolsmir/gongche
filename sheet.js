@@ -357,14 +357,13 @@ const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 const vexflowContext = vexflowRenderer.getContext();
 let vueApp;
 
-main();
-
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1";
 
-  const song = await loadSong(songId);
+  const song = urlParams.get('debugz')
+    ? {fullLyrics: '', melody: ''} : await loadSong(songId);
 
   vueApp = new Vue({
     el: '.songdata',
@@ -437,7 +436,12 @@ Vue.component('debug-sheet', {
   template:
   `
   <div>
-    Found {{ Object.keys(errors).length }} songs with errors:
+    <div v-if="Object.keys(errors).length > 0">
+      Found {{ Object.keys(errors).length }} songs with errors:
+    </div>
+    <div v-else>
+      Checking all songs, please wait...
+    </div>
     <ul v-for="(error, songId) in errors">
       <li>
         <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
@@ -458,3 +462,5 @@ export function debugSheet(lyrics, melody) {
   const voices = makeVoices(modelStaves);
   return voices;
 }
+
+main();
