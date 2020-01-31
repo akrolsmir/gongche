@@ -43,6 +43,13 @@ function checkSongMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.rhymeswith) {
+    // Look up the rhyme category and fill it in for rhyme query.
+    const rhyme = RHYME_MAP[searchParams.rhymeswith];
+    if (!searchParams.rhyme && rhyme) {
+      searchParams.rhyme = rhyme[0];
+    }
+  }
   if (searchParams.rhyme) {
     if (!song.hasRhymeCategory(searchParams.rhyme, RHYME_MAP)) {
       return false;
@@ -139,6 +146,13 @@ function checkLineMatch(line, params) {
   if (params.length) {
     if (line.getWords().length != params.length) {
       return false;
+    }
+  }
+  if (params.rhymeswith) {
+    // Look up the rhyme category and fill it in for rhyme query.
+    const rhyme = RHYME_MAP[params.rhymeswith];
+    if (!params.rhyme && rhyme) {
+      params.rhyme = rhyme[0];
     }
   }
   if (params.rhyme) {
