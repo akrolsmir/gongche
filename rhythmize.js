@@ -130,8 +130,11 @@ function processBlock(block, output, lastBeat, symbol, timeSignature) {
 
 function assignDurations(block, quarters) {
   if (block.length > 8) {
-    throw `Found ${block.length} notes in one fixed rhythm block (max is 8). ` + 
-    `Is there a mistaken character in a free rhythm piece? ${formatBlock(block)}`;
+    // Too many notes in one block; treat as free rhythm instead.
+    for (const note of block) {
+      note.setDuration('4');
+    }
+    return;
   }
   const fractions = divideBlock[block.length];
   for (let i = 0; i < block.length; i++) {
