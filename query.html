@@ -70,17 +70,15 @@
     <v-tab title="Tone">
       <p> Find tone: <input type="text" id="toneQuery" v-model="toneQuery">
       <p> (Examples: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)
-      <p>
-        <div v-if="toneQuery">
-          Found all contours for "{{ toneQuery }}":<br>
-          (Positive contours indicate the song ended on a higher note.)
-        </div>
-        <div v-else>
-          All contours for words with 2 or more notes:<br>
-          (Positive contours indicate the song ended on a higher note.)
-        </div>
       <h3>Distribution of notes</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
+      <div v-if="toneQuery">
+        <h3>All contours (for "{{ toneQuery }}")</h3>
+      </div>
+      <div v-else>
+        <h3>All contours (for words with 2 or more notes)</h3>
+      </div>
+      <p>(Positive contours indicate the song ended on a higher note.)
       <canvas ref="contourChart" id="contourChart" width="400" height="400"></canvas>
       <div class="toneRow">
         <div class="toneColumn">
@@ -115,16 +113,16 @@
       <p> (Examples: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)
       <p> <input type="checkbox" id="rhythmPercent" v-model="rhythmPercent">
       <label for="rhythmPercent">Show as percent</label>
-      <p><div v-if="rhythmQuery">
-        Found "{{ rhythmQuery }}" at the following line positions:
+      <div v-if="rhythmQuery">
+        <h3>Locations of "{{ rhythmQuery }}"</h3>
       </div>
       <div v-else>
-        Total word counts across all lines:
+        <h3>Total word counts across all lines</h3>
       </div>
       <canvas ref="rhythmChart" id="rhythmChart" width="400" height="400"></canvas>
     </div></v-tab>
     <v-tab title="Line Lengths">
-      <p> Distribution of line lengths:
+      <h3>Distribution of line lengths</h3>
       <canvas ref="lengthChart" id="lengthChart" width="400" height="400"></canvas>
     </v-tab>
   </vue-tabs>
