@@ -296,6 +296,7 @@ async function main() {
       renderChart(this.matchedRhythms, this.$refs.rhythmChart);
       renderChart(this.matchedContourGraph, this.$refs.contourChart);
       renderChart(this.matchedLineLengths, this.$refs.lengthChart);
+      renderChart(this.matchedNotes, this.$refs.noteChart);
     },
     created() {
       // See also https://stackoverflow.com/a/53022397/1222351
@@ -311,6 +312,9 @@ async function main() {
       },
       matchedLineLengths(newLengths) {
         renderChart(newLengths, this.$refs.lengthChart);
+      },
+      matchedNotes(newNotes) {
+        renderChart(newNotes, this.$refs.noteChart);
       }
     },
     computed: {
@@ -405,6 +409,23 @@ async function main() {
           }
         }
         return tones;
+      },
+      matchedNotes() {
+        const counter = new KeyCounter('1');
+        for (const line of this.matchedLines) {
+          for (const word of line.getWords()) {
+            if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
+              const melodyArray = word.melody.split(' ');
+              for (const melody of melodyArray) {
+                const offset = jianpuToOffset[melody]
+                // Map "do" to 1, "re" to 2... regardless of octave.
+                const normalizedNote = (offset + 7) % 7 + 1;
+                counter.count(normalizedNote);
+              }
+            }
+          }
+        }
+        return counter.map;
       },
       /** Return the exact breakdown of contours and counts. */
       matchedContourBreakdown() {
