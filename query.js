@@ -1,6 +1,7 @@
 import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js";
 import { renderChart, KeyCounter } from "./chart.js";
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
+import { messages } from "./assets/translations.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
 
@@ -260,7 +261,13 @@ const rowHeaders = [
 async function main() {
   const [songs, songsById] = await getSongTables();
 
+  const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages, // set locale messages
+  })
+
   const vueApp = new Vue({
+    i18n,
     el: '.songdata',
     data: {
       songs,
