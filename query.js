@@ -251,13 +251,6 @@ function parseQuery(query, params) {
   return params;
 }
 
-const rowHeaders = [
-  { id: 'lyric', display: '字' },
-  { id: 'yinyang', display: '陰陽' },
-  { id: 'tone', display: '聲調' },
-  { id: 'melody', display: '簡譜音高' },
-]
-
 async function main() {
   const [songs, songsById] = await getSongTables();
 
@@ -277,7 +270,7 @@ async function main() {
       rhythmQuery: '',
       rhythmPercent: false,
       motifs: [],
-      headers: rowHeaders,
+      headers: ['lyric', 'yinyang', 'tone', 'melody'],
       padded: false,
     },
     methods: {
