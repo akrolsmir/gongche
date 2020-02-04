@@ -194,7 +194,7 @@ function addTonemelodyString(line) {
     .map(word => word.tone + word.melody)
     .join('')
     .replace(/ /g, '');
-    return line;
+  return line;
 }
 
 function findMotifs(lines) {
@@ -305,7 +305,7 @@ async function main() {
     },
     watch: {
       matchedRhythms(newRhythms) {
-        renderChart(newRhythms, this.$refs.rhythmChart);        
+        renderChart(newRhythms, this.$refs.rhythmChart);
       },
       matchedContourGraph(newContours) {
         renderChart(newContours, this.$refs.contourChart);
@@ -400,7 +400,7 @@ async function main() {
                 const contour = jianpuToOffset[lastNote] - jianpuToOffset[firstNote];
                 const key = `${contour}`;
                 if (!(key in tones)) {
-                  tones[key] = {count: 0, titles: new Set()};
+                  tones[key] = { count: 0, titles: new Set() };
                 }
                 tones[key].count++;
                 tones[key].titles.add(line.song.title);
@@ -428,7 +428,7 @@ async function main() {
       matchedFollowingMatrix() {
         const matrix = [];
         for (let i = 0; i < 7; i++) {
-          matrix.push([0,0,0,0,0,0,0]);
+          matrix.push([0, 0, 0, 0, 0, 0, 0]);
         }
         for (const line of this.matchedLines) {
           const melodies = [];
@@ -484,7 +484,7 @@ async function main() {
       matchedLineLengths() {
         const counter = new KeyCounter();
         for (const line of this.matchedLines) {
-          counter.count(`${ line.getWords().length }`);
+          counter.count(`${line.getWords().length}`);
         }
         return counter.map;
       }

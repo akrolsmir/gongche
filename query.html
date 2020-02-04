@@ -15,8 +15,8 @@
   </div>
   <h1>Query Engine</h1>
   <div id="selectsongs">
-    <p> <input placeholder="Select songs" type="text" id="songsQuery" v-bind:value="songsQuery" v-on:input="debouncedSongsQuery($event.target.value)"> 
-    <p> ({{$t('examples')}}: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code> | <code>source:法宮</code> | <code>lyrics:春</code> | <code>melody:。</code> | <code>padding:2+</code> | <code>rhyme:東同</code> | <code>rhymeswith:中</code>)
+    <p> <input placeholder="Select songs" type="text" id="songsQuery" v-bind:value="songsQuery" v-on:input="debouncedSongsQuery($event.target.value)"> </p>
+    <p> ({{$t('examples')}}: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code> | <code>source:法宮</code> | <code>lyrics:春</code> | <code>melody:。</code> | <code>padding:2+</code> | <code>rhyme:東同</code> | <code>rhymeswith:中</code>)</p>
     <h3>{{ matchedSongs.length }} pieces</h3>
     <div class="results">
       <ul>
@@ -30,11 +30,14 @@
     </div>
   </div>
   <div id="filterlines">
-  <p> <input placeholder="Filter lines" type="text" id="linesQuery" v-bind:value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)">
-  <p> ({{$t("examples")}}: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code> | <code>padding:1</code> | <code>length:4</code> | <code>rhyme:東同</code> | <code>rhymeswith:中</code>)</p>
-  <p> <input type="checkbox" id="padded" v-model="padded">
-    <label for="padded">{{$t('countPaddingCharacters')}}</label></p>
-  <vue-tabs><v-tab :title="$t('motifs')"><div>
+  <p> <input placeholder="Filter lines" type="text" id="linesQuery" v-bind:value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)"></p>
+  <p> ({{$t("examples")}}: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code> | <code>padding:1</code> | <code>length:4</code> | <code>rhyme:東同</code> | <code>rhymeswith:中</code>)</p></p>
+  <p>
+    <input type="checkbox" id="padded" v-model="padded">
+    <label for="padded">{{$t('countPaddingCharacters')}}</label>
+  </p>
+  <vue-tabs>
+  <v-tab :title="$t('motifs')">
   <div id="motifs">
     <button v-on:click="findAllMotifs">Find motifs</button>
     <div class="results">
@@ -53,6 +56,7 @@
     <div v-else>
       Showing {{matchedLines.length}} matches:
     </div>
+  </p>
   <template v-for="line in matchedLines.slice(0, 50)">
     <table>
       <tbody>
@@ -72,10 +76,11 @@
       </tbody>
     </table>
   </template>
-  </div></v-tab>
+  </v-tab>
+  
     <v-tab :title="$t('tone')">
-      <p> {{$t('findTone')}}: <input type="text" id="toneQuery" v-model="toneQuery">
-      <p> ({{$t('examples')}}: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)
+      <p> {{$t('findTone')}}: <input type="text" id="toneQuery" v-model="toneQuery"></p>
+      <p> ({{$t('examples')}}: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)</p>
       
       <h3>Distribution of notes</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
@@ -89,7 +94,7 @@
       <div v-else>
         <h3>All contours (for words with 2 or more notes)</h3>
       </div>
-      <p>(Positive contours indicate the song ended on a higher note.)
+      <p>(Positive contours indicate the song ended on a higher note.)</p>
       <canvas ref="contourChart" id="contourChart" width="400" height="400"></canvas>
       <div class="toneRow">
         <div class="toneColumn">
@@ -119,11 +124,14 @@
         </div>
       </div>
     </v-tab>
-    <v-tab :title="$t('rhythm')"><div>
-      <p> {{$t('findSymbol')}}: <input type="text" id="rhythmQuery" v-model="rhythmQuery">
-      <p> ({{$t('examples')}}: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)
-      <p> <input type="checkbox" id="rhythmPercent" v-model="rhythmPercent">
-      <label for="rhythmPercent">Show as percent</label>
+
+    <v-tab :title="$t('rhythm')">
+      <p> {{$t('findSymbol')}}: <input type="text" id="rhythmQuery" v-model="rhythmQuery"></p>
+      <p> ({{$t('examples')}}: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)</p>
+      <p>
+        <input type="checkbox" id="rhythmPercent" v-model="rhythmPercent">
+        <label for="rhythmPercent">Show as percent</label>
+      </p>
       <div v-if="rhythmQuery">
         <h3>Locations of "{{ rhythmQuery }}"</h3>
       </div>
@@ -131,7 +139,8 @@
         <h3>Total word counts across all lines</h3>
       </div>
       <canvas ref="rhythmChart" id="rhythmChart" width="400" height="400"></canvas>
-    </div></v-tab>
+    </v-tab>
+
     <v-tab :title="$t('lineLengths')">
       <h3>Distribution of line lengths</h3>
       <canvas ref="lengthChart" id="lengthChart" width="400" height="400"></canvas>
