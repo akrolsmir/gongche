@@ -16,7 +16,11 @@
   <h1>Query Engine</h1>
   <div id="selectsongs">
     <p> <input placeholder="Select songs" type="text" id="songsQuery" v-bind:value="songsQuery" v-on:input="debouncedSongsQuery($event.target.value)"> </p>
-    <p> ({{$t('examples')}}: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code> | <code>source:法宮</code> | <code>lyrics:春</code> | <code>melody:。</code> | <code>padding:2+</code> | <code>rhyme:東同</code> | <code>rhymeswith:中</code>)</p>
+    <p> ({{$t('examples')}}: 
+      <template v-for="entry in selectSongsExamples">
+        | <code>{{$t(`keywords.${entry[0]}`)}}:{{entry[1]}}</code>
+      </template>)
+    </p>
     <h3>{{ matchedSongs.length }} pieces</h3>
     <div class="results">
       <ul>
@@ -31,7 +35,11 @@
   </div>
   <div id="filterlines">
   <p> <input placeholder="Filter lines" type="text" id="linesQuery" v-bind:value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)"></p>
-  <p> ({{$t("examples")}}: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code> | <code>padding:1</code> | <code>length:4</code> | <code>rhyme:東同</code> | <code>rhymeswith:中</code>)</p></p>
+  <p> ({{$t("examples")}}: 
+    <template v-for="entry in filterLinesExamples">
+      | <code>{{$t(`keywords.${entry[0]}`)}}:{{entry[1]}}</code>
+    </template>)
+  </p>
   <p>
     <input type="checkbox" id="padded" v-model="padded">
     <label for="padded">{{$t('countPaddingCharacters')}}</label>

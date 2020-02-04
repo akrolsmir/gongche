@@ -1,7 +1,7 @@
 import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js";
 import { renderChart, KeyCounter } from "./chart.js";
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
-import { messages } from "./assets/translations.js";
+import { messages, selectSongsExamples, filterLinesExamples, zhKeywords } from "./assets/translations.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
 
@@ -236,12 +236,16 @@ function findMotifs(lines) {
 function parseQuery(query, params) {
   const terms = query.split(' ');
   for (const term of terms) {
-    const termSplit = term.split(':');
+    const termSplit = term.split(/[:：]/);
     if (termSplit.length != 2) {
       console.log(`Invalid syntax: ${term}`);
       continue;
     }
-    const [keyword, param] = termSplit;
+    let [keyword, param] = termSplit;
+    // Translate Chinese keywords back into English
+    if (zhKeywords[keyword]) {
+      keyword = zhKeywords[keyword];
+    }
     if (!keyword in params) {
       console.log(`Invalid keyword: ${term}`);
       continue;
@@ -272,6 +276,8 @@ async function main() {
       motifs: [],
       headers: ['lyric', 'yinyang', 'tone', 'melody'],
       padded: false,
+      selectSongsExamples,
+      filterLinesExamples,
     },
     methods: {
       findAllMotifs() {

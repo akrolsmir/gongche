@@ -1,24 +1,13 @@
 // Ready translated locale messages
 export const messages = {
   en: {
-    id: 'ID',
-    title: 'Title',
-    region: 'Region',
-    n: 'n',
-    s: 's',
-    mode: 'Mode',
-    source: 'Source',
     lyric: 'Lyric',
-    lyrics: 'Lyrics',
     yinyang: 'Yin/Yang',
     melody: 'Melody',
-    padding: 'Padding',
-    rhymeCategory: 'Rhyme (Category)',
     sheet: 'Sheet',
     prosody: 'Prosody',
     edit: 'Edit',
     motifs: 'Motifs',
-    fuzzy: 'Fuzzy',
     tone: 'Tone',
     lineLengths: 'Line Lengths',
     rhythm: 'Rhythm',
@@ -35,26 +24,33 @@ export const messages = {
     skeletal: 'Skeletal',
     keySignature: 'Key Signature',
     examples: 'Examples',
+    keywords: {
+      id: 'id',
+      title: 'title',
+      region: 'region',
+      n: 'n',
+      s: 's',
+      mode: 'mode',
+      source: 'source',
+      lyrics: 'lyrics',
+      melody: 'melody',
+      padding: 'padding',
+      rhyme: 'rhyme',
+      rhymeswith: 'rhymeswith',
+      fuzzy: 'fuzzy',
+      tone: 'tone',
+      tonemelody: 'tonemelody',
+      length: 'length',
+    }
   },
   zh: {
-    id: '歌號',
-    title: '曲牌名',
-    region: '地區',
-    n: '北',
-    s: '南',
-    mode: '宮調',
-    source: '來源',
     lyric: '字',
-    lyrics: '歌詞',
     yinyang: '陰陽',
     melody: '旋律',
-    padding: '襯字',
-    rhymeCategory: '韻部',
     sheet: '五線譜',
     prosody: '格律',
     edit: '善本',
     motifs: '主腔',
-    fuzzy: '模糊',
     tone: '聲調',
     lineLengths: '長短',
     rhythm: '節奏',
@@ -71,5 +67,53 @@ export const messages = {
     skeletal: '骨幹音',
     keySignature: '調號',
     examples: '例',
+    keywords: {
+      id: '歌號',
+      title: '曲牌名',
+      region: '地區',
+      n: '北',
+      s: '南',
+      mode: '宮調',
+      source: '來源',
+      lyrics: '歌詞',
+      melody: '旋律',
+      padding: '襯字',
+      rhyme: '韻部',
+      rhymeswith: 'rhymeswith',
+      fuzzy: '模糊',
+      tone: '聲調',
+      tonemelody: '聲調旋律',
+      length: '長短',
+    }
   }
 }
+
+export const zhKeywords = {};
+for (let [key, value] of Object.entries(messages.zh.keywords)) {
+  zhKeywords[value] = key;
+}
+
+export const selectSongsExamples = [
+  ['id', '287.1,287.2'],
+  ['title', '春'],
+  ['region', 's'],
+  ['mode', '仙呂'],
+  ['source', '法宮'],
+  ['lyrics', '春'],
+  ['melody', '。'],
+  ['padding', '2'],
+  ['rhyme', '東同'],
+  ['rhymeswith', '中'],
+]
+
+export const filterLinesExamples = [
+  ['melody', '216.5.6.'],
+  ['fuzzy', '65323'],
+  ['tone', '平平仄'],
+  ['tone', '平陽平陰仄平'],
+  ['tonemelody', '平3去35'],
+  ['padding', '1'],
+  ['length', '4'],
+  ['rhyme', '東同'],
+  ['rhymeswith', '中'],
+]
