@@ -83,3 +83,31 @@ function removeData(chart) {
   });
   chart.update();
 }
+
+Vue.component('confusion-matrix', {
+  props: ['matrix'],
+  template: `
+<table>
+  <tbody>
+    <tr>
+      <th>From</th>
+      <th :colspan='matrix[0].length'>To</th>
+    </tr>
+    <tr>
+      <th></th>
+      <template v-for='i in matrix.length'>
+        <th>{{ i }}</th>
+      </template>
+    </tr>
+    <template v-for='(row, i) in matrix'>
+      <tr>
+        <th>{{ i + 1 }}</th>
+        <template v-for="entry in row">
+          <td>{{ entry }}</td>
+        </template>
+      </tr>
+    </template>
+  </tbody>
+</table>
+  `
+});

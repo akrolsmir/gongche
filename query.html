@@ -70,8 +70,13 @@
     <v-tab title="Tone">
       <p> Find tone: <input type="text" id="toneQuery" v-model="toneQuery">
       <p> (Examples: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)
+      
       <h3>Distribution of notes</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
+      
+      <h3>Notes following notes</h3>
+      <confusion-matrix :matrix="matchedFollowingMatrix"></confusion-matrix>
+      
       <div v-if="toneQuery">
         <h3>All contours (for "{{ toneQuery }}")</h3>
       </div>

@@ -416,16 +416,36 @@ async function main() {
           for (const word of line.getWords()) {
             if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
               const melodyArray = word.melody.split(' ');
-              for (const melody of melodyArray) {
-                const offset = jianpuToOffset[melody]
-                // Map "do" to 1, "re" to 2... regardless of octave.
-                const normalizedNote = (offset + 7) % 7 + 1;
-                counter.count(normalizedNote);
+              for (const jianpu of melodyArray) {
+                counter.count(normalizeJianpu(jianpu));
               }
             }
           }
         }
         return counter.map;
+      },
+      /** 7x7 matrix. Rows are start notes, columns are following notes. */
+      matchedFollowingMatrix() {
+        const matrix = [];
+        for (let i = 0; i < 7; i++) {
+          matrix.push([0,0,0,0,0,0,0]);
+        }
+        for (const line of this.matchedLines) {
+          const melodies = [];
+          for (const word of line.getWords()) {
+            if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
+              melodies.push(...word.melody.split(' '));
+            }
+          }
+          const notes = melodies.map(normalizeJianpu);
+          for (let i = 0; i < notes.length - 1; i++) {
+            const current = notes[i];
+            const next = notes[i + 1];
+            // Shift by 1 to accomodate 0-based indexing.
+            matrix[current - 1][next - 1]++;
+          }
+        }
+        return matrix;
       },
       /** Return the exact breakdown of contours and counts. */
       matchedContourBreakdown() {
@@ -470,4 +490,9 @@ async function main() {
       }
     }
   });
+}
+
+// Map "do" to 1, "re" to 2... regardless of octave.
+function normalizeJianpu(jianpu) {
+  return (jianpuToOffset[jianpu] + 7) % 7 + 1;
 }
