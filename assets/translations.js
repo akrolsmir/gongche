@@ -1,6 +1,7 @@
 // Ready translated locale messages
 export const messages = {
   en: {
+    // Used in Query Engine
     lyric: 'Lyric',
     yinyang: 'Yin/Yang',
     melody: 'Melody',
@@ -15,14 +16,19 @@ export const messages = {
     findSymbol: 'Find Symbol',
     findTone: 'Find Tone',
     countPaddingCharacters: 'Count Padding Characters',
+    // Used in Prosody
+    pronounce: 'Pronounce',
+    beats: 'Beats',
     contour: 'Contour',
     firstNote: 'First Note',
     lastNote: 'Last Note',
     interleaved: 'Interleaved',
+    // Used in Sheet Music
     playback: 'Playback',
     bpm: 'BPM',
     skeletal: 'Skeletal',
     keySignature: 'Key Signature',
+    // Query Engine example search terms
     examples: 'Examples',
     keywords: {
       id: 'id',
@@ -58,6 +64,8 @@ export const messages = {
     findSymbol: '符號檢索',
     findTone: '聲調檢索',
     countPaddingCharacters: '包括襯字',
+    pronounce: '字音',
+    beats: '板眼',
     contour: '升降',
     firstNote: '第一音',
     lastNote: '最後音',

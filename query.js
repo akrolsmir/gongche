@@ -458,8 +458,8 @@ async function main() {
         const tones = {};
         for (const line of this.matchedLines) {
           for (const word of line.getWords()) {
-            if (word.tone && word.difference && word.tone.includes(this.toneQuery)) {
-              const key = word.difference;
+            if (word.tone && word.contour && word.tone.includes(this.toneQuery)) {
+              const key = word.contour;
               if (!(key in tones)) {
                 tones[key] = { count: 0, titles: new Set() };
               }

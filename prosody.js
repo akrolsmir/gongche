@@ -1,17 +1,7 @@
 import { buildLines } from "./lines.js";
+import { messages } from "./assets/translations.js";
 
-const rowHeaders = [
-  {id: 'lyric', display: '字'},
-  {id: 'pronounce', display: '字音'},
-  {id: 'tone', display: '聲調'},
-  {id: 'yinyang', display: '陰陽'},
-  {id: 'beats', display: '板眼'},
-  {id: 'melody', display: '簡譜音高'},
-  {id: 'firstNote', display: 'First Note'},
-  {id: 'lastNote', display: 'Last Note'},
-  // How much a note is offset relative to previous note.
-  {id: 'difference', display: 'Contour'},
-]
+const rowHeaders = ['lyric', 'pronounce', 'tone', 'yinyang', 'beats', 'melody', 'firstNote', 'lastNote', 'contour'];
 
 /** @returns the lines of these songs, zipped (all line 1s, then 2s, 3s...) */
 function interleaveLines(songs) {
@@ -67,7 +57,13 @@ async function main() {
     pageTitle = 'IDs: ' + ids;
   }
 
+  const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages, // set locale messages
+  })
+
   const vueApp = new Vue({
+    i18n,
     el: '.songdata',
     data: {
       tableStyle,
@@ -75,16 +71,43 @@ async function main() {
       rawSongs,
       pageTitle,
       interleave: true,
-      checkedHeaders: rowHeaders.map(h => h.id)
+      checkedHeaders: rowHeaders
     },
     computed: {
-      filteredHeaders () {
-        return rowHeaders.filter(h => this.checkedHeaders.includes(h.id));
+      filteredHeaders() {
+        return rowHeaders.filter(h => this.checkedHeaders.includes(h));
       },
       lines() {
-        return this.interleave 
+        return this.interleave
           ? interleaveLines(this.rawSongs) : this.rawSongs.flatMap(buildLines);
       }
     }
   });
 }
+
+Vue.component('prosody', {
+  props: ['lines', 'headers', 'tableStyle'],
+  template: `
+  <div>
+  <template v-for="line in lines">
+    <table :style="tableStyle ? tableStyle(line.song) : ''">
+      <tbody>
+        <tr>
+          <td style='text-align: center' :colspan='line.words.length + 1'>
+            {{ $t('lineOf', {num: line.index, id: line.song.id})}}《{{ line.song.title }} - {{ line.song.composer }}》
+          </td>
+        </tr>
+        <template v-for='header in headers'>
+          <tr>
+            <th>{{ $t(header) }}</th>
+            <template v-for="word in line.words">
+              <td :class='{padding: word.padding, rhyme: word.rhyme}'> {{ word[header] }}</td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </template>
+  </div>
+`
+});

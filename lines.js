@@ -90,7 +90,7 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
   }
   const melody = [];
   const beats = [];
-  const differences = [];
+  const contours = [];
   for (const char of melodyChunk) {
     if (beatSymbols.includes(char)) {
       beats.push(char);
@@ -99,14 +99,14 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
       melody.push(gongcheToJianpu[char]);
       const offset = jianpuToOffset[gongcheToJianpu[char]];
       // Explicit check against undefined, since 0 is a valid offset value.
-      differences.push(lastOffset == undefined ? 0 : offset - lastOffset);
+      contours.push(lastOffset == undefined ? 0 : offset - lastOffset);
       lastOffset = offset;
     }
   }
   return [{
     beats: beats.join(' '),
     melody: melody.join(' '),
-    difference: differences.map(r => (r <= 0 ? '' : '+') + r).join(' '),
+    contour: contours.map(r => (r <= 0 ? '' : '+') + r).join(' '),
     firstNote: melody[0],
     lastNote: melody[melody.length - 1]
   }, lastOffset];
