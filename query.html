@@ -15,7 +15,7 @@
   </div>
   <h1>Query Engine</h1>
   <div id="selectsongs">
-    <p> <input placeholder="Select songs" type="text" id="songsQuery" v-bind:value="songsQuery" v-on:input="debouncedSongsQuery($event.target.value)"> </p>
+    <p> <input placeholder="Select songs" type="text" id="songsQuery" :value="songsQuery" v-on:input="debouncedSongsQuery($event.target.value)"> </p>
     <p> ({{$t('examples')}}: 
       <template v-for="entry in selectSongsExamples">
         | <code>{{$t(`keywords.${entry[0]}`)}}:{{entry[1]}}</code>
@@ -34,7 +34,7 @@
     </div>
   </div>
   <div id="filterlines">
-  <p> <input placeholder="Filter lines" type="text" id="linesQuery" v-bind:value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)"></p>
+  <p> <input placeholder="Filter lines" type="text" id="linesQuery" :value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)"></p>
   <p> ({{$t("examples")}}: 
     <template v-for="entry in filterLinesExamples">
       | <code>{{$t(`keywords.${entry[0]}`)}}:{{entry[1]}}</code>
@@ -65,25 +65,7 @@
       Showing {{matchedLines.length}} matches:
     </div>
   </p>
-  <template v-for="line in matchedLines.slice(0, 50)">
-    <table>
-      <tbody>
-        <tr>
-          <td style='text-align: center' v-bind:colspan='line.words.length + 1'>
-            {{ $t('lineOf', {num: line.index, id: line.song.id})}}《{{ line.song.title }} - {{ line.song.composer }}》
-          </td>
-        </tr>
-        <template v-for='header in headers'>
-          <tr>
-            <th>{{ $t(header) }}</th>
-            <template v-for="word in line.words">
-              <td v-bind:class='{padding: word.padding, rhyme: word.rhyme}'> {{ word[header] }}</td>
-            </template>
-          </tr>
-        </template>
-      </tbody>
-    </table>
-  </template>
+  <prosody :lines="matchedLines.slice(0, 50)" :headers="headers" :colorize="true"></prosody>
   </v-tab>
   
     <v-tab :title="$t('tone')">
@@ -161,6 +143,7 @@
 <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.5.4/randomColor.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>

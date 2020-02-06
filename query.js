@@ -2,6 +2,7 @@ import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./line
 import { renderChart, KeyCounter } from "./chart.js";
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 import { messages, selectSongsExamples, filterLinesExamples, zhKeywords } from "./assets/translations.js";
+import { ProsodyComponent } from "./prosody-vue.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
 
@@ -266,6 +267,9 @@ async function main() {
   const vueApp = new Vue({
     i18n,
     el: '.songdata',
+    components: {
+      'prosody': ProsodyComponent
+    },
     data: {
       songs,
       songsQuery: '',

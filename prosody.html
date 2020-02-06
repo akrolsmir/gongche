@@ -19,7 +19,7 @@
     <input type="checkbox" :id="header" :value="header" v-model="checkedHeaders">
     <label :for="header">{{ $t(header) }}</label>
   </template>
-  <prosody :headers="filteredHeaders" :lines="lines" :table-style="tableStyle"></prosody>
+  <prosody :headers="filteredHeaders" :lines="lines" :colorize="true"></prosody>
 </div>
 <script src="load-service-worker.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
