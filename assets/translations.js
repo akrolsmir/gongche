@@ -109,7 +109,7 @@ export const selectSongsExamples = [
   ['source', '法宮'],
   ['lyrics', '春'],
   ['melody', '。'],
-  ['padding', '2'],
+  ['padding', '2+'],
   ['rhyme', '東同'],
   ['rhymeswith', '中'],
 ]
