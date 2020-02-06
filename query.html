@@ -15,10 +15,10 @@
   </div>
   <h1>Query Engine</h1>
   <div id="selectsongs">
-    <p> <input placeholder="Select songs" type="text" id="songsQuery" :value="songsQuery" v-on:input="debouncedSongsQuery($event.target.value)"> </p>
+    <p> <input placeholder="Select songs" type="text" id="songsQuery" :value="songsQuery" @input="debouncedSongsQuery($event.target.value)"> </p>
     <p> ({{$t('examples')}}: 
-      <template v-for="entry in selectSongsExamples">
-        | <code>{{$t(`keywords.${entry[0]}`)}}:{{entry[1]}}</code>
+      <template v-for="[keyword, example] in selectSongsExamples">
+        | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
       </template>)
     </p>
     <h3>{{ matchedSongs.length }} pieces</h3>
@@ -34,10 +34,10 @@
     </div>
   </div>
   <div id="filterlines">
-  <p> <input placeholder="Filter lines" type="text" id="linesQuery" :value="linesQuery" v-on:input="debouncedLinesQuery($event.target.value)"></p>
+  <p> <input placeholder="Filter lines" type="text" id="linesQuery" :value="linesQuery" @input="debouncedLinesQuery($event.target.value)"></p>
   <p> ({{$t("examples")}}: 
-    <template v-for="entry in filterLinesExamples">
-      | <code>{{$t(`keywords.${entry[0]}`)}}:{{entry[1]}}</code>
+    <template v-for="[keyword, example] in filterLinesExamples">
+      | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
     </template>)
   </p>
   <p>
@@ -47,12 +47,12 @@
   <vue-tabs>
   <v-tab :title="$t('motifs')">
   <div id="motifs">
-    <button v-on:click="findAllMotifs">Find motifs</button>
+    <button @click="findAllMotifs">Find motifs</button>
     <div class="results">
       <ul>
-        <li v-for='motif in motifs'>
-          {{ motif[1] }} instances of
-          <a href='#results' v-on:click="setLinesQuery(`melody:${motif[0]}`)">{{ motif[0] }}</a>
+        <li v-for='[motif, count] in motifs'>
+          {{ count }} instances of
+          <a href='#results' @click="setLinesQuery(`melody:${motif}`)">{{ motif }}</a>
         </li>
       </ul>
     </div>
@@ -97,7 +97,7 @@
                   {{ title }}
                 </li>
                 <li v-if='values.titles.size > 10'>
-                  <a href="#" v-on:click="showAlert(Array.from(values.titles).join(', '))">See all...</a>
+                  <a href="#" @click="showAlert(Array.from(values.titles).join(', '))">See all...</a>
                 </li>
               </ul>
             </li>
