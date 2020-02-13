@@ -28,6 +28,11 @@ export const messages = {
     bpm: 'BPM',
     skeletal: 'Skeletal',
     keySignature: 'Key Signature',
+    id: 'Song ID',
+    source: 'Source',
+    region: 'Region',
+    north: 'North',
+    south: 'South',
     // Query Engine example search terms
     examples: 'Examples',
     keywords: {
@@ -74,6 +79,11 @@ export const messages = {
     bpm: 'BPM',
     skeletal: '骨幹音',
     keySignature: '調號',
+    id: '歌號',
+    source: '來源',
+    region: '地區',
+    north: '北',
+    south: '南',
     examples: '例',
     keywords: {
       id: '歌號',

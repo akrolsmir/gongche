@@ -4,6 +4,7 @@ import { rhythmize } from "./rhythmize.js";
 import { skeletonize, countSixteenths } from "./skeletonize.js";
 import { schedulePlayback } from "./playback.js";
 import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
+import { messages } from "./assets/translations.js";
 
 export class Note {
   constructor(gongche) {
@@ -365,7 +366,13 @@ async function main() {
   const song = urlParams.get('debugz')
     ? {fullLyrics: '', melody: ''} : await loadSong(songId);
 
+  const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages, // set locale messages
+  });
+
   vueApp = new Vue({
+    i18n,
     el: '.songdata',
     data: {
       song,
