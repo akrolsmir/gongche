@@ -115,7 +115,7 @@ async function downloadSongsAsCsv() {
   });
 }
 
-async function loadSong(id) {
+async function loadSongJson(id) {
   const doc = await db.collection(ENV).doc(id).get();
   if (doc.exists) {
     return doc.data();

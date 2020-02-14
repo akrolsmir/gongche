@@ -38,6 +38,7 @@
             {{ s }}
           </option>
         </select>
+      <p>Rhyme Category: {{ song.getRhymeCategories() }}
     </div>
   </div>
   </div>
@@ -50,7 +51,5 @@
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
-<script src="models/song.js"></script>
-<script src="database.js"></Script>
-<script src="assets/mulu.js"></script>
+<script src="database.js"></script>
 <script type="module" src="sheet.js"></script>

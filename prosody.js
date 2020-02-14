@@ -1,6 +1,7 @@
 import { buildLines } from "./lines.js";
 import { messages } from "./assets/translations.js";
 import { ProsodyComponent } from "./prosody-vue.js";
+import { getSongTables } from "./assets/mulu.js";
 
 const rowHeaders = ['lyric', 'pronounce', 'tone', 'yinyang', 'beats', 'melody', 'firstNote', 'lastNote', 'contour'];
 

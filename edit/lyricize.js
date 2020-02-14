@@ -1,13 +1,15 @@
-const canvas = document.getElementById('canvas');
-const lyricsTextField = document.getElementById('lyrics');
-const ctx = canvas.getContext('2d');
+import {requestOcr} from "./ocr.js";
+
 // Google's OCR boxes are a little offset from the PDF.
 const UI_VERTICAL_OFFSET = -15;
 
 let lines = [];
 let symbols = [];
 
-function analyze() {
+export function analyze() {
+  const canvas = document.getElementById('canvas');
+  const lyricsTextField = document.getElementById('lyrics');
+  const ctx = canvas.getContext('2d');
   // TODO: drawSeparators is slow (~300ms). Optimize or move to async.
   drawSeparators(ctx);
   requestOcr(canvas).then(json => saveOcrResults(json));
@@ -45,7 +47,7 @@ function saveOcrResults(json) {
  * Draw boxes for annotations and selected lyrics.
  * @var melodyIndex If provided, highlight the current melody symbol.
  */
-function drawUiLayer(melodyIndex = -1, showAnnotations = true) {
+export function drawUiLayer(melodyIndex = -1, showAnnotations = true) {
   // Create a hidden UI layer to stage changes
   const uiCanvas = document.createElement('canvas');
   uiCanvas.width = canvas.width;
@@ -82,7 +84,7 @@ function drawUiLayer(melodyIndex = -1, showAnnotations = true) {
 
   // Draw the layers from bottom to top.
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(bgCanvas, 0, 0);
+  ctx.drawImage(window.bgCanvas, 0, 0);
   ctx.drawImage(uiCanvas, 0, UI_VERTICAL_OFFSET);
 }
 
@@ -97,7 +99,7 @@ function intersect(x, y, objects) {
 }
 
 /** Remember the clicked box as a break symbol. */
-function processClick(event) {
+export function processClick(event) {
   let x = event.offsetX;
   let y = event.offsetY - UI_VERTICAL_OFFSET
   let clickedSymbol = intersect(x, y, symbols);
@@ -128,7 +130,8 @@ function processClick(event) {
     splitSong(clickedSymbol);
   }
   // TODO remove cross-dependency?
-  songDataApp.editedLyrics = songDataApp.song.lyrics + printSong();
+  window.songDataApp.editedLyrics = 
+    window.songDataApp.song.lyrics + printSong();
   drawUiLayer();
 }
 
@@ -205,7 +208,7 @@ function printSong() {
   return output;
 }
 
-function resetSong() {
+export function resetSong() {
   songLines = [];
   songBreaks = [];
 }

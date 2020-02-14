@@ -1,6 +1,13 @@
-const pageNumText = document.getElementById('pagenum');
+import { getSongTables, findBookAndOffset } from "../assets/mulu.js";
+import { drawUiLayer, resetSong, processClick, analyze } from "./lyricize.js";
+import { mouseUp, mouseDown, contextMenu} from "./ocr.js";
+
+let canvas = document.getElementById('canvas');
+let ctx = canvas.getContext('2d');
+
 // Invisible intermediate canvas for loading PDF.
 const bgCanvas = document.createElement('canvas');
+window.bgCanvas = bgCanvas;
 const img = new Image();
 
 let pdf;
@@ -13,8 +20,6 @@ let songIndex;
 
 let currentBook;
 
-let songDataApp;
-
 async function main() {
   // If songId is provided as a URL param, focus on that song.
   const urlParams = new URLSearchParams(window.location.search);
@@ -23,14 +28,14 @@ async function main() {
 
   [songs, songsById] = await getSongTables();
   songIndex = songsById[urlSongId];
-  songDataApp = configSongData();
+  window.songDataApp = configSongData();
   renderSong();
 }
 main();
 
 function configSongData() {
   return new Vue({
-    el: '.songdata',
+    el: '.vue',
     data: {
       song: '',
       regions: ['North', 'South'],
@@ -40,6 +45,22 @@ function configSongData() {
       editedId: '123.4',
       keyboardToGongche,
       downloadSongs: downloadSongsAsCsv,
+    },
+    mounted() {
+      canvas = this.$refs.canvas;
+      ctx = canvas.getContext('2d');
+    },
+    methods: {
+      processClick,
+      analyze,
+      nextPage,
+      prevPage,
+      jumpToPage,
+      mouseUp,
+      mouseDown,
+      contextMenu,
+      nextSong,
+      prevSong,
     },
     computed: {
       // If the song's lyrics or melody were edited, color the field yellow.
@@ -194,6 +215,7 @@ async function renderPdfPage() {
   };
   await page.render(renderContext);
   ctx.drawImage(bgCanvas, 0, 0);
+  const pageNumText = document.getElementById('pagenum');
   pageNumText.value = `Page ${pageNum}`;
 }
 
@@ -210,6 +232,7 @@ function nextPage() {
 }
 
 function jumpToPage() {
+  const pageNumText = document.getElementById('pagenum');
   try {
     saveLyricsAndMelody();
     const match = pageNumText.value.match(/\d+/);

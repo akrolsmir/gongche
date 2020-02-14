@@ -1,4 +1,6 @@
-function findBookAndOffset(pageNum) {
+import { Song } from '../models/song.js';
+
+export function findBookAndOffset(pageNum) {
   let i = 0
   for (; i < bookOffsets.length; i++) {
     let [book, page] = bookOffsets[i];
@@ -65,7 +67,7 @@ function overwriteRegion(song) {
   return song.region;
 }
 
-async function getSongTables() {
+export async function getSongTables() {
   const table = mulu.filter(row => row.length == 3 && /^頁\d+$/.test(row[2]));
   const modeKeys = parseModeKeys();
   const songsById = {};

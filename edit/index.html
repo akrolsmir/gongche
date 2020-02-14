@@ -6,16 +6,17 @@
 </head>
 
 <body>
+  <div class="vue">
   <div class="toolbar">
-    <input type="button" id="nextpage" value="(= Prev" onclick="prevPage()">
-    <input type="text" id="pagenum" value="Page X" onchange="jumpToPage()">
-    <input type="button" id="prevpage" value="Next =)" onclick="nextPage()">
-    <input type="button" id="separator" value="Analyze" onclick="analyze()">
+    <input type="button" id="nextpage" value="(= Prev" @click="prevPage">
+    <input type="text" id="pagenum" value="Page X" @change="jumpToPage">
+    <input type="button" id="prevpage" value="Next =)" @click="nextPage">
+    <input type="button" id="separator" value="Analyze" @click="analyze">
   </div>
   <div class="editor">
     <div id="dropzone">
-      <canvas id="canvas" width="520" height="800" onclick="processClick(event)" onmousedown="mouseDown(event)"
-        onmouseup="mouseUp(event)" oncontextmenu="contextMenu(event)">
+      <canvas ref="canvas" id="canvas" width="520" height="800" @click="processClick" @mousedown="mouseDown"
+        @mouseup="mouseUp" @contextmenu="contextMenu">
       </canvas>
     </div>
     <div class="songdata">
@@ -56,9 +57,9 @@
         v-model="editedLyrics"></textarea>
       Song Id
       <div class="songbar">
-        <input type="button" id="nextsong" value="Prev" onclick="prevSong()">
+        <input type="button" id="nextsong" value="Prev" @click="prevSong">
         <input type="text" id="songnum" v-model="editedId" size="8">
-        <input type="button" id="prevsong" value="Next" onclick="nextSong()">
+        <input type="button" id="prevsong" value="Next" @click="nextSong">
       </div>
       Current Lyric
       <textarea readonly id="lyricpreview" rows="1" cols="1" v-model="lyricPreview"></textarea>
@@ -88,17 +89,15 @@
     </div>
     <canvas id="snippet" width="100" height="100"></canvas>
   </div>
+  </div>
 </body>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-<script src="../models/song.js"></script>
 <script src="../database.js"></script>
-<script src="../assets/mulu.js"></script>
-<script src="ocr.js"></script>
 <script src="separator.js"></script>
-<script src="background.js"></script>
-<script src="lyricize.js"></script>
+<script type="module" src="background.js"></script>
+<script type="module" src="lyricize.js"></script>
 <script src="melodize.js"></script>

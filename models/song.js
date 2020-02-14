@@ -1,4 +1,6 @@
-class Song {
+import { RHYME_MAP } from "../assets/rhyme_dictionary.js";
+
+export class Song {
   constructor(id, title, composer, pageNum, lyrics, melody, region, fullLyrics, modeKey) {
     this.id = id;
     this.title = title;
@@ -35,18 +37,18 @@ class Song {
     return this.fullLyrics.split('')
       .flatMap((char, i) => (char == '.' && i > 0) ? i - 1 : []);
   }
-  hasRhymeCategory(query, rhymeMap) {
-    for (const index of this.getRhymeIndices()) {
-      const lyric = this.fullLyrics[index];
-      if (!rhymeMap[lyric]) {
-        console.log(`No entry in rhyme dictionary for ${lyric}`);
-        continue;
-      }
-      const category = rhymeMap[lyric][0];
+  hasRhymeCategory(query) {
+    for (const category of this.getRhymeCategories(RHYME_MAP)) {
       if (category.includes(query)) {
         return true;
       }
     }
     return false;
+  }
+  getRhymeCategories() {
+  return this.getRhymeIndices()
+    .map(index => this.fullLyrics[index])
+    .filter(lyric => RHYME_MAP[lyric])
+    .map(lyric => RHYME_MAP[lyric][0]);
   }
 }

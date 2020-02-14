@@ -23,7 +23,7 @@ function buildOcrRequest(base64) {
 }
 
 /** Upload the image from the canvas to OCR. */
-async function requestOcr(canvas) {
+export async function requestOcr(canvas) {
   const dataUrl = canvas.toDataURL("image/png");
   const base64 = dataUrl.substring(dataUrl.indexOf(',') + 1);
   const response = await fetch(OCR_URL, {
@@ -36,14 +36,14 @@ async function requestOcr(canvas) {
 
 /** Send right-click drag area to OCR. */
 let downEvent;
-function mouseDown(e) {
+export function mouseDown(e) {
   switch (e.which) {
     case 3: // Right mouse click
       downEvent = e;
   }
 }
 
-function mouseUp(e) {
+export function mouseUp(e) {
   switch (e.which) {
     case 3: // Right mouse click
       const snippet = document.getElementById('snippet');
@@ -69,6 +69,6 @@ function mouseUp(e) {
 }
 
 /** Prevent right click menu from appearing. */
-function contextMenu(e) {
+export function contextMenu(e) {
   e.preventDefault();
 }

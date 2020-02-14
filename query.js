@@ -3,6 +3,7 @@ import { renderChart, KeyCounter } from "./chart.js";
 import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
 import { messages, selectSongsExamples, filterLinesExamples, zhKeywords } from "./assets/translations.js";
 import { ProsodyComponent } from "./prosody-vue.js";
+import { getSongTables } from "./assets/mulu.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
 

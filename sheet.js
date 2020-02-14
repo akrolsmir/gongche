@@ -5,6 +5,8 @@ import { skeletonize, countSixteenths } from "./skeletonize.js";
 import { schedulePlayback } from "./playback.js";
 import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
 import { messages } from "./assets/translations.js";
+import { getSongTables } from "./assets/mulu.js";
+import { Song } from "./models/song.js";
 
 export class Note {
   constructor(gongche) {
@@ -363,8 +365,9 @@ async function main() {
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1";
 
-  const song = urlParams.get('debugz')
-    ? {fullLyrics: '', melody: ''} : await loadSong(songId);
+  const songJson = urlParams.get('debugz')
+    ? {fullLyrics: '', melody: ''} : await loadSongJson(songId);
+  const song = Song.fromJson(songJson);
 
   const i18n = new VueI18n({
     locale: 'en', // set locale
