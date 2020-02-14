@@ -25,6 +25,22 @@ const vueApp = new Vue({
       }
       return missing;
     },
+    mismatchedLines() {
+      const mismatch = {};
+      for (const song of this.songs) {
+        const lyricsCount = song.fullLyrics.replace(/[\s\.,_]/gm, '').length;
+        // Remove a trailing space from the song melody.
+        let melody = song.melody;
+        if (melody.endsWith(' ')) {
+          melody = melody.substring(0, melody.length - 1);
+        }
+        const melodyCount = melody.split(' ').length;
+        if (lyricsCount != melodyCount) {
+          mismatch[song.id] = [lyricsCount, melodyCount, melody.split(' ')];
+        }
+      }
+      return mismatch;
+    },
   },
   methods: {
     async getSheetErrors() {

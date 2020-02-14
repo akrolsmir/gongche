@@ -7,13 +7,21 @@
 <div id="debugz">
   <h1>Debug Page</h1>
   <h2>Rhyme Entries</h2>
-  <div>
     These characters are missing rhyme entries:
     <ul v-for="(songId, character) in missingCharacters">
       <li>
         <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
           {{ songId }}
         </a> -- {{ character }}
+      </li>
+    </ul>
+    <h2>Mismatched Melody and Lyrics</h2>
+    These songs have different lengths of melody and lyrics:
+    <ul v-for="(mismatch, songId) in mismatchedLines">
+      <li>
+        <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
+          {{ songId }}
+        </a> -- {{ mismatch[0] }} lyrics, but {{ mismatch[1] }} melody sections
       </li>
     </ul>
     <h2>Sheet Music</h2>
@@ -29,7 +37,6 @@
         {{ error }}
       </li>
     </ul>
-  </div>
 </div>
 <div id="vexflow" />
 <script src="https://unpkg.com/tone@13.4.9/build/Tone.js"></script>
