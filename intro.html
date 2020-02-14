@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Nine Modes Manual Online</title>
+
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <style>
+    body {
+      background-color: aliceblue;
+      padding-top: 40px;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      width: 750px;
+    }
+
+    p {
+      padding-bottom: 20px;
+    }
+
+    ul {
+      list-style-type: disc;
+      ;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" id="container">
+    <h1 class="title">Nine Modes Manual Online</h1>
+    <button class="button is-large" @click="launchQuery">Go to the Query Engine</button><br><br>
+    <h2 class="title">Introduction to the Collection</h2>
+    <p>
+      This page is a digitization of one of the oldest and most comprehensive collections of Chinese vocal melodies in
+      existence, the imperially commissioned Jiugong dacheng nanbei ci gongpu 九宮大成南北詞宮譜 (Nine Modes Comprehensive
+      Northern and
+      Southern Lyric Melody Manual), commonly abbreviated to Jiugong dacheng (JGDC hereafter), completed in the ninth
+      year of
+      the Qianlong Emperor’s reign (1744).
+    </p>
+    <p>
+      “Nine Modes” here indicates the comprehensive nature of the collection, as well as its organizational principle:
+      like
+      most Ming and early-Qing Dynasty aria manuals, it organizes pieces not by their authorship or provenance, but by
+      region
+      (“North” and “South”) and by traditional mode-key categories, like Xianlü gong 仙呂宮 (“Immortal Lady tonic mode,”
+      probably
+      a corruption of xiannü 仙女). Half a century later, Ye Tang’s 葉堂 Nashuying qupu 納書楹曲譜 (Book Storage Hall Aria
+      Manual)
+      would establish the precedent of arranging pieces as they would appear in a dramatic performance, reflecting the
+      fact
+      that, by that time, arias written as parts of dramas were much more popular for even stand-alone singing than the
+      sanqu
+      散曲 (free arias) popular for much of the Ming Dynasty.
+    </p>
+    <p>
+      “North” and “South” is the single biggest and most significant division within the collection and refers to two
+      large
+      groups of pieces popular as part of Kunqu 崑曲 performance (the most popular elite singing style in the late-Ming
+      and
+      early-Qing periods) and included in most chuanqi 傳奇 (marvelous tales) dramas—the most popular genre of literary
+      drama at
+      the time. The Southern pieces are drawn especially from Song Dynasty ci 詞 (lyric) poetry and “Southern plays”
+      (nanxi 南戲)
+      of the late-Song, Yuan, and early-Ming periods and are typified by a pentatonic scale (“do, re, mi, sol, la”), a
+      division between free rhythm preludes (yinzi 引子) and metered arias (zhengqu 正曲), use of slow tempi and expansive
+      rhythmic structures like zengban 贈板 (“extra beat” or 8/4 time), and more melisma (many notes per syllable). The
+      Northern
+      repertory comes especially from Jin, Yuan and early-Ming Dynasty sanqu, zhu gongdiao 諸宮調 (“all keys and modes”—a
+      prosimetric storytelling art), and zaju 雜劇 (variety dramas) and is characterized by a heptatonic scale (includes
+      “fa”
+      and “ti”), a stricter “suite” (taoqu 套曲) arrangement of individual melodies, less melisma (fewer notes per
+      syllable),
+      and faster or less strictly defined tempi and rhythmic structures.
+    </p>
+    <p>
+      The collection includes a combination of information about prosody (rules governing poetry/lyric writing) and
+      music. The
+      primary prosodic features the collection highlights are metrical versus extrametrical “padding” characters (襯字),
+      rhyme,
+      and the related division of poetic lines, which corresponds to an imperfect degree to the rhythmic and melodic
+      structures. This contrasts with earlier manuals aimed more at lyricists and emphasizing the linguistic tones and
+      pronunciation of characters over their associated melodies. Transitional works between prosodic manuals of the
+      mid-Ming
+      and Jiugong dacheng include late-Ming manuals like Feng Menglong’s 馮夢龍 Taixia xinzou 太霞新奏 (Celestial Airs Played
+      Anew),
+      which includes rhythmic notation (dianban 點板—literally, “marking the downbeats”) but no melody, and the early-Qing
+      Nanci
+      dinglü 南詞定律 (Fixed Pitches for Southern Lyrics), which includes downbeat and melodic gongche 工尺 (“do-re”—that is
+      solmization) notation, but no finer rhythmic details and less of the prosodic information included in the
+      late-Ming
+      manuals. This trend continues in later manuals which typically do not even note the ends of poetic lines,
+      indicating a
+      shift in priorities (perhaps due in part to innovations in notation, music grew comparatively independent of the
+      poetry
+      it was written to accompany). One may view an overview comparison of prosodic features of pieces sharing the same
+      title
+      by clicking “prosody” in the Query Engine.
+    </p>
+    <p>
+      JGDC’s musical notations are unprecedented in the Chinese tradition in the level of detail they provide, though
+      they
+      still lack detail compared to what one would expect to find today (finer rhythmic details like the position of the
+      “2”
+      and the “4” (xiaoyan 小眼) in 4/4 time are not included). They consist of a combination of rhythmic (dianban) and
+      melodic
+      (gongche) notations, as well as numerous comments about the provenance of many pieces. Though a few works, like
+      Taohua
+      shan 桃花扇 (Peach Blossom Fan), may have been omitted for political reasons, JGDC nonetheless provides an
+      unparalleled
+      snapshot of the sound of late imperial elite musical theater and Qing Dynasty court music (Kunqu was used at the
+      Qing
+      court for ceremonial pieces like the Quanshan jinke 勸善金科 (Golden Statutes for Encouraging Goodness) performed on
+      many
+      state occasions). One may view a staff notation of the rhythm and melody of a piece, along with pronunciation
+      according
+      to a Kunqu dictionary, by clicking “sheet” in the Query Engine.
+    </p>
+    <p>
+      As stated above, the collection does not indicate finer rhythmic details, so the digitally generated staff
+      notation
+      defaults to e.g., “quarter note, eighth note” where there is ambiguity as to whether that or “eighth note, quarter
+      note”
+      would be used. Such details were thought at the time to belong to the discretion of the singer and the realm of
+      oral
+      transmission. Despite the mode-key categorizations, which were actually quasi-vestigial or conventional by that
+      point,
+      the melodic notations indicate only relative pitch movement, not absolute pitch levels. The sheet music function
+      of the
+      database allows one to set the key in terms of Western music major scales, with “D” as the default because it is
+      closest
+      to the most commonly used Kunqu scale, called xiaogong diao 小工調. One should note, however, that while this
+      provides a
+      reasonable approximation for how such pieces are performed today, Kunqu, along with most traditional Chinese music
+      forms, underwent a major shift during the latter half of the twentieth century toward using Western, “equal
+      tempered”
+      scales (though late-Ming Prince Zhu Zaiyu 朱載堉 famously discovered formulae for equal temperament a few years ahead
+      of
+      the West, his ideas did not gain mainstream acceptance among the Chinese performance community).
+    </p>
+    <p>
+      Thus, though “D major” is basically equivalent to xiaogong diao today, it would not have been in the time JGDC was
+      recorded. For a closer approximation of that sound one may imagine playing these scales with a bamboo flute tuned
+      to a
+      perfect fifth interval of either G-C or A-D (to this day most Kunqu flautists keep at least two flutes,
+      traditionally
+      called cidi 雌笛 and xiongdi 雄笛, for these two important intervals, thereby allowing easy playing of the most common
+      scales) and the rest of the notes in the scale close to evenly spaced relative to those notes, albeit slightly
+      lower
+      than A=440. So, for example, a traditional xiaogong diao scale, instead of D, E, F#, G, A, B, C# would be more
+      like D,
+      E, F#-, G+, A, B, C#-, with the “mi” and the “ti” particularly low compared to what one hears today and the “fa”
+      (here
+      G) relatively high (using “fa sharp” instead of “fa” is still common in Kunqu flute playing today). This type of
+      tuning
+      is still used in a few Chinese regional arts and is similar to that used today in some Persian and Turkish music,
+      perhaps reflecting Central Asian influence in the medieval period.
+    </p>
+
+    <h2 class="title">Introduction to the Database and Tools</h2>
+
+    <p>The “Query Engine” page consists of two separate search bars which may be used in combination, along with a set
+      of tools
+      for analyzing various aspects of the pieces and/or lines selected using the two search bars. Near the top of the
+      page is
+      a search bar for narrowing the selection of pieces (the “Select Songs” search bar). Below the list of pieces is a
+      search
+      bar used to look for parts of pieces fitting certain parameters, such as the appearance of a particular pattern of
+      tones
+      or melody (the “Filter Lines” search bar). Below that are tools for analyzing the selected pieces/segments.</p>
+
+    <h3 class="subtitle">Select Songs</h3>
+    <p>The “Select Songs” search bar understands the following queries, which may be combined:</p>
+
+    <p><b>id:</b> the songs in the collection are numbered based on the page they appear in within the Shanben xiqu
+      congkan
+      edition
+      (when more than one song appears on the same page they are numbered like 300.1, 300.2). To find the first piece on
+      page
+      3300 type id:3300.1</p>
+
+    <p><b>title:</b> the title of the song (qupai 曲牌). To find all pieces with qupai name 山桃紅 type title:山桃紅</p>
+
+    <p><b>region:</b> narrows the collection to one of the two regional styles. To narrow to only Northern pieces (北曲)
+      type
+      region:n;
+      for only Southern pieces (南曲) type region:s</p>
+
+    <p><b>mode:</b> narrows by traditional mode-key category. To find only pieces categorized as 仙呂宮 type mode:仙呂宮. One
+      may
+      further
+      narrow Southern pieces here by adding 引 for preludes, 正曲 for metered arias, or 集曲 for pastiche arias and Northern
+      pieces
+      by adding 隻曲 for stand-alone arias or 套曲 for Northern suites. Thus one may search for e.g., mode:仙呂宮集曲 or
+      mode:仙呂調套曲
+      (several mode-key names have a “Northern” and a “Southern” variant, the Southern generally ending in 宮 and the
+      Northern
+      in 調).</p>
+
+    <p><b>source:</b> narrows by the source of piece. May include the name of an author of ci 詞 poetry, a chuanqi drama
+      like
+      牡丹亭, 散曲
+      for stand-alone art songs, 元人百種 for Yuan zaju dramas. To find any ci poems composed by 周邦彥 type source:周邦彥詞. To
+      find all
+      pieces from 牡丹亭 type source:牡丹亭.</p>
+
+    <p><b>lyrics:</b> Find any piece with a particular phrase as part of the lyrics. To find all pieces with the lyrics
+      春夢 type
+      lyrics:春夢</p>
+
+    <p><b>melody:</b> Find any piece with a particular sequence of gongche characters as part of the melody.
+      TO find all pieces containing 伬仜伬 type melody:伬仜伬</p>
+
+    <p><b>padding:</b> Filter pieces by the total number of padding characters. To find pieces with no padding
+      characters type
+      padding:0. To find pieces with exactly 10 padding characters type padding:10. To find pieces with 30 or more
+      padding
+      characters type padding:30+</p>
+
+    <p>
+      One may combine queries within the top search bar. For example, to look for all Northern pieces from the play 長生殿
+      type
+      region:n source:長生殿</p>
+
+    <h3 class="subtitle">Filter Lines</h3>
+    <p>The “Filter Lines” search bar filters lines and parts of pieces by the following parameters:</p>
+
+    <p><b>melody:</b> search for a melodic pattern. 1=do (上 in gongche notation), 2=re (尺 in gongche notation), etc. To
+      find
+      all lines
+      with melodic pattern do-re-mi-re-mi type melody:12323; one may also click the “find motifs” button to find
+      repeating
+      melodic patterns ordered from longest to shortest within all the selected pieces/lines.</p>
+
+    <p><b>fuzzy:</b> search for melodic strings with some margin for variability. Between any pair of the specified
+      notes, there may be at most 3 intervening notes.
+      For example: fuzzy:65323 would match against 6x53xx2xx3, but not 6xxxx5323.</p>
+
+    <p><b>tone:</b> search for strings of characters belonging to a particular tone. Tones may defined with less or
+      greater
+      specificity. For example, 平仄平 or 平去平. 陰 and 陽 tones may also be specified optionally. For example, to find all
+      strings
+      of tone 陽平陽平陰平上去 type tone:陽平陽平陰平上去</p>
+
+    <p><b>tonemelody:</b> search for patterns of tone and melody appearing together. To find all cases where tonal
+      pattern 平平去
+      corresponds to melodic pattern mi, mi, la-sol, type tonemelody:平3平3去65</p>
+
+    <p><b>padding:</b> search for lines with a particular number of padding characters. To find all lines with 6 padding
+      characters
+      type padding:6 </p>
+
+    <p><b>length:</b> find all lines of a certain length (in terms of number of Chinese characters). To find all lines
+      of
+      length 8
+      type length:8</p>
+
+    <p>
+      <h2 class="title">Analysis Tools</h2>
+      These are the tabs beneath the “Filter Lines” search bar.
+    </p>
+
+    <p><b>Count Padding Characters Box:</b> the default is not to count padding characters for purposes of analysis of
+      e.g.
+      where a
+      particular rhythmic marker appears. Check this box to count the padding characters. For example, if a given poetic
+      line
+      begins with three padding characters and is followed by five metrical characters the first metrical character will
+      count
+      as character “1” while the box is unchecked but count as character “4” when the box is checked.</p>
+
+    <p><b>Motifs:</b> Find repeating melodic patterns within selected pieces, ordered from longest to shortest</p>
+
+    <p><b>Tone:</b> Produces a bar graph analyzing the interaction of tone with melodic contour. One may enter a
+      specific tone,
+      such
+      as 平, 上, 去, or 入 to see the melodic contour associated with that tone. Melodic contours are described in terms of
+      + and
+      -. Therefore, if a particular character with 平 tone begins on do and ends on re that will be counted as a melodic
+      contour of +1 associated with 平tone.</p>
+
+    <p><b>Rhythm:</b> Analyzes appearance of rhythmic markers 。, 、, _, ▯, L, ﹆, and ╚.
+
+      <ul>
+        <li>。=中眼=the “3” in 4/4 time or “3” and “7” in 8/4 time</li>
+        <li>、=頭板=the “1” in 4/4 time (JGDC does not distinguish 2/4 time from 4/4 time so the system defaults to either
+          4/4 time or</li>
+        <li>8/4 time.)</li>
+        <li>_=底板=the end of a line of free rhythm or a break until the end of a measure in fixed rhythm. Typically
+          interpreted as a</li>
+        <li>腰板 or syncopated downbeat in contemporary Kunqu performance of metered pieces</li>
+        <li>▯=腰眼=a place where a note is held past the “3” or “7” of the fixed rhythm</li>
+        <li>L=腰板=a syncopated downbeat—that is a place where the previous note is held past the beginning of the next
+          rhythmic</li>
+        <li>measure</li>
+        <li>﹆=贈板=the “5” in 8/4 time</li>
+        <li>╚=贈腰板=a place where the previous note is held past the “5” of 8/4 time</li>
+      </ul>
+    </p>
+    <p>
+      Entering 。into the bar here, for example, will show the frequency with which that rhythmic marker appears at
+      certain
+      positions in a poetic line. Click “show as percent” to control for the fact that e.g. there are fewer “character
+      9s”
+      in
+      the collection than “character 3s.”
+    </p>
+
+
+    <p>
+      <b>Line Lengths:</b>
+      This tool simply shows the frequency of appearance of lines of various length within the selected pieces or line.
+      Within
+      the full collection the most common line length is 7 characters, followed by 4.
+
+      <h2 class="title">Credits</h2>
+      <ul>
+        <li>Database and Tool Planning and Design: <b>Casey Schoenberger</b></li>
+        <li>Site Implementation and Engineering: <b>Austin Chen</b></li>
+        <li>Database Input and Proofreading: <b>Jiang Qixin, Tsz Man Ko, and Ho Kuen Ho</b></li>
+        <li>Funding by the <b>Hong Kong University Grants Council</b> and the <b></b>Hong Kong Polytechnic
+          University</b></li>
+        <li>Contact: <b>k.c.schoenbergerjr@polyu.edu.hk</b></li>
+      </ul>
+  </div>
+</body>
+<script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+  const vueApp = new Vue({
+    el: '#container',
+    methods: {
+      launchQuery() {
+        location.href = './query.html';
+      }
+    }
+  });
+</script>
