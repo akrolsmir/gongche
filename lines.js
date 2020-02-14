@@ -90,7 +90,7 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
   }
   const melody = [];
   const beats = [];
-  const differences = [];
+  const contours = [];
   for (const char of melodyChunk) {
     if (beatSymbols.includes(char)) {
       beats.push(char);
@@ -99,43 +99,66 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
       melody.push(gongcheToJianpu[char]);
       const offset = jianpuToOffset[gongcheToJianpu[char]];
       // Explicit check against undefined, since 0 is a valid offset value.
-      differences.push(lastOffset == undefined ? 0 : offset - lastOffset);
+      contours.push(lastOffset == undefined ? 0 : offset - lastOffset);
       lastOffset = offset;
     }
   }
   return [{
     beats: beats.join(' '),
     melody: melody.join(' '),
-    difference: differences.map(r => (r <= 0 ? '' : '+') + r).join(' '),
+    contour: contours.map(r => (r <= 0 ? '' : '+') + r).join(' '),
     firstNote: melody[0],
     lastNote: melody[melody.length - 1]
   }, lastOffset];
 }
 
+class Line {
+  constructor(song, index, padded = true) {
+    // Array of {lyric, pronounce, tone, yinyang, beats, melody, padding}
+    this.words = [];
+    this.song = song;
+    this.index = index;
+    // Whether to count padding words in analysis
+    this.padded = padded;
+  }
+
+  getWords() {
+    return this.padded ? this.words : this.words.filter(word => !word.padding);
+  }
+}
+
 /**
   @returns an array of lines for the input song.
-  Line object: { song: {...}, index: 0, words: [
-    {lyric, pronounce, tone, yinyang, beats, melody}, ...
-  ]}
 */
-export function buildLines(song) {
+export function buildLines(song, padded = true) {
   let melodyIndex = 0;
   let melodyChunks = song.melody.split(' ');
   const lines = [];
   let lineCount = 1;
-  let line = { words: [], song, index: lineCount };
+  let line = new Line(song, lineCount, padded);
   let lastOffset;
   let melodyObject;
-  for (const lyric of song.lyrics) {
-    if (lyric != '\n') {
+  let padding = false;
+  for (let i = 0; i < song.fullLyrics.length; i++) {
+    const lyric = song.fullLyrics[i];
+    if (lyric == '_') {
+      // Remember that next character is padding.
+      padding = true;
+    }
+    else if (lyric != '\n' && lyric != ',' && lyric != '.') {
       const rhyme = RHYME_MAP[lyric] ? RHYME_MAP[lyric] : [, , , , ,];
       const [file, char, south, north, yinyang, tone] = rhyme;
-      const word = { lyric, yinyang, tone };
+      const word = { lyric, yinyang, tone, padding };
+      padding = false;
       word.pronounce = song.region == 'North' ? north : south;
       if (tone != null && tone.includes('/')) {
         // Tones of the form "入/上" should be chosen based on region ("S/N")
         const [southTone, northTone] = tone.split('/');
         word.tone = song.region == 'North' ? northTone : southTone;
+      }
+      // Lyrics followed by '.' are rhymes.
+      if (i < song.fullLyrics.length - 1 && song.fullLyrics[i + 1] == '.') {
+        word.rhyme = file ? file : 'MISSING_RHYME_ENTRY';
       }
       // Parse the beats and jianpu, and copy into word object.
       [melodyObject, lastOffset] = parseMelodyChunk(melodyChunks[melodyIndex], lastOffset);
@@ -143,10 +166,10 @@ export function buildLines(song) {
       melodyIndex++;
       line.words.push(word);
     }
-    else {
+    else if (lyric == '\n') {
       lines.push(line);
       lineCount++;
-      line = { words: [], song, index: lineCount };
+      line = new Line(song, lineCount, padded);
     }
   }
   if (line.words.length > 0) {

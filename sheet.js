@@ -4,6 +4,9 @@ import { rhythmize } from "./rhythmize.js";
 import { skeletonize, countSixteenths } from "./skeletonize.js";
 import { schedulePlayback } from "./playback.js";
 import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
+import { messages } from "./assets/translations.js";
+import { getSongTables } from "./assets/mulu.js";
+import { Song } from "./models/song.js";
 
 export class Note {
   constructor(gongche) {
@@ -11,9 +14,17 @@ export class Note {
     this.duration;
     this.lyricGroup;
   }
+  // Only display lyric char on the first note in the group.
   getLyric() {
     const index = this.lyricGroup.children.indexOf(this);
     return index == 0 && this.lyricGroup.lyric ? this.lyricGroup.lyric : ' ';
+  }
+  // Same as above, but wrap padding lyrics in paranthesis.
+  getPaddedLyric() {
+    if (this.getLyric() != ' ' && this.lyricGroup.padding) {
+      return `(${this.getLyric()})`;
+    }
+    return this.getLyric();
   }
   setDuration(duration) {
     this.duration = duration;
@@ -22,11 +33,11 @@ export class Note {
 
     const lyricFont = {
       family: "Noto Serif TC",
-      size: '14',
+      size: this.lyricGroup.padding ? '10' : '14',
     };
 
     this.melodyNote = makeStaveNote(key, this.duration);
-    this.lyricsNote = makeTextNote(this.getLyric(), 16, this.duration, lyricFont);
+    this.lyricsNote = makeTextNote(this.getPaddedLyric(), 16, this.duration, lyricFont);
 
     this.pronounceNote = makeTextNote(' ', 18, this.duration);
     if (this.getLyric() != ' ' && this.getLyric() in RHYME_MAP) {
@@ -58,7 +69,8 @@ export class Note {
     } else if (this.duration == '16') {
       this.jianpuLength = makeTextNote('‗', 12, this.duration, lengthFont);
     }
-    this.jianpuNote = makeTextNote(jianpu, 12, this.duration, lyricFont);
+    const jianpuFont = { family: "Noto Serif TC", size: '14'};
+    this.jianpuNote = makeTextNote(jianpu, 12, this.duration, jianpuFont);
   }
   getCopy() {
     const copy = new Note(this.gongche);
@@ -78,6 +90,9 @@ export class RestNote {
   getLyric() {
     return "R";
   }
+  getPaddedLyric() {
+    return "R";
+  }
   setDuration(duration) {
     this.duration = duration;
     this.melodyNote = makeStaveNote("b/4", this.duration + 'r');
@@ -93,8 +108,9 @@ export class RestNote {
 }
 
 export class LyricGroup {
-  constructor(lyric) {
+  constructor(lyric, padding) {
     this.lyric = lyric;
+    this.padding = padding;
     this.children = [];
   }
   addNote(note) {
@@ -128,18 +144,29 @@ function jianpuToKey(jianpu, keySignature) {
   return codeToKey(code);
 }
 
+// Parse the lyric at the index, noting whether it is padding. 
+function makeLyricGroup(unspacedLyrics, index) {
+  const padding = unspacedLyrics[index] == '_';
+  if (padding) {
+    index++;
+  }
+  return [index, new LyricGroup(unspacedLyrics[index], padding)];
+}
+
 // Assign a lyric to each gongche symbol
 // Pass through other symbols unchanged
 // Output: ['_', Note, Note, "."...]
 function assignLyrics(melody, lyrics) {
-  const unspacedLyrics = lyrics.replace(/\s/g, '');
-  let lyricIndex = 0;
-  let currentLyric = new LyricGroup(unspacedLyrics[lyricIndex]);
+  // Strip out spaces, periods and commas (but leave '_' padding markers)
+  // Note: '_' has different meanings in lyrics vs melody
+  const unspacedLyrics = lyrics.replace(/[\s.,]/g, '');
+  let lyricIndex = 0, currentLyric = null;
+  [lyricIndex, currentLyric] = makeLyricGroup(unspacedLyrics, lyricIndex);
   const result = [];
   for (const char of melody) {
     if (char == ' ') {
       lyricIndex++;
-      currentLyric = new LyricGroup(unspacedLyrics[lyricIndex]);
+      [lyricIndex, currentLyric] = makeLyricGroup(unspacedLyrics, lyricIndex);
     } else if (char in gongcheToJianpu) {
       const note = new Note(char);
       currentLyric.addNote(note);
@@ -267,9 +294,12 @@ function renderSheet(lyrics, melody) {
   const voices = makeVoices(modelStaves);
   const playbackNotes = [];
 
-  // Now that we know the number of staves, resize the canvas.
-  const canvasHeight = modelStaves.length * 200 + 100;
-  vexflowRenderer.resize(850, canvasHeight);
+  // Size the canvas now that we have a stave count.
+  // Note: Only on first render call; resizing causes weird Vexflow behavior.
+  if (!vexflowRenderer.ctx.width) {
+    const canvasHeight = modelStaves.length * 200 + 100;
+    vexflowRenderer.resize(850, canvasHeight);  
+  }
 
   for (let i = 0; i < voices.length; i++) {
     const voiceGroup = voices[i];
@@ -330,16 +360,22 @@ const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 const vexflowContext = vexflowRenderer.getContext();
 let vueApp;
 
-main();
-
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1";
 
-  const song = await loadSong(songId);
+  const songJson = urlParams.get('debugz')
+    ? {fullLyrics: '', melody: ''} : await loadSongJson(songId);
+  const song = Song.fromJson(songJson);
+
+  const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages, // set locale messages
+  });
 
   vueApp = new Vue({
+    i18n,
     el: '.songdata',
     data: {
       song,
@@ -349,6 +385,7 @@ async function main() {
       bpm: '120',
       skeletalFirst: false,
       skeletalLast: false,
+      showDebug: urlParams.get('debugz'),
     },
     methods: {
       toggleMusic(event) {
@@ -369,10 +406,71 @@ async function main() {
       bpm(newBpm) {
         Tone.Transport.bpm.value = newBpm;
       },
-      keySignature: () => { renderSheet(song.lyrics, song.melody); },
-      skeletalFirst: () => { renderSheet(song.lyrics, song.melody); },
-      skeletalLast: () => { renderSheet(song.lyrics, song.melody); },
+      keySignature: () => { renderSheet(song.fullLyrics, song.melody); },
+      skeletalFirst: () => { renderSheet(song.fullLyrics, song.melody); },
+      skeletalLast: () => { renderSheet(song.fullLyrics, song.melody); },
     }
   });
-  renderSheet(song.lyrics, song.melody);
+  try {
+    renderSheet(song.fullLyrics, song.melody);
+  } catch (e) {
+    alert(e);
+  }
 }
+
+Vue.component('debug-sheet', {
+  props: ['showDebug'],
+  data() {
+    return {
+      errors: {}
+    }
+  },
+  async mounted() {
+    if (!this.showDebug) {
+      console.log('Skipping');
+      return;
+    }
+    const [songs, songsById] = await getSongTables();
+    const start = new Date();
+
+    for (const song of songs) {
+      try {
+        debugSheet(song.fullLyrics, song.melody);
+      } catch (e) {
+        // Reactive equivalent to "this.errors[song.id] = e;"
+        this.$set(this.errors, song.id, e);
+      }
+    }
+    console.log(`${new Date() - start}ms elapsed`);
+  },
+  template:
+  `
+  <div>
+    <div v-if="Object.keys(errors).length > 0">
+      Found {{ Object.keys(errors).length }} songs with errors:
+    </div>
+    <div v-else>
+      Checking all songs, please wait...
+    </div>
+    <ul v-for="(error, songId) in errors">
+      <li>
+        <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
+          {{ songId }}
+        </a> -- 
+        {{ error }}
+      </li>
+    </ul>
+  </div>
+  `
+});
+
+export function debugSheet(lyrics, melody) {
+  const timeSignature = getTimeSignature(melody);
+  const quarters = assignLyrics(melody, lyrics)
+  let rhythmized = rhythmize(quarters, timeSignature);
+  const modelStaves = splitStaves(rhythmized);
+  const voices = makeVoices(modelStaves);
+  return voices;
+}
+
+main();

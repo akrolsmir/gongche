@@ -1,4 +1,6 @@
-class Song {
+import { RHYME_MAP } from "../assets/rhyme_dictionary.js";
+
+export class Song {
   constructor(id, title, composer, pageNum, lyrics, melody, region, fullLyrics, modeKey) {
     this.id = id;
     this.title = title;
@@ -29,5 +31,24 @@ class Song {
   static fromJson(json) {
     return new Song(json.id, json.title, json.composer, json.pageNum, 
       json.lyrics, json.melody, json.region, json.fullLyrics, json.modeKey);
+  }
+  // Return the locations of all rhyming lyrics (lyrics followed by '.');
+  getRhymeIndices() {
+    return this.fullLyrics.split('')
+      .flatMap((char, i) => (char == '.' && i > 0) ? i - 1 : []);
+  }
+  hasRhymeCategory(query) {
+    for (const category of this.getRhymeCategories(RHYME_MAP)) {
+      if (category.includes(query)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  getRhymeCategories() {
+  return this.getRhymeIndices()
+    .map(index => this.fullLyrics[index])
+    .filter(lyric => RHYME_MAP[lyric])
+    .map(lyric => RHYME_MAP[lyric][0]);
   }
 }

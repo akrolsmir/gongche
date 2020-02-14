@@ -5,30 +5,42 @@
 <link rel="stylesheet" href="sheet.css">
 <link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
 <div class="songdata">
+  <div v-if="showDebug">
+    <debug-sheet :show-debug="showDebug"></debug-sheet>
+  </div>
+  <div v-else>
+  <div class="locale-changer">
+    <select v-model="$i18n.locale">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+    </select>
+  </div>
   <h1>{{ song.title }}</h1>
   <div id="metadata">
     <div id="left">
-      <p>Playback: 
+      <p>{{ $t('playback')}}: 
         <button v-on:click='stopMusic()'>⏹️</button>
         <button v-on:click='toggleMusic()'>{{ toggle }}</button>
-      <p>BPM: {{ bpm }} 
+      <p>{{ $t('bpm') }}: {{ bpm }} 
         <input type="range" v-model='bpm' min='30' max='150' value='120'>
-      <p>Skeletal: <label for="skeletalFirst">First</label>
+      <p>{{ $t('skeletal') }}: <label for="skeletalFirst">{{ $t('firstNote') }}</label>
         <input type="checkbox" id="skeletalFirst" v-model="skeletalFirst">
-        <label for="skeletalLast">Last</label>
+        <label for="skeletalLast">{{ $t('lastNote') }}</label>
         <input type="checkbox" id="skeletalLast" v-model="skeletalLast">
     </div>
     <div id="right">
-      <p>Source: {{ song.composer }}
-      <p>Song ID: {{ song.id }}
-      <p>Region: {{ song.region }}
-      <p>Key Signature:
+      <p>{{ $t('source') }}: {{ song.composer }}
+      <p>{{ $t('id') }}: {{ song.id }}
+      <p>{{ $t('region') }}: {{ $t(song.region.toLowerCase()) }}
+      <p>{{ $t('keySignature') }}:
         <select v-model="keySignature">
           <option v-for="s in signatures">
             {{ s }}
           </option>
         </select>
+      <p>Rhyme Category: {{ song.getRhymeCategories() }}
     </div>
+  </div>
   </div>
 </div>
 <div id="vexflow" />
@@ -38,7 +50,6 @@
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="models/song.js"></script>
-<script src="database.js"></Script>
-<script src="assets/mulu.js"></script>
+<script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
+<script src="database.js"></script>
 <script type="module" src="sheet.js"></script>

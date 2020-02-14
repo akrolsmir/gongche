@@ -7,37 +7,56 @@
 <link rel="stylesheet" href="https://unpkg.com/vue-nav-tabs/themes/vue-tabs.css">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
 <div class="songdata">
+  <div class="locale-changer">
+    <select v-model="$i18n.locale">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+    </select>
+  </div>
   <h1>Query Engine</h1>
   <div id="selectsongs">
-    <p> Select songs: <input type="text" id="songsQuery" v-model="songsQueryBuffer" v-on:keyup.enter="querySongs"> 
-      <button v-on:click="querySongs">Search</button>
-    <p> (Examples: <code>id:287.1,287.2</code> | <code>title:春</code> | <code>region:s</code> | <code>mode:仙呂</code> | <code>source:法宮</code> | <code>lyrics:春</code> | <code>melody:。</code>)
+    <p> <input placeholder="Select songs" type="text" id="songsQuery" :value="songsQuery" @input="debouncedSongsQuery($event.target.value)"> </p>
+    <p> ({{$t('examples')}}: 
+      <template v-for="[keyword, example] in selectSongsExamples">
+        | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
+      </template>)
+    </p>
     <h3>{{ matchedSongs.length }} pieces</h3>
     <div class="results">
       <ul>
         <li v-for='song in matchedSongs'>
           {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
-          <pwa-a :href='`sheet.html?songId=${song.id}`'>Sheet</pwa-a> | 
-          <pwa-a :href='`prosody.html?songTitle=${song.title}`'>Prosody</pwa-a> |
-          <pwa-a :href='`./edit/?songId=${song.id}`'>Edit</pwa-a>
+          <a :target='target' :rel='rel' :href='`sheet.html?songId=${song.id}`'>{{$t('sheet')}}</a> | 
+          <a :target='target' :rel='rel' :href='`prosody.html?songTitle=${song.title}`'>{{$t('prosody')}}</a> |
+          <a :target='target' :rel='rel' :href='`./edit/?songId=${song.id}`'>{{$t('edit')}}</a>
         </li>
       </ul>
     </div>
   </div>
-  <vue-tabs><v-tab title="Motifs"><div>
+  <div id="filterlines">
+  <p> <input placeholder="Filter lines" type="text" id="linesQuery" :value="linesQuery" @input="debouncedLinesQuery($event.target.value)"></p>
+  <p> ({{$t("examples")}}: 
+    <template v-for="[keyword, example] in filterLinesExamples">
+      | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
+    </template>)
+  </p>
+  <p>
+    <input type="checkbox" id="padded" v-model="padded">
+    <label for="padded">{{$t('countPaddingCharacters')}}</label>
+  </p>
+  <vue-tabs>
+  <v-tab :title="$t('motifs')">
   <div id="motifs">
-    <button v-on:click="findAllMotifs">Find motifs</button>
+    <button @click="findAllMotifs">Find motifs</button>
     <div class="results">
       <ul>
-        <li v-for='motif in motifs'>
-          {{ motif[1] }} instances of
-          <a href='#results' v-on:click="setLinesQuery(`melody:${motif[0]}`)">{{ motif[0] }}</a>
+        <li v-for='[motif, count] in motifs'>
+          {{ count }} instances of
+          <a href='#results' @click="setLinesQuery(`melody:${motif}`)">{{ motif }}</a>
         </li>
       </ul>
     </div>
   </div>
-  <p> Filter lines: <input type="text" id="linesQuery" v-model="linesQuery">
-  <p> (Examples: <code>melody:216.5.6.</code> | <code>fuzzy:65323</code> | <code>tone:平平仄</code> | <code>tone:平陽平陰仄平</code> | <code>tonemelody:平3去35</code>)
   <p>
     <div v-if="matchedLines.length > 50">
       Showing first 50 of {{matchedLines.length}} matches:
@@ -45,38 +64,27 @@
     <div v-else>
       Showing {{matchedLines.length}} matches:
     </div>
-  <template v-for="line in matchedLines.slice(0, 50)">
-    <table>
-      <tbody>
-        <tr>
-          <td style='text-align: center' v-bind:colspan='line.words.length + 1'>
-            Line {{ line.index }} of {{ line.song.id }} 《{{ line.song.title }} - {{ line.song.composer }}》
-          </td>
-        </tr>
-        <template v-for='header in headers'>
-          <tr>
-            <th>{{ header.display }}</th>
-            <template v-for="word in line.words">
-              <td>{{ word[header.id] }}</td>
-            </template>
-          </tr>
-        </template>
-      </tbody>
-    </table>
-  </template>
-  </div></v-tab>
-    <v-tab title="Tone">
-      <p> Find tone: <input type="text" id="toneQuery" v-model="toneQuery">
-      <p> (Examples: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)
-      <p>
-        <div v-if="toneQuery">
-          Found all contours for "{{ toneQuery }}":<br>
-          (Positive contours indicate the song ended on a higher note.)
-        </div>
-        <div v-else>
-          All contours for words with 2 or more notes:<br>
-          (Positive contours indicate the song ended on a higher note.)
-        </div>
+  </p>
+  <prosody :lines="matchedLines.slice(0, 50)" :headers="headers" :colorize="true"></prosody>
+  </v-tab>
+  
+    <v-tab :title="$t('tone')">
+      <p> {{$t('findTone')}}: <input type="text" id="toneQuery" v-model="toneQuery"></p>
+      <p> ({{$t('examples')}}: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code>)</p>
+      
+      <h3>Distribution of notes</h3> 
+      <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
+      
+      <h3>Notes following notes</h3>
+      <confusion-matrix :matrix="matchedFollowingMatrix"></confusion-matrix>
+      
+      <div v-if="toneQuery">
+        <h3>All contours (for "{{ toneQuery }}")</h3>
+      </div>
+      <div v-else>
+        <h3>All contours (for words with 2 or more notes)</h3>
+      </div>
+      <p>(Positive contours indicate the song ended on a higher note.)</p>
       <canvas ref="contourChart" id="contourChart" width="400" height="400"></canvas>
       <div class="toneRow">
         <div class="toneColumn">
@@ -89,7 +97,7 @@
                   {{ title }}
                 </li>
                 <li v-if='values.titles.size > 10'>
-                  <a href="#" v-on:click="showAlert(Array.from(values.titles).join(', '))">See all...</a>
+                  <a href="#" @click="showAlert(Array.from(values.titles).join(', '))">See all...</a>
                 </li>
               </ul>
             </li>
@@ -106,32 +114,38 @@
         </div>
       </div>
     </v-tab>
-    <v-tab title="Rhythm"><div>
-      <p> Find symbol: <input type="text" id="rhythmQuery" v-model="rhythmQuery">
-      <p> (Examples: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)
-      <p> <input type="checkbox" id="rhythmPercent" v-model="rhythmPercent">
-      <label for="rhythmPercent">Show as percent</label>
-      <p><div v-if="rhythmQuery">
-        Found "{{ rhythmQuery }}" at the following line positions:
+
+    <v-tab :title="$t('rhythm')">
+      <p> {{$t('findSymbol')}}: <input type="text" id="rhythmQuery" v-model="rhythmQuery"></p>
+      <p> ({{$t('examples')}}: <code>。</code> | <code>、</code> | <code>_</code> | <code>▯</code> | <code>L</code> | <code>﹆</code> | <code>╚</code>)</p>
+      <p>
+        <input type="checkbox" id="rhythmPercent" v-model="rhythmPercent">
+        <label for="rhythmPercent">Show as percent</label>
+      </p>
+      <div v-if="rhythmQuery">
+        <h3>Locations of "{{ rhythmQuery }}"</h3>
       </div>
       <div v-else>
-        Total word counts across all lines:
+        <h3>Total word counts across all lines</h3>
       </div>
       <canvas ref="rhythmChart" id="rhythmChart" width="400" height="400"></canvas>
-    </div></v-tab>
-    <v-tab title="Line Lengths">
-      <p> Distribution of line lengths:
+    </v-tab>
+
+    <v-tab :title="$t('lineLengths')">
+      <h3>Distribution of line lengths</h3>
       <canvas ref="lengthChart" id="lengthChart" width="400" height="400"></canvas>
     </v-tab>
   </vue-tabs>
+  </div>
 </div>
 <script src="load-service-worker.js"></script>
 <script src="https://unpkg.com/vue-nav-tabs/dist/vue-tabs.js"></script>
+<script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.5.4/randomColor.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
-<script src="models/song.js"></script>
 <script src="database.js"></Script>
-<script src="assets/mulu.js"></script>
 <script type="module" src="query.js"></script>

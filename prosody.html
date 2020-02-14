@@ -5,40 +5,27 @@
 <link rel="stylesheet" href="prosody.css">
 <link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
 <div class="songdata">
+  <div class="locale-changer">
+    <select v-model="$i18n.locale">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+    </select>
+  </div>
   <h1>{{ pageTitle }}</h1>
   <input type="checkbox" id="interleave" v-model="interleave">
-  <label for="interleave">Interleaved</label>
+  <label for="interleave">{{ $t('interleaved') }}</label>
   <p>
   <template v-for="header in rowHeaders">
-    <input type="checkbox" v-bind:id="header.id" v-bind:value="header.id" v-model="checkedHeaders">
-    <label v-bind:for="header.id">{{ header.display }}</label>
+    <input type="checkbox" :id="header" :value="header" v-model="checkedHeaders">
+    <label :for="header">{{ $t(header) }}</label>
   </template>
-  <template v-for="line in lines">
-  <table v-bind:style="tableStyle(line.song)">
-    <tbody>
-      <tr>
-        <td style='text-align: center' v-bind:colspan='line.words.length + 1'>
-          Line {{ line.index }} of {{ line.song.id }} 《{{ line.song.title }} - {{ line.song.composer }}》
-        </td>
-      </tr>
-      <template v-for='header in filteredHeaders'>
-        <tr>
-          <th>{{ header.display }}</th>
-          <template v-for="word in line.words">
-            <td>{{ word[header.id] }}</td>
-          </template>
-        </tr>
-      </template>
-    </tbody>
-  </table>
-  </template>
+  <prosody :headers="filteredHeaders" :lines="lines" :colorize="true"></prosody>
 </div>
 <script src="load-service-worker.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.5.4/randomColor.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="models/song.js"></script>
-<script src="database.js"></Script>
-<script src="assets/mulu.js"></script>
+<script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
+<script src="database.js"></script>
 <script type="module" src="prosody.js"></script>

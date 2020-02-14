@@ -1,4 +1,4 @@
-body {
+.vue {
   display: grid;
   grid-template-rows: 60px 350px 50px;
 }

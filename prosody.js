@@ -1,17 +1,9 @@
 import { buildLines } from "./lines.js";
+import { messages } from "./assets/translations.js";
+import { ProsodyComponent } from "./prosody-vue.js";
+import { getSongTables } from "./assets/mulu.js";
 
-const rowHeaders = [
-  {id: 'lyric', display: '字'},
-  {id: 'pronounce', display: '字音'},
-  {id: 'tone', display: '聲調'},
-  {id: 'yinyang', display: '陰陽'},
-  {id: 'beats', display: '板眼'},
-  {id: 'melody', display: '簡譜音高'},
-  {id: 'firstNote', display: 'First Note'},
-  {id: 'lastNote', display: 'Last Note'},
-  // How much a note is offset relative to previous note.
-  {id: 'difference', display: 'Contour'},
-]
+const rowHeaders = ['lyric', 'pronounce', 'tone', 'yinyang', 'beats', 'melody', 'firstNote', 'lastNote', 'contour'];
 
 /** @returns the lines of these songs, zipped (all line 1s, then 2s, 3s...) */
 function interleaveLines(songs) {
@@ -26,24 +18,6 @@ function interleaveLines(songs) {
     }
   }
   return result;
-}
-
-function tableStyle(song) {
-  // From https://stackoverflow.com/a/7616484/1222351
-  function hashString(str) {
-    var hash = 0, i, chr;
-    if (str.length === 0) return hash;
-    for (i = 0; i < str.length; i++) {
-      chr = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  }
-  // Reverse the string, to generate wider color ranges over small sigdigits.
-  const seed = hashString(song.id.split('').reverse().join(''));
-  // Set opacity to be #66 to keep text readable.
-  return `background-color: ${randomColor({ seed }) + '66'}`;
 }
 
 main();
@@ -67,22 +41,30 @@ async function main() {
     pageTitle = 'IDs: ' + ids;
   }
 
+  const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages, // set locale messages
+  })
+
   const vueApp = new Vue({
+    i18n,
     el: '.songdata',
+    components: {
+      'prosody': ProsodyComponent
+    },
     data: {
-      tableStyle,
       rowHeaders,
       rawSongs,
       pageTitle,
       interleave: true,
-      checkedHeaders: rowHeaders.map(h => h.id)
+      checkedHeaders: rowHeaders
     },
     computed: {
-      filteredHeaders () {
-        return rowHeaders.filter(h => this.checkedHeaders.includes(h.id));
+      filteredHeaders() {
+        return rowHeaders.filter(h => this.checkedHeaders.includes(h));
       },
       lines() {
-        return this.interleave 
+        return this.interleave
           ? interleaveLines(this.rawSongs) : this.rawSongs.flatMap(buildLines);
       }
     }

@@ -1,4 +1,6 @@
-function findBookAndOffset(pageNum) {
+import { Song } from '../models/song.js';
+
+export function findBookAndOffset(pageNum) {
   let i = 0
   for (; i < bookOffsets.length; i++) {
     let [book, page] = bookOffsets[i];
@@ -54,7 +56,18 @@ function getModeKey(pageNum, modeKeys) {
   return 'default_mode_key';
 }
 
-async function getSongTables() {
+function overwriteRegion(song) {
+  // TODO: Once we have better backup/restore, actually persist region to DB.
+  if (song.modeKey.match(/(引|集曲|正曲)$/)) {
+    return 'South';
+  }
+  if (song.modeKey.match(/(隻曲|套曲)$/)) {
+    return 'North';
+  }
+  return song.region;
+}
+
+export async function getSongTables() {
   const table = mulu.filter(row => row.length == 3 && /^頁\d+$/.test(row[2]));
   const modeKeys = parseModeKeys();
   const songsById = {};
@@ -77,6 +90,7 @@ async function getSongTables() {
     const song = songsMap.has(id) ? Song.fromJson(songsMap.get(id))
       : new Song(id, title, composer, pageNum);
     song.modeKey = getModeKey(pageNum, modeKeys);
+    song.region = overwriteRegion(song);
     fullTable.push(song);
     songsById[id] = i;
   }

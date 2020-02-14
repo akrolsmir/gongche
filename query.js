@@ -1,5 +1,9 @@
 import { buildLines, encodeJianpu, decodeToJianpu, jianpuToOffset } from "./lines.js";
 import { renderChart, KeyCounter } from "./chart.js";
+import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
+import { messages, selectSongsExamples, filterLinesExamples, zhKeywords } from "./assets/translations.js";
+import { ProsodyComponent } from "./prosody-vue.js";
+import { getSongTables } from "./assets/mulu.js";
 Vue.use(vueTabs.default);
 Vue.config.performance = true;
 Vue.component('pwa-a', {
@@ -58,9 +62,37 @@ function checkSongMatch(song, searchParams) {
       return false;
     }
   }
+  if (searchParams.rhymeswith) {
+    // Look up the rhyme category and fill it in for rhyme query.
+    const rhyme = RHYME_MAP[searchParams.rhymeswith];
+    if (!searchParams.rhyme && rhyme) {
+      searchParams.rhyme = rhyme[0];
+    }
+  }
+  if (searchParams.rhyme) {
+    if (!song.hasRhymeCategory(searchParams.rhyme, RHYME_MAP)) {
+      return false;
+    }
+  }
   if (searchParams.melody) {
     if (!song.melody.includes(searchParams.melody)) {
       return false;
+    }
+  }
+  if (searchParams.padding) {
+    let query = searchParams.padding;
+    const paddingCount = (song.fullLyrics.match(/_/g) || []).length;
+    if (query.endsWith('+')) {
+      // Song must have at least this many padding chars
+      query = query.substring(0, query.length - 1);
+      if (query > paddingCount) {
+        return false;
+      }
+    } else {
+      // Song must have exactly this many padding chars
+      if (query != paddingCount) {
+        return false;
+      }
     }
   }
   return true;
@@ -113,11 +145,52 @@ function checkLineMatch(line, params) {
       return false;
     }
   }
+  if (params.padding) {
+    let query = params.padding;
+    // Directly access line.words so padding is always included
+    const paddingCount = line.words.filter(word => word.padding).length;
+    if (query.endsWith('+')) {
+      // Line must have at least this many padding chars
+      query = query.substring(0, query.length - 1);
+      if (query > paddingCount) {
+        return false;
+      }
+    } else {
+      // Line must have exactly this many padding chars
+      if (query != paddingCount) {
+        return false;
+      }
+    }
+  }
+  if (params.length) {
+    if (line.getWords().length != params.length) {
+      return false;
+    }
+  }
+  if (params.rhymeswith) {
+    // Look up the rhyme category and fill it in for rhyme query.
+    const rhyme = RHYME_MAP[params.rhymeswith];
+    if (!params.rhyme && rhyme) {
+      params.rhyme = rhyme[0];
+    }
+  }
+  if (params.rhyme) {
+    // Some word in this line must match this rhyming scheme.
+    let hasRhyme = false;
+    for (const word of line.getWords()) {
+      if (word.rhyme && word.rhyme.includes(params.rhyme)) {
+        hasRhyme = true;
+      }
+    }
+    if (!hasRhyme) {
+      return false;
+    }
+  }
   return true;
 }
 
 function addJianpuString(line) {
-  line.jianpuString = line.words
+  line.jianpuString = line.getWords()
     .map(word => word.melody)
     .join(' ')
     .replace(/ /g, '');
@@ -125,7 +198,7 @@ function addJianpuString(line) {
 }
 
 function addToneString(line) {
-  line.toneString = line.words
+  line.toneString = line.getWords()
     .map(word => word.yinyang + word.tone)
     // Mark missing dictionary entries with two underscores.
     .map(token => token ? token : '__')
@@ -135,11 +208,11 @@ function addToneString(line) {
 
 /** Joint combination to match both tone and melody. TODO: rename. */
 function addTonemelodyString(line) {
-  line.tonemelodyString = line.words
+  line.tonemelodyString = line.getWords()
     .map(word => word.tone + word.melody)
     .join('')
     .replace(/ /g, '');
-    return line;
+  return line;
 }
 
 function findMotifs(lines) {
@@ -181,12 +254,16 @@ function findMotifs(lines) {
 function parseQuery(query, params) {
   const terms = query.split(' ');
   for (const term of terms) {
-    const termSplit = term.split(':');
+    const termSplit = term.split(/[:：]/);
     if (termSplit.length != 2) {
       console.log(`Invalid syntax: ${term}`);
       continue;
     }
-    const [keyword, param] = termSplit;
+    let [keyword, param] = termSplit;
+    // Translate Chinese keywords back into English
+    if (zhKeywords[keyword]) {
+      keyword = zhKeywords[keyword];
+    }
     if (!keyword in params) {
       console.log(`Invalid keyword: ${term}`);
       continue;
@@ -196,28 +273,32 @@ function parseQuery(query, params) {
   return params;
 }
 
-const rowHeaders = [
-  { id: 'lyric', display: '字' },
-  { id: 'yinyang', display: '陰陽' },
-  { id: 'tone', display: '聲調' },
-  { id: 'melody', display: '簡譜音高' },
-]
-
 async function main() {
   const [songs, songsById] = await getSongTables();
 
+  const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages, // set locale messages
+  })
+
   const vueApp = new Vue({
+    i18n,
     el: '.songdata',
+    components: {
+      'prosody': ProsodyComponent
+    },
     data: {
       songs,
       songsQuery: '',
-      songsQueryBuffer: '',
       linesQuery: '',
       toneQuery: '',
       rhythmQuery: '',
       rhythmPercent: false,
       motifs: [],
-      headers: rowHeaders
+      headers: ['lyric', 'yinyang', 'tone', 'melody'],
+      padded: false,
+      selectSongsExamples,
+      filterLinesExamples,
     },
     methods: {
       findAllMotifs() {
@@ -229,14 +310,12 @@ async function main() {
       showAlert(text) {
         alert(text);
       },
-      querySongs() {
-        // Note: this doens't quite remove all the latency. Seems like
-        // Vue is re-rendering root component even when only the buffer
-        // is changing. Some ideas:
-        // - Remove songsQueryBuffer from vue entirely, extract on button click
-        // - Debounce (wait for user to stop typing)
-        this.songsQuery = this.songsQueryBuffer;
-      }
+      submitLinesQuery(value) {
+        this.linesQuery = value;
+      },
+      submitSongsQuery(value) {
+        this.songsQuery = value;
+      },
     },
     // To reference canvas, we have to use $refs and lifestyle hooks.
     // See also https://stackoverflow.com/a/42606029/1222351
@@ -244,19 +323,38 @@ async function main() {
       renderChart(this.matchedRhythms, this.$refs.rhythmChart);
       renderChart(this.matchedContourGraph, this.$refs.contourChart);
       renderChart(this.matchedLineLengths, this.$refs.lengthChart);
+      renderChart(this.matchedNotes, this.$refs.noteChart);
+    },
+    created() {
+      // See also https://stackoverflow.com/a/53022397/1222351
+      this.debouncedSongsQuery = _.debounce(this.submitSongsQuery, 500);
+      this.debouncedLinesQuery = _.debounce(this.submitLinesQuery, 500);
     },
     watch: {
       matchedRhythms(newRhythms) {
-        renderChart(newRhythms, this.$refs.rhythmChart);        
+        renderChart(newRhythms, this.$refs.rhythmChart);
       },
       matchedContourGraph(newContours) {
         renderChart(newContours, this.$refs.contourChart);
       },
       matchedLineLengths(newLengths) {
         renderChart(newLengths, this.$refs.lengthChart);
+      },
+      matchedNotes(newNotes) {
+        renderChart(newNotes, this.$refs.noteChart);
       }
     },
     computed: {
+      // In PWA desktop app, open in same window. Otherwise, new tab.
+      isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches;
+      },
+      target() {
+        return this.isStandalone ? '' : '_blank';
+      },
+      rel() {
+        return this.isStandalone ? '' : 'noopener noreferrer';
+      },
       matchedSongs() {
         const songParams = {
           'id': '',
@@ -266,6 +364,7 @@ async function main() {
           'mode': '',
           'lyrics': '',
           'melody': '',
+          'padding': '',
         }
         const params = parseQuery(this.songsQuery, songParams);
         // TODO: Consider v-show for performance https://stackoverflow.com/a/43920347/1222351
@@ -273,7 +372,10 @@ async function main() {
       },
       lines() {
         this.motifs = [];
-        return this.matchedSongs.flatMap(buildLines).map(addJianpuString).map(addToneString).map(addTonemelodyString);
+        return this.matchedSongs.flatMap(song => buildLines(song, this.padded))
+          .map(addJianpuString)
+          .map(addToneString)
+          .map(addTonemelodyString);
       },
       matchedLines() {
         const lineParams = {
@@ -281,6 +383,8 @@ async function main() {
           'fuzzy': '',
           'tone': '',
           'tonemelody': '',
+          'padding': '',
+          'length': '',
         }
         const params = parseQuery(this.linesQuery, lineParams);
         return this.lines.filter(line => checkLineMatch(line, params));
@@ -288,9 +392,9 @@ async function main() {
       matchedRhythms() {
         const matchCounter = new KeyCounter('1');
         const totalCounter = new KeyCounter('1');
-        for (const line of this.lines) {
-          for (let i = 0; i < line.words.length; i++) {
-            const word = line.words[i];
+        for (const line of this.matchedLines) {
+          for (let i = 0; i < line.getWords().length; i++) {
+            const word = line.getWords()[i];
             if (word.beats != null) {
               totalCounter.count(`${i + 1}`);
               if (word.beats.includes(this.rhythmQuery)) {
@@ -312,8 +416,8 @@ async function main() {
       matchedToneContours() {
         // Maps contours to [count, [song names...]]
         const tones = {};
-        for (const line of this.lines) {
-          for (const word of line.words) {
+        for (const line of this.matchedLines) {
+          for (const word of line.getWords()) {
             if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
               const melodyArray = word.melody.split(' ');
               // Only count contours of 2 or more notes
@@ -323,7 +427,7 @@ async function main() {
                 const contour = jianpuToOffset[lastNote] - jianpuToOffset[firstNote];
                 const key = `${contour}`;
                 if (!(key in tones)) {
-                  tones[key] = {count: 0, titles: new Set()};
+                  tones[key] = { count: 0, titles: new Set() };
                 }
                 tones[key].count++;
                 tones[key].titles.add(line.song.title);
@@ -333,13 +437,50 @@ async function main() {
         }
         return tones;
       },
+      matchedNotes() {
+        const counter = new KeyCounter('1');
+        for (const line of this.matchedLines) {
+          for (const word of line.getWords()) {
+            if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
+              const melodyArray = word.melody.split(' ');
+              for (const jianpu of melodyArray) {
+                counter.count(normalizeJianpu(jianpu));
+              }
+            }
+          }
+        }
+        return counter.map;
+      },
+      /** 7x7 matrix. Rows are start notes, columns are following notes. */
+      matchedFollowingMatrix() {
+        const matrix = [];
+        for (let i = 0; i < 7; i++) {
+          matrix.push([0, 0, 0, 0, 0, 0, 0]);
+        }
+        for (const line of this.matchedLines) {
+          const melodies = [];
+          for (const word of line.getWords()) {
+            if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
+              melodies.push(...word.melody.split(' '));
+            }
+          }
+          const notes = melodies.map(normalizeJianpu);
+          for (let i = 0; i < notes.length - 1; i++) {
+            const current = notes[i];
+            const next = notes[i + 1];
+            // Shift by 1 to accomodate 0-based indexing.
+            matrix[current - 1][next - 1]++;
+          }
+        }
+        return matrix;
+      },
       /** Return the exact breakdown of contours and counts. */
       matchedContourBreakdown() {
         const tones = {};
-        for (const line of this.lines) {
-          for (const word of line.words) {
-            if (word.tone && word.difference && word.tone.includes(this.toneQuery)) {
-              const key = word.difference;
+        for (const line of this.matchedLines) {
+          for (const word of line.getWords()) {
+            if (word.tone && word.contour && word.tone.includes(this.toneQuery)) {
+              const key = word.contour;
               if (!(key in tones)) {
                 tones[key] = { count: 0, titles: new Set() };
               }
@@ -369,11 +510,16 @@ async function main() {
       },
       matchedLineLengths() {
         const counter = new KeyCounter();
-        for (const line of this.lines) {
-          counter.count(`${ line.words.length }`);
+        for (const line of this.matchedLines) {
+          counter.count(`${line.getWords().length}`);
         }
         return counter.map;
       }
     }
   });
+}
+
+// Map "do" to 1, "re" to 2... regardless of octave.
+function normalizeJianpu(jianpu) {
+  return (jianpuToOffset[jianpu] + 7) % 7 + 1;
 }

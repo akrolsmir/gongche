@@ -1,3 +1,5 @@
+const ENV = "songs"
+
 firebase.initializeApp({
   apiKey: 'AIzaSyCKjEsP_YFyT45ULNihdDkDptXHcapoXLE',
   authDomain: 'minotaur-153205.firebaseapp.com',
@@ -26,7 +28,7 @@ db.enablePersistence({ experimentalTabSynchronization: true })
   });
 
 function saveSong(song) {
-  db.collection("songs").doc(song.id).set(song.toJson());
+  db.collection(ENV).doc(song.id).set(song.toJson());
 }
 
 const EDIT_PASSWORD = 'swordfish';
@@ -51,15 +53,70 @@ function hasEditPermission() {
 
 async function loadSongs() {
   const songsMap = new Map();
-  const songsQuery = await db.collection("songs").get();
+  const songsQuery = await db.collection(ENV).get();
   songsQuery.forEach(doc => {
     songsMap.set(doc.id, doc.data());
   });
   return songsMap;
 }
 
-async function loadSong(id) {
-  const doc = await db.collection("songs").doc(id).get();
+const songFields = [
+  'id',
+  'title',
+  'composer',
+  'pageNum',
+  // 'lyrics', // TODO: Skipping because it's derivable from fullLyrics
+  'melody',
+  'region',
+  'fullLyrics',
+  'modeKey'
+]
+
+function toCsv(songsMap) {
+  const headings = songFields.join(', ');
+  function toLine(song) {
+    return songFields.map(field => `"${song[field]}"`).join(', ');
+  }
+  const lines = Array.from(songsMap.values()).map(toLine).join('\n');
+  return headings + '\n' + lines;
+}
+
+function makeTextFile(text) {
+  const data = new Blob([text], { type: 'text/plain' });
+
+  let textFile = null; // TODO actually prevent leak?
+  // If we are replacing a previously generated file we need to
+  // manually revoke the object URL to avoid memory leaks.
+  if (textFile !== null) {
+    window.URL.revokeObjectURL(textFile);
+  }
+
+  textFile = window.URL.createObjectURL(data);
+
+  return textFile;
+};
+
+async function downloadSongsAsCsv() {
+  // TODO: songsMap has incorrect region, modekey, etc. data... 
+  // Can correct from mulu fulltable. Or maybe it's okay?
+  const songsMap = await loadSongs();
+  // const jsonText = JSON.stringify(Object.fromEntries(songsMap));
+  const csvText = toCsv(songsMap);
+  var link = document.createElement('a');
+  link.setAttribute('download', 'gongche-database.csv');
+  link.href = makeTextFile(csvText);
+  document.body.appendChild(link);
+
+  // Wait for the link to be added to the document
+  window.requestAnimationFrame(function () {
+    var event = new MouseEvent('click');
+    link.dispatchEvent(event);
+    document.body.removeChild(link);
+  });
+}
+
+async function loadSongJson(id) {
+  const doc = await db.collection(ENV).doc(id).get();
   if (doc.exists) {
     return doc.data();
   } else {
