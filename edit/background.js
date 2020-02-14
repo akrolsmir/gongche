@@ -270,8 +270,8 @@ function selectMelodyForLyrics() {
     return;
   }
 
-  let lyricsStart = unspacedIndex(lyricsText.value, lyricsText.selectionStart);
-  let lyricsEnd = unspacedIndex(lyricsText.value, lyricsText.selectionEnd);
+  const lyricsStart = strippedIndex(lyricsText.value, lyricsText.selectionStart);
+  const lyricsEnd = strippedIndex(lyricsText.value, lyricsText.selectionEnd);
 
   let melodyStart = 0;
   let melodyEnd = 0;
@@ -291,9 +291,14 @@ function selectMelodyForLyrics() {
   melodyText.setSelectionRange(melodyStart, melodyEnd);
 }
 
-function unspacedIndex(string, index) {
+/** Index into string after non-lyrical symbols are removed. */
+function strippedIndex(string, index) {
   let prefix = string.substring(0, index);
+<<<<<<< HEAD
   return prefix.replace(/[\s\.,_]/g, '').length;
+=======
+  return prefix.replace(/[\s_.,]/g, '').length;
+>>>>>>> master
 }
 
 /** Handle drag + dropped image or PDF.*/
