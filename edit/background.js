@@ -294,11 +294,7 @@ function selectMelodyForLyrics() {
 /** Index into string after non-lyrical symbols are removed. */
 function strippedIndex(string, index) {
   let prefix = string.substring(0, index);
-<<<<<<< HEAD
   return prefix.replace(/[\s\.,_]/g, '').length;
-=======
-  return prefix.replace(/[\s_.,]/g, '').length;
->>>>>>> master
 }
 
 /** Handle drag + dropped image or PDF.*/
