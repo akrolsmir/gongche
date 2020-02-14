@@ -250,7 +250,7 @@ function jumpToPage() {
   }
 }
 
-/** Use Ctrl + D shortcut to jump to corresponding melody. */
+/** Use Ctrl + D and Ctrl + E shortcut to jump to corresponding melody. */
 document.onkeydown = function (event) {
   if (event.ctrlKey || event.metaKey) {
     switch (String.fromCharCode(event.which).toLowerCase()) {
@@ -258,6 +258,9 @@ document.onkeydown = function (event) {
         event.preventDefault();
         selectMelodyForLyrics();
         break;
+      case 'e':
+        event.preventDefault();
+        selectLyricsForMelody();
     }
   }
 }
@@ -289,6 +292,45 @@ function selectMelodyForLyrics() {
   }
   melodyText.focus();
   melodyText.setSelectionRange(melodyStart, melodyEnd);
+}
+
+function selectLyricsForMelody() {
+  const lyricsText = document.getElementById('lyrics');
+  const melodyText = document.getElementById('melody');
+
+  if (melodyText != document.activeElement) {
+    return;
+  }
+
+  const melodyStart = melodyText.selectionStart;
+  const melodyEnd = melodyText.selectionEnd;
+  // Number of spaces before == index in stripped lyrics
+  let spacesStart = melodyText.value.substring(0, melodyStart).match(/ /g || []).length;
+  let spacesEnd = melodyText.value.substring(0, melodyEnd).match(/ /g || []).length;
+  if (spacesEnd == spacesStart) {
+    // End selection at least one whole lyric after
+    spacesEnd++;
+  }
+
+  let lyricsStart = 0;
+  let lyricsEnd = 0;
+  for (let i = 0; i < lyricsText.value.length; i++) {
+    if (lyricsText.value[i].match(/[\s\.,_]/g)) {
+      // Ignore non-lyric character
+      continue;
+    }
+    if (spacesStart == 0) {
+      lyricsStart = i;
+    }
+    spacesStart--;
+    if (spacesEnd == 0) {
+      lyricsEnd = i;
+    }
+    spacesEnd--;
+  }
+
+  lyricsText.focus();
+  lyricsText.setSelectionRange(lyricsStart, lyricsEnd);
 }
 
 /** Index into string after non-lyrical symbols are removed. */
