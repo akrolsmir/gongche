@@ -76,11 +76,13 @@
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
       
       <h3>Notes following notes</h3>
+      Skeletal: <select v-model="matrixSkeletal">
+        <option value="off">----</option>
+        <option value="first">{{ $t('firstNote') }}</option>
+        <option value="last">{{ $t('lastNote') }}</option>
+        <option value="both">First and Last</option>
+      </select>
       <confusion-matrix :matrix="matchedFollowingMatrix"></confusion-matrix>
-      <h3>Skeletal First</h3>
-      <confusion-matrix :matrix="matchedFollowingMatrixFirst"></confusion-matrix>
-      <h3>Skeletal Last</h3>
-      <confusion-matrix :matrix="matchedFollowingMatrixLast"></confusion-matrix>
       
       <div v-if="toneQuery">
         <h3>All contours (for "{{ toneQuery }}")</h3>

@@ -299,6 +299,7 @@ async function main() {
       padded: false,
       selectSongsExamples,
       filterLinesExamples,
+      matrixSkeletal: 'off',
     },
     methods: {
       findAllMotifs() {
@@ -452,14 +453,17 @@ async function main() {
         return counter.map;
       },
       matchedFollowingMatrix() {
-        return makeMatrix(this, (word) => word.melody.split(' '));
-      },
-      matchedFollowingMatrixFirst() {
-        return makeMatrix(this, (word) => [word.melody.split(' ')[0]]);
-      },
-      matchedFollowingMatrixLast() {
-        return makeMatrix(this, (word) => 
-          [word.melody.split(' ')[word.melody.split(' ').length - 1]]);
+        const skeletalFuncs = {
+          off: (word) => word.melody.split(' '),
+          first: (word) => [word.melody.split(' ')[0]],
+          last: (word) =>
+            [word.melody.split(' ')[word.melody.split(' ').length - 1]],
+          both: (word) => [
+            word.melody.split(' ')[0], 
+            word.melody.split(' ')[word.melody.split(' ').length - 1]
+          ]
+        };
+        return makeMatrix(this, skeletalFuncs[this.matrixSkeletal]);
       },
       /** Return the exact breakdown of contours and counts. */
       matchedContourBreakdown() {
