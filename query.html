@@ -13,7 +13,7 @@
       <option value="zh">中文</option>
     </select>
   </div>
-  <h1>Query Engine</h1>
+  <h1>{{ $t('queryEngine') }}</h1>
   <div id="selectsongs">
     <p> <input :placeholder="$t('selectSongs')" type="text" id="songsQuery" :value="songsQuery" @input="debouncedSongsQuery($event.target.value)"> </p>
     <p> ({{$t('examples')}}: 

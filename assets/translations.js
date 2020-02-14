@@ -2,6 +2,7 @@
 export const messages = {
   en: {
     // Used in Query Engine
+    queryEngine: 'Query Engine',
     lyric: 'Lyric',
     yinyang: 'Yin/Yang',
     melody: 'Melody',
@@ -58,6 +59,7 @@ export const messages = {
     }
   },
   zh: {
+    queryEngine: '查詢系統',
     lyric: '字',
     yinyang: '陰陽',
     melody: '旋律',
