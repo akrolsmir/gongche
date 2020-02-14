@@ -54,6 +54,7 @@ function outputNotes(sixteenths, newGroup, gongche) {
 /** @param first Whether to fix the tone to the first or last note. */
 export function skeletonize(rhythmized, first = true) {
   let result = [];
+  // TODO: breaks on songs like 1069.1 where the first lyric group is BAR.
   let lastGroup = rhythmized[0].lyricGroup; // The lyric group of the previous note.
   let newGroup = new LyricGroup(lastGroup.lyric, lastGroup.padding); // The new group for the merged notes.
   let toMerge = [];

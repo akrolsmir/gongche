@@ -285,9 +285,10 @@ function renderSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics)
   let rhythmized = rhythmize(quarters, timeSignature);
-  if (vueApp.skeletalFirst || vueApp.skeletalLast) {
-    // If both first and last are checked, render with last.
-    rhythmized = skeletonize(rhythmized, !vueApp.skeletalLast);
+  if (vueApp.skeletal == 'first') {
+    rhythmized = skeletonize(rhythmized);
+  } else if (vueApp.skeletal == 'last') {
+    rhythmized = skeletonize(rhythmized, false);
   }
   const modelStaves = splitStaves(rhythmized);
   const voices = makeVoices(modelStaves);
@@ -381,8 +382,7 @@ async function main() {
       signatures: Object.keys(VF.keySignature.keySpecs),
       toggle: '▶️',
       bpm: '120',
-      skeletalFirst: false,
-      skeletalLast: false,
+      skeletal: 'off',
     },
     methods: {
       toggleMusic(event) {
@@ -404,8 +404,7 @@ async function main() {
         Tone.Transport.bpm.value = newBpm;
       },
       keySignature: () => { renderSheet(song.fullLyrics, song.melody); },
-      skeletalFirst: () => { renderSheet(song.fullLyrics, song.melody); },
-      skeletalLast: () => { renderSheet(song.fullLyrics, song.melody); },
+      skeletal: () => { renderSheet(song.fullLyrics, song.melody); },
     }
   });
   try {

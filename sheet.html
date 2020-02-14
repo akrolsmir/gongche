@@ -25,10 +25,12 @@
         <button v-on:click='toggleMusic()'>{{ toggle }}</button>
       <p>{{ $t('bpm') }}: {{ bpm }} 
         <input type="range" v-model='bpm' min='30' max='150' value='120'>
-      <p>{{ $t('skeletal') }}: <label for="skeletalFirst">{{ $t('firstNote') }}</label>
-        <input type="checkbox" id="skeletalFirst" v-model="skeletalFirst">
-        <label for="skeletalLast">{{ $t('lastNote') }}</label>
-        <input type="checkbox" id="skeletalLast" v-model="skeletalLast">
+      <p>{{ $t('skeletal') }}: 
+        <select v-model="skeletal">
+          <option value="off">----</option>
+          <option value="first">{{ $t('firstNote') }}</option>
+          <option value="last">{{ $t('lastNote') }}</option>
+        </select>
     </div>
     <div id="right">
       <p>{{ $t('source') }}: {{ song.composer }}
