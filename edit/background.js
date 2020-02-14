@@ -94,7 +94,7 @@ function configSongData() {
         },
         set(input) {
           let output = "";
-          for (char of input) {
+          for (const char of input) {
             const gongche = keyboardToGongche[char];
             output += gongche ? gongche : char;
           }
@@ -293,7 +293,7 @@ function selectMelodyForLyrics() {
 
 function unspacedIndex(string, index) {
   let prefix = string.substring(0, index);
-  return prefix.replace(/\s/g, '').length;
+  return prefix.replace(/[\s\.,_]/g, '').length;
 }
 
 /** Handle drag + dropped image or PDF.*/
