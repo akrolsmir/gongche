@@ -1,13 +1,16 @@
 import {getSongTables} from "./assets/mulu.js";
 import {debugSheet} from "./sheet.js";
+import {RHYME_MAP} from "./assets/rhyme_dictionary.js";
 
 const vueApp = new Vue({
   el: '#debugz',
   data: {
-    errors: {}
+    errors: {},
+    songs: [],
   },
   async mounted() {
     const [songs, songsById] = await getSongTables();
+    this.songs = songs;
     const start = new Date();
 
     for (const song of songs) {
@@ -21,4 +24,18 @@ const vueApp = new Vue({
     }
     console.log(`${new Date() - start}ms elapsed`);
   },
+  computed: {
+    missingCharacters() {
+      const missing = {};
+      for (const song of this.songs) {
+        for (const index of song.getRhymeIndices()) {
+          const lyric = song.fullLyrics[index];
+          if (!(RHYME_MAP[lyric] || missing[lyric])) {
+            missing[lyric] = song.id;
+          }
+        }
+      }
+      return missing;
+    }
+  }
 });

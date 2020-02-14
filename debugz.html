@@ -13,6 +13,14 @@
     <div v-else>
       Checking all songs, please wait...
     </div>
+    These characters are missing rhyme entries:
+    <ul v-for="(songId, character) in missingCharacters">
+      <li>
+        <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
+          {{ songId }}
+        </a> -- {{ character }}
+      </li>
+    </ul>
     <ul v-for="(error, songId) in errors">
       <li>
         <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
