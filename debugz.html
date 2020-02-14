@@ -5,14 +5,9 @@
 <link rel="stylesheet" href="sheet.css">
 <link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
 <div id="debugz">
-  <h2>Debug Page</h2>
+  <h1>Debug Page</h1>
+  <h2>Rhyme Entries</h2>
   <div>
-    <div v-if="Object.keys(errors).length > 0">
-      Found {{ Object.keys(errors).length }} songs with errors:
-    </div>
-    <div v-else>
-      Checking all songs, please wait...
-    </div>
     These characters are missing rhyme entries:
     <ul v-for="(songId, character) in missingCharacters">
       <li>
@@ -21,7 +16,12 @@
         </a> -- {{ character }}
       </li>
     </ul>
-    <ul v-for="(error, songId) in errors">
+    <h2>Sheet Music</h2>
+    <button @click="getSheetErrors">Find errors in sheet music</button>
+    <div v-if="Object.keys(sheetErrors).length > 0">
+      Found {{ Object.keys(sheetErrors).length }} songs with errors:
+    </div>
+    <ul v-for="(error, songId) in sheetErrors">
       <li>
         <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
           {{ songId }}
