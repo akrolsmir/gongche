@@ -10,6 +10,11 @@
       padding-top: 40px;
       padding-bottom: 80px;
     }
+    
+    a#lang {
+      text-align: right;
+      display:block;
+    }
 
     .container {
       width: 750px;
@@ -28,6 +33,7 @@
 
 <body>
   <div class="container" id="container">
+    <a id="lang" href="./intro-zh.html">中文</a>
     <h1 class="title">Nine Modes Manual Online</h1>
     <button class="button is-large" @click="launchQuery">Go to the Query Engine</button><br><br>
     <h2 class="title">Introduction to the Collection</h2>
@@ -210,7 +216,7 @@
       lyrics:春夢</p>
 
     <p><b>melody:</b> Find any piece with a particular sequence of gongche characters as part of the melody.
-      TO find all pieces containing 伬仜伬 type melody:伬仜伬</p>
+      To find all pieces containing 伬仜伬 type melody:伬仜伬</p>
 
     <p><b>padding:</b> Filter pieces by the total number of padding characters. To find pieces with no padding
       characters type
@@ -285,15 +291,12 @@
       <ul>
         <li>。=中眼=the “3” in 4/4 time or “3” and “7” in 8/4 time</li>
         <li>、=頭板=the “1” in 4/4 time (JGDC does not distinguish 2/4 time from 4/4 time so the system defaults to either
-          4/4 time or</li>
-        <li>8/4 time.)</li>
+          4/4 time or 8/4 time.)</li>
         <li>_=底板=the end of a line of free rhythm or a break until the end of a measure in fixed rhythm. Typically
-          interpreted as a</li>
-        <li>腰板 or syncopated downbeat in contemporary Kunqu performance of metered pieces</li>
+          interpreted as a 腰板 or syncopated downbeat in contemporary Kunqu performance of metered pieces</li>
         <li>▯=腰眼=a place where a note is held past the “3” or “7” of the fixed rhythm</li>
         <li>L=腰板=a syncopated downbeat—that is a place where the previous note is held past the beginning of the next
-          rhythmic</li>
-        <li>measure</li>
+          rhythmic measure</li>
         <li>﹆=贈板=the “5” in 8/4 time</li>
         <li>╚=贈腰板=a place where the previous note is held past the “5” of 8/4 time</li>
       </ul>
@@ -319,7 +322,7 @@
         <li>Database and Tool Planning and Design: <b>Casey Schoenberger</b></li>
         <li>Site Implementation and Engineering: <b>Austin Chen</b></li>
         <li>Database Input and Proofreading: <b>Jiang Qixin, Tsz Man Ko, and Ho Kuen Ho</b></li>
-        <li>Funding by the <b>Hong Kong University Grants Council</b> and the <b></b>Hong Kong Polytechnic
+        <li>Funding by the <b>Hong Kong University Grants Council</b> and the <b>Hong Kong Polytechnic
           University</b></li>
         <li>Contact: <b>k.c.schoenbergerjr@polyu.edu.hk</b></li>
       </ul>
