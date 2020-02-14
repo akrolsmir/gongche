@@ -14,6 +14,12 @@
   <h1>{{ song.title }}</h1>
   <div id="metadata">
     <div id="left">
+      <p>{{ $t('keySignature') }}:
+        <select v-model="keySignature">
+          <option v-for="s in signatures">
+            {{ s }}
+          </option>
+        </select>
       <p>{{ $t('playback')}}: 
         <button v-on:click='stopMusic()'>⏹️</button>
         <button v-on:click='toggleMusic()'>{{ toggle }}</button>
@@ -28,14 +34,8 @@
       <p>{{ $t('source') }}: {{ song.composer }}
       <p>{{ $t('id') }}: {{ song.id }}
       <p>{{ $t('region') }}: {{ $t(song.region.toLowerCase()) }}
-      <p>{{ $t('keySignature') }}:
-        <select v-model="keySignature">
-          <option v-for="s in signatures">
-            {{ s }}
-          </option>
-        </select>
       <p v-if="song.getRhymeCategories().length > 0">
-        Rhyme Category: {{ song.getRhymeCategories()[0] }}
+        {{ $t('rhymeCategory') }}: {{ song.getRhymeCategories()[0] }}
       </p>
     </div>
   </div>
