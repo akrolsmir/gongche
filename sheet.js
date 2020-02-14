@@ -5,7 +5,6 @@ import { skeletonize, countSixteenths } from "./skeletonize.js";
 import { schedulePlayback } from "./playback.js";
 import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
 import { messages } from "./assets/translations.js";
-import { getSongTables } from "./assets/mulu.js";
 import { Song } from "./models/song.js";
 
 export class Note {
@@ -365,8 +364,7 @@ async function main() {
   let songId = urlParams.get('songId');
   songId = songId ? songId : "6584.1";
 
-  const songJson = urlParams.get('debugz')
-    ? {fullLyrics: '', melody: ''} : await loadSongJson(songId);
+  const songJson = await loadSongJson(songId);
   const song = Song.fromJson(songJson);
 
   const i18n = new VueI18n({
@@ -385,7 +383,6 @@ async function main() {
       bpm: '120',
       skeletalFirst: false,
       skeletalLast: false,
-      showDebug: urlParams.get('debugz'),
     },
     methods: {
       toggleMusic(event) {
@@ -417,52 +414,6 @@ async function main() {
     alert(e);
   }
 }
-
-Vue.component('debug-sheet', {
-  props: ['showDebug'],
-  data() {
-    return {
-      errors: {}
-    }
-  },
-  async mounted() {
-    if (!this.showDebug) {
-      console.log('Skipping');
-      return;
-    }
-    const [songs, songsById] = await getSongTables();
-    const start = new Date();
-
-    for (const song of songs) {
-      try {
-        debugSheet(song.fullLyrics, song.melody);
-      } catch (e) {
-        // Reactive equivalent to "this.errors[song.id] = e;"
-        this.$set(this.errors, song.id, e);
-      }
-    }
-    console.log(`${new Date() - start}ms elapsed`);
-  },
-  template:
-  `
-  <div>
-    <div v-if="Object.keys(errors).length > 0">
-      Found {{ Object.keys(errors).length }} songs with errors:
-    </div>
-    <div v-else>
-      Checking all songs, please wait...
-    </div>
-    <ul v-for="(error, songId) in errors">
-      <li>
-        <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
-          {{ songId }}
-        </a> -- 
-        {{ error }}
-      </li>
-    </ul>
-  </div>
-  `
-});
 
 export function debugSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);

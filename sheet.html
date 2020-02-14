@@ -5,10 +5,6 @@
 <link rel="stylesheet" href="sheet.css">
 <link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
 <div class="songdata">
-  <div v-if="showDebug">
-    <debug-sheet :show-debug="showDebug"></debug-sheet>
-  </div>
-  <div v-else>
   <div class="locale-changer">
     <select v-model="$i18n.locale">
       <option value="en">English</option>
@@ -42,7 +38,6 @@
         Rhyme Category: {{ song.getRhymeCategories()[0] }}
       </p>
     </div>
-  </div>
   </div>
 </div>
 <div id="vexflow" />

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Debug</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="sheet.css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
+<div id="debugz">
+  <h2>Debug Page</h2>
+  <div>
+    <div v-if="Object.keys(errors).length > 0">
+      Found {{ Object.keys(errors).length }} songs with errors:
+    </div>
+    <div v-else>
+      Checking all songs, please wait...
+    </div>
+    <ul v-for="(error, songId) in errors">
+      <li>
+        <a target='_blank' rel='noopener noreferrer' :href='"./edit/?songId=" + songId'>
+          {{ songId }}
+        </a> --
+        {{ error }}
+      </li>
+    </ul>
+  </div>
+</div>
+<div id="vexflow" />
+<script src="https://unpkg.com/tone@13.4.9/build/Tone.js"></script>
+<script src="https://unpkg.com/vexflow@1.2.87/releases/vexflow-debug.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
+<script src="database.js"></script>
+<script type="module" src="debugz.js"></script>
