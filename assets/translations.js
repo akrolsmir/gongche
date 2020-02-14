@@ -16,6 +16,8 @@ export const messages = {
     findSymbol: 'Find Symbol',
     findTone: 'Find Tone',
     countPaddingCharacters: 'Count Padding Characters',
+    selectSongs: 'Select songs',
+    filterLines: 'Filter lines',
     // Used in Prosody
     pronounce: 'Pronounce',
     beats: 'Beats',
@@ -33,6 +35,7 @@ export const messages = {
     region: 'Region',
     north: 'North',
     south: 'South',
+    rhymeCategory: 'Rhyme Category',
     // Query Engine example search terms
     examples: 'Examples',
     keywords: {
@@ -69,12 +72,16 @@ export const messages = {
     findSymbol: '符號檢索',
     findTone: '聲調檢索',
     countPaddingCharacters: '包括襯字',
+    selectSongs: '曲子篩選',
+    filterLines: '篩選句子',
+    // Used in Prosody
     pronounce: '字音',
     beats: '板眼',
     contour: '升降',
     firstNote: '第一音',
     lastNote: '最後音',
     interleaved: '交叉對比',
+    // Used in Sheet Music
     playback: '播放',
     bpm: 'BPM',
     skeletal: '骨幹音',
@@ -84,6 +91,8 @@ export const messages = {
     region: '地區',
     north: '北',
     south: '南',
+    rhymeCategory: '韻部',
+    // Query Engine example search terms
     examples: '例',
     keywords: {
       id: '歌號',
