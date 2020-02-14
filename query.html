@@ -77,6 +77,10 @@
       
       <h3>Notes following notes</h3>
       <confusion-matrix :matrix="matchedFollowingMatrix"></confusion-matrix>
+      <h3>Skeletal First</h3>
+      <confusion-matrix :matrix="matchedFollowingMatrixFirst"></confusion-matrix>
+      <h3>Skeletal Last</h3>
+      <confusion-matrix :matrix="matchedFollowingMatrixLast"></confusion-matrix>
       
       <div v-if="toneQuery">
         <h3>All contours (for "{{ toneQuery }}")</h3>

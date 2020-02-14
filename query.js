@@ -451,28 +451,15 @@ async function main() {
         }
         return counter.map;
       },
-      /** 7x7 matrix. Rows are start notes, columns are following notes. */
       matchedFollowingMatrix() {
-        const matrix = [];
-        for (let i = 0; i < 7; i++) {
-          matrix.push([0, 0, 0, 0, 0, 0, 0]);
-        }
-        for (const line of this.matchedLines) {
-          const melodies = [];
-          for (const word of line.getWords()) {
-            if (word.tone && word.melody && word.tone.includes(this.toneQuery)) {
-              melodies.push(...word.melody.split(' '));
-            }
-          }
-          const notes = melodies.map(normalizeJianpu);
-          for (let i = 0; i < notes.length - 1; i++) {
-            const current = notes[i];
-            const next = notes[i + 1];
-            // Shift by 1 to accomodate 0-based indexing.
-            matrix[current - 1][next - 1]++;
-          }
-        }
-        return matrix;
+        return makeMatrix(this, (word) => word.melody.split(' '));
+      },
+      matchedFollowingMatrixFirst() {
+        return makeMatrix(this, (word) => [word.melody.split(' ')[0]]);
+      },
+      matchedFollowingMatrixLast() {
+        return makeMatrix(this, (word) => 
+          [word.melody.split(' ')[word.melody.split(' ').length - 1]]);
       },
       /** Return the exact breakdown of contours and counts. */
       matchedContourBreakdown() {
@@ -517,6 +504,33 @@ async function main() {
       }
     }
   });
+}
+
+/** 
+ * 7x7 matrix. Rows are start notes, columns are following notes.
+ * wordToMelodies is a function that takes in a word and returns 
+ * an array of melodies that we want to include for "following". */
+function makeMatrix(vueApp, wordToMelodies) {
+  const matrix = [];
+  for (let i = 0; i < 7; i++) {
+    matrix.push([0, 0, 0, 0, 0, 0, 0]);
+  }
+  for (const line of vueApp.matchedLines) {
+    const melodies = [];
+    for (const word of line.getWords()) {
+      if (word.tone && word.melody && word.tone.includes(vueApp.toneQuery)) {
+        melodies.push(...wordToMelodies(word));
+      }
+    }
+    const notes = melodies.map(normalizeJianpu);
+    for (let i = 0; i < notes.length - 1; i++) {
+      const current = notes[i];
+      const next = notes[i + 1];
+      // Shift by 1 to accomodate 0-based indexing.
+      matrix[current - 1][next - 1]++;
+    }
+  }
+  return matrix;
 }
 
 // Map "do" to 1, "re" to 2... regardless of octave.
