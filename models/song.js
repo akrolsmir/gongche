@@ -46,9 +46,11 @@ export class Song {
     return false;
   }
   getRhymeCategories() {
-  return this.getRhymeIndices()
-    .map(index => this.fullLyrics[index])
-    .filter(lyric => RHYME_MAP[lyric])
-    .map(lyric => RHYME_MAP[lyric][0]);
+    const categories = this.getRhymeIndices()
+      .map(index => this.fullLyrics[index])
+      .filter(lyric => RHYME_MAP[lyric])
+      .map(lyric => RHYME_MAP[lyric][0]);
+    // Deduplicate with an intermediate set.
+    return [...new Set(categories)];
   }
 }

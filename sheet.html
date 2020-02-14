@@ -38,7 +38,9 @@
             {{ s }}
           </option>
         </select>
-      <p>Rhyme Category: {{ song.getRhymeCategories() }}
+      <p v-if="song.getRhymeCategories().length > 0">
+        Rhyme Category: {{ song.getRhymeCategories()[0] }}
+      </p>
     </div>
   </div>
   </div>
