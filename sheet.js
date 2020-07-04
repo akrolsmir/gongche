@@ -1,11 +1,11 @@
 const VF = Vex.Flow;
-import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
-import { rhythmize } from "./rhythmize.js";
-import { skeletonize, countSixteenths } from "./skeletonize.js";
-import { schedulePlayback } from "./playback.js";
-import { gongcheToJianpu, jianpuToOffset } from "./lines.js";
-import { messages } from "./assets/translations.js";
-import { Song } from "./models/song.js";
+import { RHYME_MAP } from './assets/rhyme_dictionary.js';
+import { rhythmize } from './rhythmize.js';
+import { skeletonize, countSixteenths } from './skeletonize.js';
+import { schedulePlayback } from './playback.js';
+import { gongcheToJianpu, jianpuToOffset } from './lines.js';
+import { messages } from './assets/translations.js';
+import { Song } from './models/song.js';
 
 export class Note {
   constructor(gongche) {
@@ -31,17 +31,22 @@ export class Note {
     const key = jianpuToKey(jianpu, vueApp.keySignature);
 
     const lyricFont = {
-      family: "Noto Serif TC",
+      family: 'Noto Serif TC',
       size: this.lyricGroup.padding ? '10' : '14',
     };
 
     this.melodyNote = makeStaveNote(key, this.duration);
-    this.lyricsNote = makeTextNote(this.getPaddedLyric(), 16, this.duration, lyricFont);
+    this.lyricsNote = makeTextNote(
+      this.getPaddedLyric(),
+      16,
+      this.duration,
+      lyricFont
+    );
 
     this.pronounceNote = makeTextNote(' ', 18, this.duration);
     if (this.getLyric() != ' ' && this.getLyric() in RHYME_MAP) {
       const rhyme = RHYME_MAP[this.getLyric()];
-      const font = { family: "Noto Serif TC", size: '10'};
+      const font = { family: 'Noto Serif TC', size: '10' };
       const index = vueApp.song.region == 'North' ? 3 : 2;
       this.pronounceNote = makeTextNote(rhyme[index], 18, this.duration, font);
     }
@@ -56,7 +61,7 @@ export class Note {
     }
 
     // Append dashes, or (double) underline to indicate note length.
-    const lengthFont = {size: '16'};
+    const lengthFont = { size: '16' };
     this.jianpuLength = makeTextNote(' ', 12, this.duration);
     jianpu = jianpu.replace(/[\.']/g, '');
     if (this.duration == '1') {
@@ -68,7 +73,7 @@ export class Note {
     } else if (this.duration == '16') {
       this.jianpuLength = makeTextNote('‗', 12, this.duration, lengthFont);
     }
-    const jianpuFont = { family: "Noto Serif TC", size: '14'};
+    const jianpuFont = { family: 'Noto Serif TC', size: '14' };
     this.jianpuNote = makeTextNote(jianpu, 12, this.duration, jianpuFont);
   }
   getCopy() {
@@ -84,19 +89,18 @@ export class Note {
 }
 
 export class RestNote {
-  constructor() {
-  }
+  constructor() {}
   getLyric() {
-    return "R";
+    return 'R';
   }
   getPaddedLyric() {
-    return "R";
+    return 'R';
   }
   setDuration(duration) {
     this.duration = duration;
-    this.melodyNote = makeStaveNote("b/4", this.duration + 'r');
+    this.melodyNote = makeStaveNote('b/4', this.duration + 'r');
     this.jianpuNote = makeTextNote('0', 12, this.duration, {
-      family: "Noto Serif TC",
+      family: 'Noto Serif TC',
       size: '14',
     });
     this.pronounceNote = makeTextNote(' ', 16, this.duration);
@@ -119,10 +123,10 @@ export class LyricGroup {
 }
 
 export const TimeSignature = {
-  FOUR_FOUR: "four_four",
-  EIGHT_FOUR: "eight_four",
-  FREE: "free",
-}
+  FOUR_FOUR: 'four_four',
+  EIGHT_FOUR: 'eight_four',
+  FREE: 'free',
+};
 
 export const BAR = '|';
 
@@ -143,7 +147,7 @@ function jianpuToKey(jianpu, keySignature) {
   return codeToKey(code);
 }
 
-// Parse the lyric at the index, noting whether it is padding. 
+// Parse the lyric at the index, noting whether it is padding.
 function makeLyricGroup(unspacedLyrics, index) {
   const padding = unspacedLyrics[index] == '_';
   if (padding) {
@@ -159,7 +163,8 @@ function assignLyrics(melody, lyrics) {
   // Strip out spaces, periods and commas (but leave '_' padding markers)
   // Note: '_' has different meanings in lyrics vs melody
   const unspacedLyrics = lyrics.replace(/[\s.,]/g, '');
-  let lyricIndex = 0, currentLyric = null;
+  let lyricIndex = 0,
+    currentLyric = null;
   [lyricIndex, currentLyric] = makeLyricGroup(unspacedLyrics, lyricIndex);
   const result = [];
   for (const char of melody) {
@@ -179,25 +184,25 @@ function assignLyrics(melody, lyrics) {
 
 function makeStave(index, timeSignature) {
   const stave = new VF.Stave(10, 200 * index, 800);
-  stave.addClef("treble").addKeySignature(vueApp.keySignature);
+  stave.addClef('treble').addKeySignature(vueApp.keySignature);
   if (timeSignature == TimeSignature.FOUR_FOUR) {
-    stave.addTimeSignature("4/4");
+    stave.addTimeSignature('4/4');
   } else if (timeSignature == TimeSignature.EIGHT_FOUR) {
-    stave.addTimeSignature("8/4");
+    stave.addTimeSignature('8/4');
   }
   stave.setContext(vexflowContext).draw();
   return stave;
 }
 
 function makeStaveNote(key, duration) {
-  return new VF.StaveNote({clef: "treble", keys: [key], duration: duration});
+  return new VF.StaveNote({ clef: 'treble', keys: [key], duration: duration });
 }
 
 function makeTextNote(text, line, duration, font) {
   return new VF.TextNote({
     text: text,
     duration: duration,
-    font: font
+    font: font,
   })
     .setLine(line)
     .setContext(vexflowContext);
@@ -220,7 +225,7 @@ function splitStaves(notes) {
         staves.push(stave);
         stave = measure;
         if (measure.length > MAX_NOTES_PER_STAVE) {
-          // This measure should also end its stave 
+          // This measure should also end its stave
           staves.push(stave);
           stave = [];
         }
@@ -252,18 +257,27 @@ function countQuarters(notes) {
 function makeVoices(staves) {
   // TODO ugly reflection hack
   function getTickables(stave, noteElement) {
-    return stave.map(note => note[noteElement] ? note[noteElement] : new VF.BarNote());
+    return stave.map((note) =>
+      note[noteElement] ? note[noteElement] : new VF.BarNote()
+    );
   }
 
   const voices = [];
   for (const stave of staves) {
     const beats = countQuarters(getTickables(stave, 'melodyNote'));
 
-    const voiceGroup =
-      ["melodyNote", "jianpuNote", "jianpuOctave", "jianpuLength", "lyricsNote", "pronounceNote"]
-        .map(voiceName => 
-          new VF.Voice({ num_beats: beats, beat_value: 4 })
-            .addTickables(getTickables(stave, voiceName)));
+    const voiceGroup = [
+      'melodyNote',
+      'jianpuNote',
+      'jianpuOctave',
+      'jianpuLength',
+      'lyricsNote',
+      'pronounceNote',
+    ].map((voiceName) =>
+      new VF.Voice({ num_beats: beats, beat_value: 4 }).addTickables(
+        getTickables(stave, voiceName)
+      )
+    );
 
     voices.push(voiceGroup);
   }
@@ -271,10 +285,10 @@ function makeVoices(staves) {
 }
 
 function getTimeSignature(melody) {
-  if (melody.includes("﹆") || melody.includes("╚")) {
+  if (melody.includes('﹆') || melody.includes('╚')) {
     return TimeSignature.EIGHT_FOUR;
   }
-  if (melody.includes("、")) {
+  if (melody.includes('、')) {
     return TimeSignature.FOUR_FOUR;
   }
   return TimeSignature.FREE;
@@ -283,7 +297,7 @@ function getTimeSignature(melody) {
 function renderSheet(lyrics, melody) {
   vexflowContext.clear();
   const timeSignature = getTimeSignature(melody);
-  const quarters = assignLyrics(melody, lyrics)
+  const quarters = assignLyrics(melody, lyrics);
   let rhythmized = rhythmize(quarters, timeSignature);
   if (vueApp.skeletal == 'first') {
     rhythmized = skeletonize(rhythmized);
@@ -298,7 +312,7 @@ function renderSheet(lyrics, melody) {
   // Note: Only on first render call; resizing causes weird Vexflow behavior.
   if (!vexflowRenderer.ctx.width) {
     const canvasHeight = modelStaves.length * 200 + 100;
-    vexflowRenderer.resize(850, canvasHeight);  
+    vexflowRenderer.resize(850, canvasHeight);
   }
 
   for (let i = 0; i < voices.length; i++) {
@@ -328,7 +342,7 @@ function renderSheet(lyrics, melody) {
       playbackNotes.push(melodyNote);
     }
     // Draw the beams
-    beams.forEach(beam => beam.setContext(vexflowContext).draw());
+    beams.forEach((beam) => beam.setContext(vexflowContext).draw());
   }
 
   // Find all lyric groups in order
@@ -341,12 +355,15 @@ function renderSheet(lyrics, melody) {
 
   // For groups with more than 1 note, draw a slur from first to last.
   const curves = allLyricGroups
-    .filter(lg => lg.children.length > 1)
-    .map(lg => new VF.Curve(
-      lg.children[0].melodyNote,
-      lg.children[lg.children.length - 1].melodyNote,
-    ));
-  curves.forEach(curve => curve.setContext(vexflowContext).draw());
+    .filter((lg) => lg.children.length > 1)
+    .map(
+      (lg) =>
+        new VF.Curve(
+          lg.children[0].melodyNote,
+          lg.children[lg.children.length - 1].melodyNote
+        )
+    );
+  curves.forEach((curve) => curve.setContext(vexflowContext).draw());
 
   schedulePlayback(playbackNotes, allLyricGroups, vueApp.keySignature);
 }
@@ -354,7 +371,7 @@ function renderSheet(lyrics, melody) {
 // We do this globally because TextNote needs a global context.
 // TODO: See if we can remove that global context.
 // Create an SVG renderer and attach it to the DIV element named "vexflow".
-const vexflowDiv = document.getElementById("vexflow")
+const vexflowDiv = document.getElementById('vexflow');
 const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
 // And get a drawing context:
 const vexflowContext = vexflowRenderer.getContext();
@@ -363,7 +380,7 @@ let vueApp;
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
-  songId = songId ? songId : "6584.1";
+  songId = songId ? songId : '6584.1';
 
   const songJson = await loadSongJson(songId);
   const song = Song.fromJson(songJson);
@@ -397,15 +414,19 @@ async function main() {
       stopMusic(event) {
         Tone.Transport.stop();
         this.toggle = '▶️';
-      }
+      },
     },
     watch: {
       bpm(newBpm) {
         Tone.Transport.bpm.value = newBpm;
       },
-      keySignature: () => { renderSheet(song.fullLyrics, song.melody); },
-      skeletal: () => { renderSheet(song.fullLyrics, song.melody); },
-    }
+      keySignature: () => {
+        renderSheet(song.fullLyrics, song.melody);
+      },
+      skeletal: () => {
+        renderSheet(song.fullLyrics, song.melody);
+      },
+    },
   });
   try {
     renderSheet(song.fullLyrics, song.melody);
@@ -416,7 +437,7 @@ async function main() {
 
 export function debugSheet(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
-  const quarters = assignLyrics(melody, lyrics)
+  const quarters = assignLyrics(melody, lyrics);
   let rhythmized = rhythmize(quarters, timeSignature);
   const modelStaves = splitStaves(rhythmized);
   const voices = makeVoices(modelStaves);
