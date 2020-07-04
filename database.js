@@ -1,9 +1,9 @@
-const ENV = "songs"
+const ENV = 'songs';
 
 firebase.initializeApp({
   apiKey: 'AIzaSyCKjEsP_YFyT45ULNihdDkDptXHcapoXLE',
   authDomain: 'minotaur-153205.firebaseapp.com',
-  projectId: 'minotaur-153205'
+  projectId: 'minotaur-153205',
 });
 
 // Initialize Cloud Firestore through Firebase
@@ -11,21 +11,22 @@ var db = firebase.firestore();
 
 // Disable deprecated features
 db.settings({
-  timestampsInSnapshots: true
+  timestampsInSnapshots: true,
 });
 
-db.enablePersistence({ experimentalTabSynchronization: true })
-  .catch(function (err) {
-    if (err.code == 'failed-precondition') {
-      // Multiple tabs open, persistence can only be enabled
-      // in one tab at a a time.
-      console.warn('Failed to enbable persistence!');
-    } else if (err.code == 'unimplemented') {
-      // The current browser does not support all of the
-      // features required to enable persistence
-      console.warn('Persistence not implemented!');
-    }
-  });
+db.enablePersistence({ experimentalTabSynchronization: true }).catch(function (
+  err
+) {
+  if (err.code == 'failed-precondition') {
+    // Multiple tabs open, persistence can only be enabled
+    // in one tab at a a time.
+    console.warn('Failed to enbable persistence!');
+  } else if (err.code == 'unimplemented') {
+    // The current browser does not support all of the
+    // features required to enable persistence
+    console.warn('Persistence not implemented!');
+  }
+});
 
 function saveSong(song) {
   db.collection(ENV).doc(song.id).set(song.toJson());
@@ -54,7 +55,7 @@ function hasEditPermission() {
 async function loadSongs() {
   const songsMap = new Map();
   const songsQuery = await db.collection(ENV).get();
-  songsQuery.forEach(doc => {
+  songsQuery.forEach((doc) => {
     songsMap.set(doc.id, doc.data());
   });
   return songsMap;
@@ -69,13 +70,13 @@ const songFields = [
   'melody',
   'region',
   'fullLyrics',
-  'modeKey'
-]
+  'modeKey',
+];
 
 function toCsv(songsMap) {
   const headings = songFields.join(', ');
   function toLine(song) {
-    return songFields.map(field => `"${song[field]}"`).join(', ');
+    return songFields.map((field) => `"${song[field]}"`).join(', ');
   }
   const lines = Array.from(songsMap.values()).map(toLine).join('\n');
   return headings + '\n' + lines;
@@ -94,10 +95,10 @@ function makeTextFile(text) {
   textFile = window.URL.createObjectURL(data);
 
   return textFile;
-};
+}
 
 async function downloadSongsAsCsv() {
-  // TODO: songsMap has incorrect region, modekey, etc. data... 
+  // TODO: songsMap has incorrect region, modekey, etc. data...
   // Can correct from mulu fulltable. Or maybe it's okay?
   const songsMap = await loadSongs();
   // const jsonText = JSON.stringify(Object.fromEntries(songsMap));
