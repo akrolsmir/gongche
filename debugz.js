@@ -1,6 +1,6 @@
-import {getSongTables} from "./assets/mulu.js";
-import {debugSheet} from "./sheet.js";
-import {RHYME_MAP} from "./assets/rhyme_dictionary.js";
+import { getSongTables } from './assets/mulu.js';
+import { debugSheet } from './sheet.js';
+import { RHYME_MAP } from './assets/rhyme_dictionary.js';
 
 const vueApp = new Vue({
   el: '#debugz',
@@ -55,6 +55,6 @@ const vueApp = new Vue({
         }
       }
       console.log(`${new Date() - start}ms elapsed`);
-    }
-  }
+    },
+  },
 });
