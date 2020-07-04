@@ -4,7 +4,9 @@ body {
   align-items: center;
 }
 
-body, button, input[type='text'] {
+body,
+button,
+input[type='text'] {
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -41,6 +43,8 @@ div.songdata {
 div.results {
   overflow: auto;
   max-height: 200px;
+  table-layout: auto;
+  white-space: nowrap;
 }
 
 div.toneRow {

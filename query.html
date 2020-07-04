@@ -16,29 +16,34 @@
   <h1>{{ $t('queryEngine') }}</h1>
   <div id="selectsongs">
     <p> <input :placeholder="$t('selectSongs')" type="text" id="songsQuery" :value="songsQuery" @input="debouncedSongsQuery($event.target.value)"> </p>
-    <p> ({{$t('examples')}}: 
+    <p> {{$t('examples')}}: 
       <template v-for="[keyword, example] in selectSongsExamples">
         | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
-      </template>)
+      </template>
     </p>
-    <h3>{{ matchedSongs.length }} pieces</h3>
+    <h3>{{ matchedSongs.length }} songs matched - showing first 50</h3>
     <div class="results">
-      <ul>
-        <li v-for='song in matchedSongs'>
-          {{ song.id }} 《{{ song.title }} - {{ song.composer }}》 （{{ song.modeKey }}）
-          <a :target='target' :rel='rel' :href='`sheet.html?songId=${song.id}`'>{{$t('sheet')}}</a> | 
-          <a :target='target' :rel='rel' :href='`prosody.html?songTitle=${song.title}`'>{{$t('prosody')}}</a> |
-          <a :target='target' :rel='rel' :href='`./edit/?songId=${song.id}`'>{{$t('edit')}}</a>
-        </li>
-      </ul>
+      <table width="100%">
+        <tbody>
+          <tr v-for='song in matchedSongs.splice(0, 50)'>
+            <td>{{ song.id }}</td>
+            <td>《{{ song.title }}》</td>
+            <td>{{ song.composer }}</td>
+            <td>{{ song.modeKey }}</td>
+            <td><a :target='target' :rel='rel' :href='`sheet.html?songId=${song.id}`'>{{$t('sheet')}}</a></td>
+            <td><a :target='target' :rel='rel' :href='`prosody.html?songTitle=${song.title}`'>{{$t('prosody')}}</a></td>
+            <td><a :target='target' :rel='rel' :href='`./edit/?songId=${song.id}`'>{{$t('edit')}}</a></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <div id="filterlines">
   <p> <input :placeholder="$t('filterLines')" type="text" id="linesQuery" :value="linesQuery" @input="debouncedLinesQuery($event.target.value)"></p>
-  <p> ({{$t("examples")}}: 
+  <p> {{$t("examples")}}: 
     <template v-for="[keyword, example] in filterLinesExamples">
       | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
-    </template>)
+    </template>
   </p>
   <p>
     <input type="checkbox" id="padded" v-model="padded">
