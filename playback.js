@@ -19,16 +19,17 @@ export function schedulePlayback(playbackNotes, lyricGroups, keySignature) {
   buildParentLinks(lyricGroups);
   Tone.Transport.cancel(); // Remove preexisting notes scheduled in Tone.js.
   let elapsed = Tone.Time('4n'); // Start after quarter beat.
-  const svgSuperGroup = {children: []}; // Parent of all svg notes.
+  const svgSuperGroup = { children: [] }; // Parent of all svg notes.
   const events = [];
   for (let i = 0; i < playbackNotes.length; i++) {
     const note = playbackNotes[i];
     if (note instanceof VF.StaveNote) {
       // Two notes are tied if they share the same key and lyric group.
-      const tied = note.lyricGroup
-        && i + 1 < playbackNotes.length
-        && note.lyricGroup == playbackNotes[i + 1].lyricGroup
-        && note.keys[0] == playbackNotes[i + 1].keys[0];
+      const tied =
+        note.lyricGroup &&
+        i + 1 < playbackNotes.length &&
+        note.lyricGroup == playbackNotes[i + 1].lyricGroup &&
+        note.keys[0] == playbackNotes[i + 1].keys[0];
       let duration = Tone.Time(note.duration + 'n');
       if (tied) {
         // Extend this note by the tie. TODO: this fails for multiple ties.
@@ -40,9 +41,9 @@ export function schedulePlayback(playbackNotes, lyricGroups, keySignature) {
       elapsed = elapsed + Tone.Time(duration);
     }
   }
-  const synth = new Tone.Synth().toMaster()
+  const synth = new Tone.Synth().toMaster();
   for (const event of events) {
-    Tone.Transport.schedule(function(time) {
+    Tone.Transport.schedule(function (time) {
       if (event.note.noteType == 'n') {
         // Play the tone for non-rest stave notes.
         const tone = convertTone(event.note, keySignature);
@@ -51,7 +52,7 @@ export function schedulePlayback(playbackNotes, lyricGroups, keySignature) {
       // Color the current note red, and all others black.
       colorSvgGroup(svgSuperGroup, 'black');
       colorSvgGroup(event.note.svgGroup, 'red');
-    }, event.time)
+    }, event.time);
   }
 }
 
