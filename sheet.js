@@ -27,6 +27,9 @@ export class Note {
   }
   setDuration(duration) {
     this.duration = duration;
+    if (window.VEXFLOW_HEADLESS) {
+      return;
+    }
     let jianpu = gongcheToJianpu[this.gongche];
     const key = jianpuToKey(jianpu, vueApp.keySignature);
 
@@ -98,6 +101,9 @@ export class RestNote {
   }
   setDuration(duration) {
     this.duration = duration;
+    if (window.VEXFLOW_HEADLESS) {
+      return;
+    }
     this.melodyNote = makeStaveNote('b/4', this.duration + 'r');
     this.jianpuNote = makeTextNote('0', 12, this.duration, {
       family: 'Noto Serif TC',
@@ -368,15 +374,6 @@ function renderSheet(lyrics, melody) {
   schedulePlayback(playbackNotes, allLyricGroups, vueApp.keySignature);
 }
 
-// We do this globally because TextNote needs a global context.
-// TODO: See if we can remove that global context.
-// Create an SVG renderer and attach it to the DIV element named "vexflow".
-const vexflowDiv = document.getElementById('vexflow');
-const vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
-// And get a drawing context:
-const vexflowContext = vexflowRenderer.getContext();
-let vueApp;
-
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
   let songId = urlParams.get('songId');
@@ -435,13 +432,23 @@ async function main() {
   }
 }
 
-export function debugSheet(lyrics, melody) {
+export function getRhythmized(lyrics, melody) {
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics);
-  let rhythmized = rhythmize(quarters, timeSignature);
-  const modelStaves = splitStaves(rhythmized);
-  const voices = makeVoices(modelStaves);
-  return voices;
+  return rhythmize(quarters, timeSignature);
 }
 
-main();
+// We do this globally because TextNote needs a global context.
+// TODO: See if we can remove that global context.
+let vexflowRenderer, vexflowContext, vueApp;
+
+// To load sheet.js to get melody breakdowns but without rendering, set:
+// window.VEXFLOW_HEADLESS = true;
+if (!window.VEXFLOW_HEADLESS) {
+  // Create an SVG renderer and attach it to the DIV element named "vexflow".
+  const vexflowDiv = document.getElementById('vexflow');
+  vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
+  // And get a drawing context:
+  vexflowContext = vexflowRenderer.getContext();
+  main();
+}

@@ -1,5 +1,5 @@
 import { getSongTables } from './assets/mulu.js';
-import { debugSheet } from './sheet.js';
+import { getRhythmized } from './sheet.js';
 import { RHYME_MAP } from './assets/rhyme_dictionary.js';
 
 const vueApp = new Vue({
@@ -44,10 +44,11 @@ const vueApp = new Vue({
   },
   methods: {
     async getSheetErrors() {
+      window.VEXFLOW_HEADLESS = true;
       const start = new Date();
       for (const song of this.songs) {
         try {
-          debugSheet(song.fullLyrics, song.melody);
+          getRhythmized(song.fullLyrics, song.melody);
           console.log('Done with ' + song.id);
         } catch (e) {
           // Reactive equivalent to "this.errors[song.id] = e;"
