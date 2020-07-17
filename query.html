@@ -21,7 +21,7 @@
         | <code>{{$t(`keywords.${keyword}`)}}:{{example}}</code>
       </template>
     </p>
-    <h3>{{ matchedSongs.length }} songs matched - showing first 50</h3>
+    <h3>{{ matchedSongs.length }} songs matched</h3>
     <div class="results">
       <table width="100%">
         <tbody>
@@ -79,6 +79,8 @@
       
       <h3>Distribution of notes</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
+
+      <h3>Average rhythmic time: {{ matchedToneQuarters.toFixed(2) }} quarters</h3>
 
       <h3>Notes following notes</h3>
       Skeletal: <select v-model="matrixSkeletal">

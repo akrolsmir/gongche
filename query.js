@@ -579,6 +579,23 @@ async function main() {
       finalTones() {
         return makeTones(this.matchedLines, '.');
       },
+      matchedToneQuarters() {
+        let total = 0;
+        let count = 0.00001; // To prevent division by 0 xP
+        for (const line of this.matchedLines) {
+          for (const word of line.getWords()) {
+            if (
+              word.tone &&
+              word.quarters &&
+              toneMatches(this.toneQuery, word)
+            ) {
+              total += word.quarters;
+              count += 1;
+            }
+          }
+        }
+        return total / count;
+      },
     },
   });
 }
@@ -600,6 +617,7 @@ function makeTones(lines, end) {
 
 // Whether a tone query matches a particular word.
 // When the word has no rhyme entry, we assume it matches.
+// TODO: ^ might not matter, since we always check for word.tones first?
 function toneMatches(query, word) {
   if (query.length == 0) {
     return true;
