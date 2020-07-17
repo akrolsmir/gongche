@@ -1,5 +1,3 @@
-const VF = Vex.Flow;
-
 /** For slur/tied notes, add a parent pointer to the lyric group. */
 function buildParentLinks(lyricGroups) {
   for (const lyricGroup of lyricGroups) {
@@ -23,7 +21,7 @@ export function schedulePlayback(playbackNotes, lyricGroups, keySignature) {
   const events = [];
   for (let i = 0; i < playbackNotes.length; i++) {
     const note = playbackNotes[i];
-    if (note instanceof VF.StaveNote) {
+    if (note instanceof Vex.Flow.StaveNote) {
       // Two notes are tied if they share the same key and lyric group.
       const tied =
         note.lyricGroup &&
@@ -58,7 +56,7 @@ export function schedulePlayback(playbackNotes, lyricGroups, keySignature) {
 
 /** Return the note for Tone.js to play, adding #/b based on key signature. */
 function convertTone(melodyNote, keySignature) {
-  const keySpec = VF.keySignature.keySpecs[keySignature];
+  const keySpec = Vex.Flow.keySignature.keySpecs[keySignature];
   let scale = '';
   if (keySpec.acc == '#') {
     const SHARPS_ORDER = 'fcgdaeb';

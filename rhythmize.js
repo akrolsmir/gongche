@@ -203,3 +203,27 @@ function between(lastBeat, thisBeat, quarters = 4) {
   const length = thisBeat - lastBeat;
   return length > 0 ? length : length + quarters;
 }
+
+function convertToQuarters(duration) {
+  return 4 / parseInt(duration);
+}
+
+/** Array of durations (in quarters) for each note in the song. */
+export function toLyricTimes(rhythmized) {
+  let currentGroup = rhythmized[0].lyricGroup;
+  const lyricTimes = [toLyricTime(currentGroup)];
+  for (let note of rhythmized) {
+    if (note.lyricGroup && note.lyricGroup != currentGroup) {
+      currentGroup = note.lyricGroup;
+      lyricTimes.push(toLyricTime(currentGroup));
+    }
+  }
+  return lyricTimes;
+}
+
+function toLyricTime(lyricGroup) {
+  const duration = lyricGroup.children
+    .map((c) => convertToQuarters(c.duration))
+    .reduce((a, b) => a + b);
+  return duration;
+}

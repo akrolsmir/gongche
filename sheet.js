@@ -1,6 +1,5 @@
-const VF = Vex.Flow;
 import { RHYME_MAP } from './assets/rhyme_dictionary.js';
-import { rhythmize } from './rhythmize.js';
+import { rhythmize, toLyricTimes } from './rhythmize.js';
 import { skeletonize, countSixteenths } from './skeletonize.js';
 import { schedulePlayback } from './playback.js';
 import { gongcheToJianpu, jianpuToOffset } from './lines.js';
@@ -438,13 +437,23 @@ export function getRhythmized(lyrics, melody) {
   return rhythmize(quarters, timeSignature);
 }
 
+/** Returns an array of each note's length in quarters (or null on an error) */
+export function getQuarters(song) {
+  try {
+    return toLyricTimes(getRhythmized(song.fullLyrics, song.melody));
+  } catch (error) {
+    return null;
+  }
+}
+
 // We do this globally because TextNote needs a global context.
 // TODO: See if we can remove that global context.
-let vexflowRenderer, vexflowContext, vueApp;
+let VF, vexflowRenderer, vexflowContext, vueApp;
 
 // To load sheet.js to get melody breakdowns but without rendering, set:
 // window.VEXFLOW_HEADLESS = true;
 if (!window.VEXFLOW_HEADLESS) {
+  VF = Vex.Flow;
   // Create an SVG renderer and attach it to the DIV element named "vexflow".
   const vexflowDiv = document.getElementById('vexflow');
   vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);

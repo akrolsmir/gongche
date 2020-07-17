@@ -319,6 +319,7 @@ async function main() {
       motifs: [],
       headers: ['lyric', 'yinyang', 'tone', 'melody'],
       padded: false,
+      quartered: false,
       selectSongsExamples,
       filterLinesExamples,
       matrixSkeletal: 'off',
@@ -347,6 +348,7 @@ async function main() {
       renderChart(this.matchedContourGraph, this.$refs.contourChart);
       renderChart(this.matchedLineLengths, this.$refs.lengthChart);
       renderChart(this.matchedNotes, this.$refs.noteChart);
+      renderChart(this.avgQuartersByPos, this.$refs.quartersChart);
     },
     created() {
       // See also https://stackoverflow.com/a/53022397/1222351
@@ -365,6 +367,9 @@ async function main() {
       },
       matchedNotes(newNotes) {
         renderChart(newNotes, this.$refs.noteChart);
+      },
+      avgQuartersByPos(newTimes) {
+        renderChart(newTimes, this.$refs.quartersChart);
       },
     },
     computed: {
@@ -396,7 +401,7 @@ async function main() {
       lines() {
         this.motifs = [];
         return this.matchedSongs
-          .flatMap((song) => buildLines(song, this.padded))
+          .flatMap((song) => buildLines(song, this.padded, this.quartered))
           .map(addJianpuString)
           .map(addToneString)
           .map(addTonemelodyString);
@@ -543,6 +548,30 @@ async function main() {
           counter.count(`${line.getWords().length}`);
         }
         return counter.map;
+      },
+      avgQuartersByPos() {
+        const total = {};
+        const counts = {};
+        for (const line of this.matchedLines) {
+          for (let i = 0; i < line.words.length; i++) {
+            const word = line.words[i];
+            // Songs that didn't have a valid rhythmization have quarters = 0
+            if (word.quarters) {
+              if (!total[i]) {
+                total[i] = 0;
+                counts[i] = 0;
+              }
+              total[i] += word.quarters;
+              counts[i] += 1;
+            }
+          }
+        }
+        const entries = Object.keys(total).map((i) => [
+          // Shift to 1-based indexing in the result
+          parseInt(i) + 1,
+          total[i] / counts[i],
+        ]);
+        return Object.fromEntries(entries);
       },
     },
   });

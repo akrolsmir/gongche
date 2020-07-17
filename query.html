@@ -25,7 +25,7 @@
     <div class="results">
       <table width="100%">
         <tbody>
-          <tr v-for='song in matchedSongs.splice(0, 50)'>
+          <tr v-for='song in matchedSongs'>
             <td>{{ song.id }}</td>
             <td>《{{ song.title }}》</td>
             <td>{{ song.composer }}</td>
@@ -146,9 +146,19 @@
       <h3>Distribution of line lengths</h3>
       <canvas ref="lengthChart" id="lengthChart" width="400" height="400"></canvas>
     </v-tab>
+
+    <v-tab title="Melody">
+      <input type="checkbox" id="quartered" v-model="quartered">
+      <label for="quartered">Calculate song quarters</label>
+      <h3>Average # of quarter beats, by line position</h3>
+      <canvas ref="quartersChart" id="quartersChart" width="400" height="400"></canvas>
+    </v-tab>
   </vue-tabs>
   </div>
 </div>
+<script>
+  window.VEXFLOW_HEADLESS = true;
+</script>
 <script src="load-service-worker.js"></script>
 <script src="https://unpkg.com/vue-nav-tabs/dist/vue-tabs.js"></script>
 <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>

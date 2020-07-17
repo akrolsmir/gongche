@@ -1,4 +1,5 @@
 import { RHYME_MAP } from './assets/rhyme_dictionary.js';
+import { getQuarters } from './sheet.js';
 
 // TODO deduplicate from sheet.js
 export const gongcheToJianpu = {
@@ -133,7 +134,7 @@ class Line {
 /**
   @returns an array of lines for the input song.
 */
-export function buildLines(song, padded = true) {
+export function buildLines(song, padded = true, quartered = false) {
   let melodyIndex = 0;
   let melodyChunks = song.melody.split(' ');
   const lines = [];
@@ -142,6 +143,7 @@ export function buildLines(song, padded = true) {
   let lastOffset;
   let melodyObject;
   let padding = false;
+  let songQuarters = quartered ? getQuarters(song) : null;
   for (let i = 0; i < song.fullLyrics.length; i++) {
     const lyric = song.fullLyrics[i];
     if (lyric == '_') {
@@ -168,6 +170,7 @@ export function buildLines(song, padded = true) {
         lastOffset
       );
       Object.assign(word, melodyObject);
+      word.quarters = songQuarters ? songQuarters[melodyIndex] : 0;
       melodyIndex++;
       line.words.push(word);
     } else if (lyric == '\n') {
