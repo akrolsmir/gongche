@@ -18,7 +18,7 @@ export class KeyCounter {
 const charts = {};
 export function renderChart(labelsToData, canvas) {
   // Generate a nice green-to-blue gradient. From https://uigradients.com/#Meridian.
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   const gradient = ctx.createLinearGradient(0, 0, 400, 0);
   gradient.addColorStop(0, '#45a247');
   gradient.addColorStop(1, '#283c86');
@@ -31,7 +31,7 @@ export function renderChart(labelsToData, canvas) {
     const dataset = {
       data: values,
       backgroundColor: gradient,
-      label: 'Count'
+      label: 'Count',
     };
     const data = { labels, datasets: [dataset] };
     charts[canvas.id] = new Chart(canvas, {
@@ -39,8 +39,8 @@ export function renderChart(labelsToData, canvas) {
       data,
       options: {
         responsive: false,
-        scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
-      }
+        scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+      },
     });
   }
 }
@@ -54,12 +54,14 @@ function cleanLabels(labelsToData) {
   for (let i = minLabel; i <= maxLabel; i++) {
     labels.push(i);
   }
-  const values = labels.map(label => label in labelsToData ? labelsToData[label] : 0);
+  const values = labels.map((label) =>
+    label in labelsToData ? labelsToData[label] : 0
+  );
   return [labels, values];
 }
 
 function replaceData(chart, labels, data) {
-  const oldCount = chart.data.labels.length
+  const oldCount = chart.data.labels.length;
   for (let i = 0; i < oldCount; i++) {
     removeData(chart);
   }
@@ -109,5 +111,5 @@ Vue.component('confusion-matrix', {
     </template>
   </tbody>
 </table>
-  `
+  `,
 });
