@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Prosody</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="prosody.css">
-<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="prosody.css" />
+<link
+  href="https://fonts.googleapis.com/css?family=Noto+Serif+TC"
+  rel="stylesheet"
+/>
 <div class="songdata">
   <div class="locale-changer">
     <select v-model="$i18n.locale">
@@ -12,14 +15,24 @@
     </select>
   </div>
   <h1>{{ pageTitle }}</h1>
-  <input type="checkbox" id="interleave" v-model="interleave">
+  <input type="checkbox" id="interleave" v-model="interleave" />
   <label for="interleave">{{ $t('interleaved') }}</label>
   <p>
-  <template v-for="header in rowHeaders">
-    <input type="checkbox" :id="header" :value="header" v-model="checkedHeaders">
-    <label :for="header">{{ $t(header) }}</label>
-  </template>
-  <prosody :headers="filteredHeaders" :lines="lines" :colorize="true"></prosody>
+    <template v-for="header in rowHeaders">
+      <input
+        type="checkbox"
+        :id="header"
+        :value="header"
+        v-model="checkedHeaders"
+      />
+      <label :for="header">{{ $t(header) }}</label>
+    </template>
+    <prosody
+      :headers="filteredHeaders"
+      :lines="lines"
+      :colorize="true"
+    ></prosody>
+  </p>
 </div>
 <script src="load-service-worker.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
