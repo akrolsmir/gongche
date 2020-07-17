@@ -456,11 +456,7 @@ async function main() {
         const tones = {};
         for (const line of this.matchedLines) {
           for (const word of line.getWords()) {
-            if (
-              word.tone &&
-              word.melody &&
-              word.tone.includes(this.toneQuery)
-            ) {
+            if (word.tone && word.melody && toneMatches(this.toneQuery, word)) {
               const melodyArray = word.melody.split(' ');
               // Only count contours of 2 or more notes
               if (melodyArray.length > 1) {
@@ -484,11 +480,7 @@ async function main() {
         const counter = new KeyCounter('1');
         for (const line of this.matchedLines) {
           for (const word of line.getWords()) {
-            if (
-              word.tone &&
-              word.melody &&
-              word.tone.includes(this.toneQuery)
-            ) {
+            if (word.tone && word.melody && toneMatches(this.toneQuery, word)) {
               const melodyArray = word.melody.split(' ');
               for (const jianpu of melodyArray) {
                 counter.count(normalizeJianpu(jianpu));
@@ -520,7 +512,7 @@ async function main() {
             if (
               word.tone &&
               word.contour &&
-              word.tone.includes(this.toneQuery)
+              toneMatches(this.toneQuery, word)
             ) {
               const key = word.contour;
               if (!(key in tones)) {
@@ -606,6 +598,29 @@ function makeTones(lines, end) {
   return counter.map;
 }
 
+// Whether a tone query matches a particular word.
+// When the word has no rhyme entry, we assume it matches.
+function toneMatches(query, word) {
+  if (query.length == 0) {
+    return true;
+  }
+  // Supported patterns: 平/上/去/入/仄, maybe prefixed by 陰/陽
+  const matches = query.match(/^[陰陽]?[平上去入仄]$/);
+  if (!matches) {
+    return false;
+  }
+  if (query.startsWith('陰') || query.startsWith('陽')) {
+    if (word.yinyang && word.yinyang != query[0]) {
+      return false;
+    }
+  }
+  let tone = query[query.length - 1];
+  if (tone == '仄') {
+    tone = '上去入';
+  }
+  return !word.tone || tone.includes(word.tone);
+}
+
 /**
  * 7x7 matrix. Rows are start notes, columns are following notes.
  * wordToMelodies is a function that takes in a word and returns
@@ -618,7 +633,7 @@ function makeMatrix(vueApp, wordToMelodies) {
   for (const line of vueApp.matchedLines) {
     const melodies = [];
     for (const word of line.getWords()) {
-      if (word.tone && word.melody && word.tone.includes(vueApp.toneQuery)) {
+      if (word.tone && word.melody && toneMatches(vueApp.toneQuery, word)) {
         melodies.push(...wordToMelodies(word));
       }
     }
