@@ -349,6 +349,8 @@ async function main() {
       renderChart(this.matchedLineLengths, this.$refs.lengthChart);
       renderChart(this.matchedNotes, this.$refs.noteChart);
       renderChart(this.avgQuartersByPos, this.$refs.quartersChart);
+      renderChart(this.rhymingTones, this.$refs.rhymingChart);
+      renderChart(this.finalTones, this.$refs.finalChart);
     },
     created() {
       // See also https://stackoverflow.com/a/53022397/1222351
@@ -370,6 +372,12 @@ async function main() {
       },
       avgQuartersByPos(newTimes) {
         renderChart(newTimes, this.$refs.quartersChart);
+      },
+      rhymingTones(newTones) {
+        renderChart(newTones, this.$refs.rhymingChart);
+      },
+      finalTones(newTones) {
+        renderChart(newTones, this.$refs.finalChart);
       },
     },
     computed: {
@@ -573,8 +581,29 @@ async function main() {
         ]);
         return Object.fromEntries(entries);
       },
+      rhymingTones() {
+        return makeTones(this.matchedLines, ',');
+      },
+      finalTones() {
+        return makeTones(this.matchedLines, '.');
+      },
     },
   });
+}
+
+// TODO: Try charts with arbitrary string keys
+function makeTones(lines, end) {
+  const tonesToInt = { 平: 0, 上: 1, 去: 2, 入: 3 };
+  const counter = new KeyCounter();
+  for (const line of lines) {
+    if (line.end == end) {
+      const lastWord = line.words[line.words.length - 1];
+      if (lastWord && lastWord.tone) {
+        counter.count(tonesToInt[lastWord.tone]);
+      }
+    }
+  }
+  return counter.map;
 }
 
 /**

@@ -79,7 +79,12 @@
       
       <h3>Distribution of notes</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
-      
+
+      <h3>Rhyming and final tones</h3>
+      (平 = 0, 上 = 1, 去 = 2, 入 = 3)
+      <canvas ref="rhymingChart" id="rhymingChart" width="400" height="400"></canvas>
+      <canvas ref="finalChart" id="finalChart" width="400" height="400"></canvas>
+
       <h3>Notes following notes</h3>
       Skeletal: <select v-model="matrixSkeletal">
         <option value="off">----</option>

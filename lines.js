@@ -177,6 +177,8 @@ export function buildLines(song, padded = true, quartered = false) {
       lines.push(line);
       lineCount++;
       line = new Line(song, lineCount, padded);
+    } else if (lyric == ',' || lyric == '.') {
+      line.end = lyric;
     }
   }
   if (line.words.length > 0) {
