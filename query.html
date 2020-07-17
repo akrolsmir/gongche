@@ -50,7 +50,7 @@
     <label for="padded">{{$t('countPaddingCharacters')}}</label>
   </p>
   <vue-tabs>
-  <v-tab :title="$t('motifs')">
+  <v-tab :title="$t('prosody')">
   <p>
     <div v-if="matchedLines.length > 50">
       Showing first 50 of {{matchedLines.length}} matches:
@@ -79,11 +79,6 @@
       
       <h3>Distribution of notes</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
-
-      <h3>Rhyming and final tones</h3>
-      (平 = 0, 上 = 1, 去 = 2, 入 = 3)
-      <canvas ref="rhymingChart" id="rhymingChart" width="400" height="400"></canvas>
-      <canvas ref="finalChart" id="finalChart" width="400" height="400"></canvas>
 
       <h3>Notes following notes</h3>
       Skeletal: <select v-model="matrixSkeletal">
@@ -157,6 +152,16 @@
       <label for="quartered">Calculate song quarters</label>
       <h3>Average # of quarter beats, by line position</h3>
       <canvas ref="quartersChart" id="quartersChart" width="400" height="400"></canvas>
+    </v-tab>
+
+    <v-tab title="Rhyme">
+      <h3>Tones of rhyming characters</h3>
+      <canvas ref="rhymingChart" id="rhymingChart" width="400" height="400"></canvas>
+      (平 = 0, 上 = 1, 去 = 2, 入 = 3)
+
+      <h3>Tones of non-rhyming final characters</h3>
+      <canvas ref="finalChart" id="finalChart" width="400" height="400"></canvas>
+      (平 = 0, 上 = 1, 去 = 2, 入 = 3)
     </v-tab>
   </vue-tabs>
   </div>
