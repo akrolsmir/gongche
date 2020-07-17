@@ -1,4 +1,4 @@
-import { TimeSignature, BAR, RestNote } from "./sheet.js";
+import { TimeSignature, BAR, RestNote } from './sheet.js';
 
 export function rhythmize(input, timeSignature) {
   switch (timeSignature) {
@@ -15,7 +15,7 @@ function rhythmizeFree(input) {
   let output = [];
   for (let i = 0; i < input.length; i++) {
     const symbol = input[i];
-    if (symbol == "_") {
+    if (symbol == '_') {
       // Last note in a measure is a whole note.
       output[output.length - 1].setDuration('1');
       output.push(BAR);
@@ -24,7 +24,9 @@ function rhythmizeFree(input) {
       try {
         symbol.setDuration('4');
       } catch (e) {
-        throw `Invalid symbol "${symbol}" in free rhythm piece at position ${i + 1}.`;
+        throw `Invalid symbol "${symbol}" in free rhythm piece at position ${
+          i + 1
+        }.`;
       }
       output.push(symbol);
     }
@@ -34,21 +36,21 @@ function rhythmizeFree(input) {
 
 function getBeatForSymbol(symbol, timeSignature, lastBeat) {
   const beats4 = {
-    "、": 1,
-    "。": 3,
-    "_": 1,  // Extend to measure, then rest on 1
-    "▯": 3, // Sustain past 3
-    "L": 1,  // Sustain past 1
-  }
+    '、': 1,
+    '。': 3,
+    _: 1, // Extend to measure, then rest on 1
+    '▯': 3, // Sustain past 3
+    L: 1, // Sustain past 1
+  };
   const beats8 = {
-    "、": 1,
-    "﹆": 5,
-    "。": lastBeat < 3 ? 3 : 7, // Can represent either 3 or 7
-    "_": 1, // Extend to measure, then rest on 1
-    "▯": lastBeat < 3 ? 3 : 7, // Sustain past midway
-    "L": 1, // Sustain past 1
-    "╚": 5, // Sustain past 5
-  }
+    '、': 1,
+    '﹆': 5,
+    '。': lastBeat < 3 ? 3 : 7, // Can represent either 3 or 7
+    _: 1, // Extend to measure, then rest on 1
+    '▯': lastBeat < 3 ? 3 : 7, // Sustain past midway
+    L: 1, // Sustain past 1
+    '╚': 5, // Sustain past 5
+  };
   if (timeSignature == TimeSignature.FOUR_FOUR) {
     return beats4[symbol];
   } else {
@@ -80,22 +82,22 @@ function rhythmizeFixed(input, timeSignature) {
       }
 
       let markedNote;
-      if ("▯L╚".includes(symbol)) {
+      if ('▯L╚'.includes(symbol)) {
         // Include the marked (next) note in the block.
         i++;
         markedNote = input[i];
         block.push(markedNote);
       }
-      
+
       // Assign durations to each note in this rhythm block.
       [block, lastBeat] = processBlock(block, output, lastBeat, symbol, ts);
 
-      if ("、_L".includes(symbol)) {
+      if ('、_L'.includes(symbol)) {
         // Add a new bar marker, since we're starting on 1.
         output.push(BAR);
       }
 
-      if (symbol == "_"){
+      if (symbol == '_') {
         // Make sure to rest on 1.
         block.push(new RestNote());
       }
@@ -115,7 +117,7 @@ function rhythmizeFixed(input, timeSignature) {
   }
   if (block.length > 0) {
     // Add any remaining notes to one last bar.
-    [block, lastBeat] = processBlock(block, output, lastBeat, "、", ts);
+    [block, lastBeat] = processBlock(block, output, lastBeat, '、', ts);
   }
   return output;
 }
@@ -141,29 +143,34 @@ function assignDurations(block, quarters) {
     try {
       block[i].setDuration(convertToDuration(fractions[i] * quarters));
     } catch (e) {
-      throw `Invalid symbol "${block[i]}" in fixed rhythm piece (Position ${i + 1} in ${formatBlock(block)}).`;
+      throw `Invalid symbol "${block[i]}" in fixed rhythm piece (Position ${
+        i + 1
+      } in ${formatBlock(block)}).`;
     }
   }
 }
 
 function formatBlock(block) {
-  return "[" + block
-    .map(note => note.gongche ? note.gongche : note)
-    .join(", ") + "]";
+  return (
+    '[' +
+    block.map((note) => (note.gongche ? note.gongche : note)).join(', ') +
+    ']'
+  );
 }
 
 /**
- * Convert from a length (in # of quarters) to a duration 
+ * Convert from a length (in # of quarters) to a duration
  * (e.g. '2' = half note, '8' = eight note)
- */ 
+ */
+
 function convertToDuration(quarters) {
   const map = {
     4: '1',
     2: '2',
     1: '4',
     0.5: '8',
-    0.25: '16'
-  }
+    0.25: '16',
+  };
 
   // TODO handle dotted notes
   if (quarters > 4) {
@@ -181,14 +188,14 @@ function convertToDuration(quarters) {
 const divideBlock = [
   [],
   [1],
-  [1/2, 1/2],
-  [1/2, 1/4, 1/4],
-  [1/4, 1/4, 1/4, 1/4],
-  [1/4, 1/4, 1/4, 1/8, 1/8], 
-  [1/4, 1/4, 1/8, 1/8, 1/8, 1/8],
-  [1/4, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8],
-  [1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8]
-]
+  [1 / 2, 1 / 2],
+  [1 / 2, 1 / 4, 1 / 4],
+  [1 / 4, 1 / 4, 1 / 4, 1 / 4],
+  [1 / 4, 1 / 4, 1 / 4, 1 / 8, 1 / 8],
+  [1 / 4, 1 / 4, 1 / 8, 1 / 8, 1 / 8, 1 / 8],
+  [1 / 4, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8],
+  [1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8],
+];
 
 // Return the length between the marked quarter beats.
 // Assumes that no length exceeds 3 beats.
