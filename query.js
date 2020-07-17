@@ -351,6 +351,7 @@ async function main() {
       renderChart(this.avgQuartersByPos, this.$refs.quartersChart);
       renderChart(this.rhymingTones, this.$refs.rhymingChart);
       renderChart(this.finalTones, this.$refs.finalChart);
+      renderChart(this.allTones, this.$refs.allTonesChart);
     },
     created() {
       // See also https://stackoverflow.com/a/53022397/1222351
@@ -378,6 +379,9 @@ async function main() {
       },
       finalTones(newTones) {
         renderChart(newTones, this.$refs.finalChart);
+      },
+      allTones(newTones) {
+        renderChart(allTones, this.$refs.allTonesChart);
       },
     },
     computed: {
@@ -578,6 +582,18 @@ async function main() {
       },
       finalTones() {
         return makeTones(this.matchedLines, '.');
+      },
+      allTones() {
+        const tonesToInt = { 平: 0, 上: 1, 去: 2, 入: 3 };
+        const counter = new KeyCounter();
+        for (const line of this.matchedLines) {
+          for (const word of line.words) {
+            if (word && word.tone) {
+              counter.count(tonesToInt[word.tone]);
+            }
+          }
+        }
+        return counter.map;
       },
       matchedToneQuarters() {
         let total = 0;

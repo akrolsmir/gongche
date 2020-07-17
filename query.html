@@ -48,6 +48,8 @@
   <p>
     <input type="checkbox" id="padded" v-model="padded">
     <label for="padded">{{$t('countPaddingCharacters')}}</label>
+    <input type="checkbox" id="quartered" v-model="quartered">
+    <label for="quartered">Calculate song quarters</label>
   </p>
   <vue-tabs>
   <v-tab :title="$t('prosody')">
@@ -77,7 +79,7 @@
       <p> {{$t('findTone')}}: <input type="text" id="toneQuery" v-model="toneQuery"></p>
       <p> ({{$t('examples')}}: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code> | <code>仄</code> | <code>陽平</code>...)</p>
       
-      <h3>Distribution of notes</h3> 
+      <h3>Distribution of note melodies</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
 
       <h3>Average rhythmic time: {{ matchedToneQuarters.toFixed(2) }} quarters</h3>
@@ -150,8 +152,6 @@
     </v-tab>
 
     <v-tab title="Melody">
-      <input type="checkbox" id="quartered" v-model="quartered">
-      <label for="quartered">Calculate song quarters</label>
       <h3>Average # of quarter beats, by line position</h3>
       <canvas ref="quartersChart" id="quartersChart" width="400" height="400"></canvas>
     </v-tab>
@@ -163,6 +163,10 @@
 
       <h3>Tones of non-rhyming final characters</h3>
       <canvas ref="finalChart" id="finalChart" width="400" height="400"></canvas>
+      (平 = 0, 上 = 1, 去 = 2, 入 = 3)
+
+      <h3>Tones of all characters</h3>
+      <canvas ref="allTonesChart" id="allTonesChart" width="400" height="400"></canvas>
       (平 = 0, 上 = 1, 去 = 2, 入 = 3)
     </v-tab>
   </vue-tabs>
