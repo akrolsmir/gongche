@@ -1,54 +1,54 @@
-import { RHYME_MAP } from "./assets/rhyme_dictionary.js";
+import { RHYME_MAP } from './assets/rhyme_dictionary.js';
 
 // TODO deduplicate from sheet.js
 export const gongcheToJianpu = {
-  "合": "5.",
-  "四": "6.",
-  "一": "7.",
-  "上": "1",
-  "尺": "2",
-  "工": "3",
-  "凡": "4",
-  "六": "5",
-  "五": "6",
-  "乙": "7",
-  "仩": "1'",
-  "伬": "2'",
-  "仜": "3'",
-}
+  合: '5.',
+  四: '6.',
+  一: '7.',
+  上: '1',
+  尺: '2',
+  工: '3',
+  凡: '4',
+  六: '5',
+  五: '6',
+  乙: '7',
+  仩: "1'",
+  伬: "2'",
+  仜: "3'",
+};
 
 export const jianpuToOffset = {
-  "5.": -3,
-  "6.": -2,
-  "7.": -1,
-  "1": 0,
-  "2": 1,
-  "3": 2,
-  "4": 3,
-  "5": 4,
-  "6": 5,
-  "7": 6,
+  '5.': -3,
+  '6.': -2,
+  '7.': -1,
+  '1': 0,
+  '2': 1,
+  '3': 2,
+  '4': 3,
+  '5': 4,
+  '6': 5,
+  '7': 6,
   "1'": 7,
   "2'": 8,
   "3'": 9,
-}
+};
 
 // Mapping from jianpu to single char for string manipulation.
 const jianpuToChar = {
-  "5.": "g",
-  "6.": "a",
-  "7.": "b",
-  "1": "1",
-  "2": "2",
-  "3": "3",
-  "4": "4",
-  "5": "5",
-  "6": "6",
-  "7": "7",
-  "1'": "C",
-  "2'": "D",
-  "3'": "E",
-}
+  '5.': 'g',
+  '6.': 'a',
+  '7.': 'b',
+  '1': '1',
+  '2': '2',
+  '3': '3',
+  '4': '4',
+  '5': '5',
+  '6': '6',
+  '7': '7',
+  "1'": 'C',
+  "2'": 'D',
+  "3'": 'E',
+};
 
 const charToJianpu = {};
 for (let jianpu in jianpuToChar) {
@@ -57,12 +57,12 @@ for (let jianpu in jianpuToChar) {
 }
 
 export function encodeJianpu(jianpu) {
-  let result = "";
+  let result = '';
   for (let i = 0; i < jianpu.length; i++) {
     if (i + 1 < jianpu.length) {
       const two = jianpu[i] + jianpu[i + 1];
       if (two in jianpuToChar) {
-        result += jianpuToChar[two]
+        result += jianpuToChar[two];
         i++;
         continue;
       }
@@ -81,8 +81,7 @@ export function decodeToJianpu(chars) {
   return result;
 }
 
-const beatSymbols = ["、", "。", "_",  "▯",  "L",  "﹆",  "╚"];
-
+const beatSymbols = ['、', '。', '_', '▯', 'L', '﹆', '╚'];
 
 function parseMelodyChunk(melodyChunk, lastOffset) {
   if (!melodyChunk) {
@@ -94,8 +93,7 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
   for (const char of melodyChunk) {
     if (beatSymbols.includes(char)) {
       beats.push(char);
-    }
-    else if (char in gongcheToJianpu) {
+    } else if (char in gongcheToJianpu) {
       melody.push(gongcheToJianpu[char]);
       const offset = jianpuToOffset[gongcheToJianpu[char]];
       // Explicit check against undefined, since 0 is a valid offset value.
@@ -103,13 +101,16 @@ function parseMelodyChunk(melodyChunk, lastOffset) {
       lastOffset = offset;
     }
   }
-  return [{
-    beats: beats.join(' '),
-    melody: melody.join(' '),
-    contour: contours.map(r => (r <= 0 ? '' : '+') + r).join(' '),
-    firstNote: melody[0],
-    lastNote: melody[melody.length - 1]
-  }, lastOffset];
+  return [
+    {
+      beats: beats.join(' '),
+      melody: melody.join(' '),
+      contour: contours.map((r) => (r <= 0 ? '' : '+') + r).join(' '),
+      firstNote: melody[0],
+      lastNote: melody[melody.length - 1],
+    },
+    lastOffset,
+  ];
 }
 
 class Line {
@@ -123,7 +124,9 @@ class Line {
   }
 
   getWords() {
-    return this.padded ? this.words : this.words.filter(word => !word.padding);
+    return this.padded
+      ? this.words
+      : this.words.filter((word) => !word.padding);
   }
 }
 
@@ -144,8 +147,7 @@ export function buildLines(song, padded = true) {
     if (lyric == '_') {
       // Remember that next character is padding.
       padding = true;
-    }
-    else if (lyric != '\n' && lyric != ',' && lyric != '.') {
+    } else if (lyric != '\n' && lyric != ',' && lyric != '.') {
       const rhyme = RHYME_MAP[lyric] ? RHYME_MAP[lyric] : [, , , , ,];
       const [file, char, south, north, yinyang, tone] = rhyme;
       const word = { lyric, yinyang, tone, padding };
@@ -161,12 +163,14 @@ export function buildLines(song, padded = true) {
         word.rhyme = file ? file : 'MISSING_RHYME_ENTRY';
       }
       // Parse the beats and jianpu, and copy into word object.
-      [melodyObject, lastOffset] = parseMelodyChunk(melodyChunks[melodyIndex], lastOffset);
+      [melodyObject, lastOffset] = parseMelodyChunk(
+        melodyChunks[melodyIndex],
+        lastOffset
+      );
       Object.assign(word, melodyObject);
       melodyIndex++;
       line.words.push(word);
-    }
-    else if (lyric == '\n') {
+    } else if (lyric == '\n') {
       lines.push(line);
       lineCount++;
       line = new Line(song, lineCount, padded);
