@@ -349,6 +349,7 @@ async function main() {
       renderChart(this.matchedLineLengths, this.$refs.lengthChart);
       renderChart(this.matchedNotes, this.$refs.noteChart);
       renderChart(this.avgQuartersByPos, this.$refs.quartersChart);
+      renderChart(this.avgNotesByPos, this.$refs.notesByPosChart);
       renderChart(this.rhymingTones, this.$refs.rhymingChart);
       renderChart(this.finalTones, this.$refs.finalChart);
       renderChart(this.allTones, this.$refs.allTonesChart);
@@ -374,6 +375,9 @@ async function main() {
       avgQuartersByPos(newTimes) {
         renderChart(newTimes, this.$refs.quartersChart);
       },
+      avgNotesByPos(newAvgs) {
+        renderChart(newAvgs, this.$refs.notesByPosChart);
+      },
       rhymingTones(newTones) {
         renderChart(newTones, this.$refs.rhymingChart);
       },
@@ -381,7 +385,7 @@ async function main() {
         renderChart(newTones, this.$refs.finalChart);
       },
       allTones(newTones) {
-        renderChart(allTones, this.$refs.allTonesChart);
+        renderChart(newTones, this.$refs.allTonesChart);
       },
     },
     computed: {
@@ -576,6 +580,38 @@ async function main() {
           total[i] / counts[i],
         ]);
         return Object.fromEntries(entries);
+      },
+      avgNotesByPos() {
+        const total = {};
+        const counts = {};
+        for (const line of this.matchedLines) {
+          for (let i = 0; i < line.words.length; i++) {
+            const word = line.words[i];
+            if (!total[i]) {
+              total[i] = 0;
+              counts[i] = 0;
+            }
+            total[i] += word.melody.split(' ').length;
+            counts[i] += 1;
+          }
+        }
+        const entries = Object.keys(total).map((i) => [
+          // Shift to 1-based indexing in the result
+          parseInt(i) + 1,
+          total[i] / counts[i],
+        ]);
+        return Object.fromEntries(entries);
+      },
+      avgNotesPerWord() {
+        let notes = 0;
+        let words = 0;
+        for (const line of this.matchedLines) {
+          for (const word of line.words) {
+            notes += word.melody.split(' ').length;
+            words += 1;
+          }
+        }
+        return notes / words;
       },
       rhymingTones() {
         return makeTones(this.matchedLines, ',');

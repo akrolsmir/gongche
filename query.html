@@ -154,6 +154,11 @@
     <v-tab title="Melody">
       <h3>Average # of quarter beats, by line position</h3>
       <canvas ref="quartersChart" id="quartersChart" width="400" height="400"></canvas>
+
+      <h3>Average # of notes per character: {{ avgNotesPerWord.toFixed(2) }}</h3>
+
+      <h3>Average # of notes per character, by line position</h3>
+      <canvas ref="notesByPosChart" id="notesByPosChart" width="400" height="400"></canvas>
     </v-tab>
 
     <v-tab title="Rhyme">
