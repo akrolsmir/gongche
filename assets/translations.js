@@ -56,7 +56,8 @@ export const messages = {
       tone: 'tone',
       tonemelody: 'tonemelody',
       length: 'length',
-    }
+      lines: 'lines',
+    },
   },
   zh: {
     queryEngine: '查詢系統',
@@ -113,9 +114,10 @@ export const messages = {
       tone: '聲調',
       tonemelody: '聲調旋律',
       length: '長短',
-    }
-  }
-}
+      lines: 'lines',
+    },
+  },
+};
 
 export const zhKeywords = {};
 for (let [key, value] of Object.entries(messages.zh.keywords)) {
@@ -133,7 +135,8 @@ export const selectSongsExamples = [
   ['padding', '2+'],
   ['rhyme', '東同'],
   ['rhymeswith', '中'],
-]
+  ['lines', '7/7/4/4/7'],
+];
 
 export const filterLinesExamples = [
   ['melody', '216.5.6.'],
@@ -145,4 +148,4 @@ export const filterLinesExamples = [
   ['length', '4'],
   ['rhyme', '東同'],
   ['rhymeswith', '中'],
-]
+];

@@ -107,6 +107,13 @@ function checkSongMatch(song, searchParams) {
       }
     }
   }
+  if (searchParams.lines) {
+    // Expects a search like "lines:7/7/4/4/7"
+    const query = searchParams.lines.replace(/\//g, ' ');
+    if (!song.getLineCounts().includes(query)) {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -413,6 +420,7 @@ async function main() {
           lyrics: '',
           melody: '',
           padding: '',
+          lines: '',
         };
         const params = parseQuery(this.songsQuery, songParams);
         // TODO: Consider v-show for performance https://stackoverflow.com/a/43920347/1222351

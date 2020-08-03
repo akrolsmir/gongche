@@ -33,6 +33,7 @@
             <td><a :target='target' :rel='rel' :href='`sheet.html?songId=${song.id}`'>{{$t('sheet')}}</a></td>
             <td><a :target='target' :rel='rel' :href='`prosody.html?songTitle=${song.title}`'>{{$t('prosody')}}</a></td>
             <td><a :target='target' :rel='rel' :href='`./edit/?songId=${song.id}`'>{{$t('edit')}}</a></td>
+            <td>{{ song.getLineCounts() }}</td>
           </tr>
         </tbody>
       </table>
