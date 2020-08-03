@@ -384,6 +384,9 @@ async function main() {
       finalTones(newTones) {
         renderChart(newTones, this.$refs.finalChart);
       },
+      finalNotes(newNotes) {
+        renderChart(newNotes, this.$refs.finalNotesChart);
+      },
       allTones(newTones) {
         renderChart(newTones, this.$refs.allTonesChart);
       },
@@ -493,6 +496,21 @@ async function main() {
               for (const jianpu of melodyArray) {
                 counter.count(normalizeJianpu(jianpu));
               }
+            }
+          }
+        }
+        return counter.map;
+      },
+      finalNotes() {
+        const counter = new KeyCounter('1');
+        for (const line of this.matchedLines) {
+          const lastIndex = line.song.fullLyrics.trim().split('\n').length;
+          if (line.index === lastIndex) {
+            const lastWord = line.getWords()[line.getWords().length - 1];
+            if (lastWord && lastWord.melody) {
+              const melodyArray = lastWord.melody.split(' ');
+              const lastJianpu = melodyArray[melodyArray.length - 1];
+              counter.count(normalizeJianpu(lastJianpu));
             }
           }
         }

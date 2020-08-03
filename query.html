@@ -82,7 +82,8 @@
       <h3>Distribution of note melodies</h3> 
       <canvas ref="noteChart" id="noteChart" width="400" height="400"></canvas>
 
-      <h3>Average rhythmic time: {{ matchedToneQuarters.toFixed(2) }} quarters</h3>
+      <h3>Distribution of final note melodies</h3>
+      <canvas ref="finalNotesChart" id="finalNotesChart" width="400" height="400"></canvas>
 
       <h3>Notes following notes</h3>
       Skeletal: <select v-model="matrixSkeletal">
@@ -152,6 +153,8 @@
     </v-tab>
 
     <v-tab title="Melody">
+      <h3>Average rhythmic time: {{ matchedToneQuarters.toFixed(2) }} quarters</h3>
+
       <h3>Average # of quarter beats, by line position</h3>
       <canvas ref="quartersChart" id="quartersChart" width="400" height="400"></canvas>
 
