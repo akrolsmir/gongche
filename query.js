@@ -352,6 +352,7 @@ async function main() {
       renderChart(this.avgNotesByPos, this.$refs.notesByPosChart);
       renderChart(this.rhymingTones, this.$refs.rhymingChart);
       renderChart(this.finalTones, this.$refs.finalChart);
+      renderChart(this.finalNotes, this.$refs.finalNotesChart);
       renderChart(this.allTones, this.$refs.allTonesChart);
     },
     created() {
