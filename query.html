@@ -77,6 +77,16 @@
   </v-tab>
   
     <v-tab :title="$t('tone')">
+      <button @click="findAllTonalPatterns">Find tonal patterns</button> (limit: 5000 lines)<br />
+      <template v-for="(ordered, length) in tonalPatterns">
+        Length: {{ length }}
+        <ul>
+          <li v-for="pattern in ordered.slice(0, 20)">
+            {{ pattern }}
+          </li>
+        </ul>
+      </template>
+
       <p> {{$t('findTone')}}: <input type="text" id="toneQuery" v-model="toneQuery"></p>
       <p> ({{$t('examples')}}: <code>平</code> | <code>上</code> | <code>去</code> | <code>入</code> | <code>仄</code> | <code>陽平</code>...)</p>
       

@@ -223,6 +223,15 @@ function addJianpuString(line) {
   return line;
 }
 
+function addToneStrings(line) {
+  line.toneAllString = line
+    .getWords()
+    .map((word) => word.tone)
+    .join('');
+  line.toneZeString = line.toneAllString.replace(/[上去入]/g, '仄');
+  return line;
+}
+
 function addToneString(line) {
   line.toneString = line
     .getWords()
@@ -278,6 +287,53 @@ function findMotifs(lines) {
   return finalMotifs.map(([m, c]) => [decodeToJianpu(m), c]);
 }
 
+function findTonalPatterns(lines) {
+  // 1. Group lines by length
+  const linesByLength = {};
+  for (const line of lines) {
+    const length = line.words.length;
+    if (!linesByLength[length]) {
+      linesByLength[length] = [];
+    }
+    linesByLength[length].push(line);
+  }
+  // Format: allGroup[length=6][most matches=0] = ['入去平去去平', [line1, line2, line3...]]
+  const allGroup = {};
+  for (const [length, lines] of Object.entries(linesByLength)) {
+    // 2. Sort lines by toneAllString
+    lines.sort((a, b) => a.toneAllString.localeCompare(b.toneAllString));
+
+    // 3. Group matching lines of that length
+    const groupedByTone = {};
+    for (const line of lines) {
+      if (groupedByTone[line.toneAllString]) {
+        groupedByTone[line.toneAllString].push(line);
+      } else {
+        groupedByTone[line.toneAllString] = [line];
+      }
+    }
+    // 4. Output most matches first
+    const ordered = Object.entries(groupedByTone)
+      .filter(([tone, group]) => group.length > 1)
+      .sort(([t1, g1], [t2, g2]) => g2.length - g1.length)
+      // Convert to string for easier processing, for now
+      .map(
+        ([tone, group]) =>
+          `${tone} (${group.length}) -- ${group
+            .map((line) => lineId(line))
+            .join(', ')}`
+      );
+    allGroup[length] = ordered;
+  }
+  return allGroup;
+
+  // 5. Repeat 2-4 for toneZeString
+}
+
+function lineId(line) {
+  return `${line.song.id}-${line.index}`;
+}
+
 // Parse the search query for the keywords specified in params.
 // Example format: 'id:123.4 title:hello region:north'
 function parseQuery(query, params) {
@@ -330,10 +386,14 @@ async function main() {
       selectSongsExamples,
       filterLinesExamples,
       matrixSkeletal: 'off',
+      tonalPatterns: {},
     },
     methods: {
       findAllMotifs() {
         this.motifs = findMotifs(this.lines);
+      },
+      findAllTonalPatterns() {
+        this.tonalPatterns = findTonalPatterns(this.lines.slice(0, 5000));
       },
       setLinesQuery(query) {
         this.linesQuery = query;
@@ -432,7 +492,8 @@ async function main() {
           .flatMap((song) => buildLines(song, this.padded, this.quartered))
           .map(addJianpuString)
           .map(addToneString)
-          .map(addTonemelodyString);
+          .map(addTonemelodyString)
+          .map(addToneStrings);
       },
       matchedLines() {
         const lineParams = {
