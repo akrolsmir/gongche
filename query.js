@@ -591,8 +591,10 @@ async function main() {
               total[i] = 0;
               counts[i] = 0;
             }
-            total[i] += word.melody.split(' ').length;
-            counts[i] += 1;
+            if (word.melody) {
+              total[i] += word.melody.split(' ').length;
+              counts[i] += 1;
+            }
           }
         }
         const entries = Object.keys(total).map((i) => [
@@ -607,8 +609,10 @@ async function main() {
         let words = 0;
         for (const line of this.matchedLines) {
           for (const word of line.words) {
-            notes += word.melody.split(' ').length;
-            words += 1;
+            if (word.melody) {
+              notes += word.melody.split(' ').length;
+              words += 1;
+            }
           }
         }
         return notes / words;
