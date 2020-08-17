@@ -73,10 +73,11 @@ export class Song {
     // Deduplicate with an intermediate set.
     return [...new Set(categories)];
   }
-  // E.g. "aaa\nbbbb\ncc" => "3 4 2"
+  // E.g. "aaa\nbbbb\nccc" => "3 4 2", "aa,\n_b_bb." => "2 1"
   getLineCounts() {
-    // Remove all rhyme and padding markers.
-    const lyrics = this.fullLyrics.replace(/[.,_]/g, '');
+    // Remove rhyme markers, and (non-space) padding characters & markers.
+    const lyrics = this.fullLyrics.replace(/[.,]/g, '').replace(/_\S/g, '');
+
     return lyrics
       .split('\n')
       .map((line) => line.length)
