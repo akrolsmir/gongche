@@ -77,7 +77,10 @@
   </v-tab>
   
     <v-tab :title="$t('tone')">
-      <button @click="findAllTonalPatterns">Find tonal patterns</button> (limit: 5000 lines)<br />
+      <button @click="findAllTonalPatterns">Find tonal patterns</button>
+      <input type="checkbox" id="useToneZeString" v-model="useToneZeString">
+      <label for="useToneZeString">Use 仄</label><br />
+      (Limit: 5000 lines)<br />
       <template v-for="(ordered, length) in tonalPatterns">
         Length: {{ length }}
         <ul>

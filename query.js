@@ -287,7 +287,7 @@ function findMotifs(lines) {
   return finalMotifs.map(([m, c]) => [decodeToJianpu(m), c]);
 }
 
-function findTonalPatterns(lines) {
+function findTonalPatterns(lines, useToneZeString = false) {
   // 1. Group lines by length
   const linesByLength = {};
   for (const line of lines) {
@@ -300,16 +300,17 @@ function findTonalPatterns(lines) {
   // Format: allGroup[length=6][most matches=0] = ['入去平去去平', [line1, line2, line3...]]
   const allGroup = {};
   for (const [length, lines] of Object.entries(linesByLength)) {
-    // 2. Sort lines by toneAllString
-    lines.sort((a, b) => a.toneAllString.localeCompare(b.toneAllString));
+    const toneString = useToneZeString ? 'toneZeString' : 'toneAllString';
+    // 2. Sort lines by toneAll/ZeString
+    lines.sort((a, b) => a[toneString].localeCompare(b[toneString]));
 
     // 3. Group matching lines of that length
     const groupedByTone = {};
     for (const line of lines) {
-      if (groupedByTone[line.toneAllString]) {
-        groupedByTone[line.toneAllString].push(line);
+      if (groupedByTone[line[toneString]]) {
+        groupedByTone[line[toneString]].push(line);
       } else {
-        groupedByTone[line.toneAllString] = [line];
+        groupedByTone[line[toneString]] = [line];
       }
     }
     // 4. Output most matches first
@@ -387,13 +388,17 @@ async function main() {
       filterLinesExamples,
       matrixSkeletal: 'off',
       tonalPatterns: {},
+      useToneZeString: false,
     },
     methods: {
       findAllMotifs() {
         this.motifs = findMotifs(this.lines);
       },
       findAllTonalPatterns() {
-        this.tonalPatterns = findTonalPatterns(this.lines.slice(0, 5000));
+        this.tonalPatterns = findTonalPatterns(
+          this.lines.slice(0, 5000),
+          this.useToneZeString
+        );
       },
       setLinesQuery(query) {
         this.linesQuery = query;
