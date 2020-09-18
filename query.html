@@ -4,16 +4,20 @@
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="prosody.css">
 <link rel="stylesheet" href="query.css">
+<link rel="stylesheet" href="assets/loader.css">
 <link rel="stylesheet" href="https://unpkg.com/vue-nav-tabs/themes/vue-tabs.css">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
 <div class="songdata">
+  <div v-if="false">
+    <h1>Loading<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></h1>
+  </div>
   <div class="locale-changer">
     <select v-model="$i18n.locale">
       <option value="en">English</option>
       <option value="zh">中文</option>
     </select>
   </div>
-  <h1>{{ $t('queryEngine') }}</h1>
+  <h1 v-cloak>{{ $t('queryEngine') }}</h1>
   <div id="selectsongs">
     <p> <input :placeholder="$t('selectSongs')" type="text" id="songsQuery" :value="songsQuery" @input="debouncedSongsQuery($event.target.value)"> </p>
     <p> {{$t('examples')}}: 

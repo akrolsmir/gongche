@@ -54,3 +54,7 @@ div.toneRow {
 div.toneColumn {
   flex: 50%;
 }
+
+[v-cloak] {
+  display: none;
+}
