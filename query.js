@@ -339,6 +339,7 @@ function lineId(line) {
 // Example format: 'id:123.4 title:hello region:north'
 function parseQuery(query, params) {
   const terms = query.split(' ');
+  const paramsClone = { ...params };
   for (const term of terms) {
     const termSplit = term.split(/[:：]/);
     if (termSplit.length != 2) {
@@ -354,9 +355,9 @@ function parseQuery(query, params) {
       console.log(`Invalid keyword: ${term}`);
       continue;
     }
-    params[keyword] = param;
+    paramsClone[keyword] = param;
   }
-  return params;
+  return paramsClone;
 }
 
 async function main() {
@@ -487,9 +488,18 @@ async function main() {
           padding: '',
           lines: '',
         };
-        const params = parseQuery(this.songsQuery, songParams);
-        // TODO: Consider v-show for performance https://stackoverflow.com/a/43920347/1222351
-        return songs.filter((song) => checkSongMatch(song, params));
+        // Split up songsQuery into &'ed components
+        const jointQueries = this.songsQuery.split(' & ');
+        const songsSet = new Set();
+
+        for (const query of jointQueries) {
+          const params = parseQuery(query, songParams);
+          // TODO: Consider v-show for performance https://stackoverflow.com/a/43920347/1222351
+          songs
+            .filter((song) => checkSongMatch(song, params))
+            .forEach((s) => songsSet.add(s));
+        }
+        return Array.from(songsSet);
       },
       lines() {
         this.motifs = [];
