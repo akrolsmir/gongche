@@ -14,25 +14,27 @@
       <option value="zh">中文</option>
     </select>
   </div>
-  <h1>{{ pageTitle }}</h1>
-  <input type="checkbox" id="interleave" v-model="interleave" />
-  <label for="interleave">{{ $t('interleaved') }}</label>
-  <p>
-    <template v-for="header in rowHeaders">
-      <input
-        type="checkbox"
-        :id="header"
-        :value="header"
-        v-model="checkedHeaders"
-      />
-      <label :for="header">{{ $t(header) }}</label>
-    </template>
-    <prosody
-      :headers="filteredHeaders"
-      :lines="lines"
-      :colorize="true"
-    ></prosody>
-  </p>
+  <div v-cloak>
+    <h1>{{ pageTitle }}</h1>
+    <input type="checkbox" id="interleave" v-model="interleave" />
+    <label for="interleave">{{ $t('interleaved') }}</label>
+    <p>
+      <template v-for="header in rowHeaders">
+        <input
+          type="checkbox"
+          :id="header"
+          :value="header"
+          v-model="checkedHeaders"
+        />
+        <label :for="header">{{ $t(header) }}</label>
+      </template>
+      <prosody
+        :headers="filteredHeaders"
+        :lines="lines"
+        :colorize="true"
+      ></prosody>
+    </p>
+  </div>
 </div>
 
 <script>

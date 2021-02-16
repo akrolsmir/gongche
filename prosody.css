@@ -34,3 +34,7 @@ td.padding {
 td.rhyme {
   background: aquamarine;
 }
+
+[v-cloak] {
+  display: none;
+}
