@@ -393,23 +393,23 @@ async function main() {
       song,
       keySignature: 'D',
       signatures: Object.keys(VF.keySignature.keySpecs),
-      toggle: '▶️',
+      playing: false,
       bpm: '120',
       skeletal: 'off',
     },
     methods: {
       toggleMusic(event) {
-        if (this.toggle == '▶️') {
-          Tone.Transport.start();
-          this.toggle = '⏸️';
-        } else if (this.toggle == '⏸️') {
+        if (this.playing) {
           Tone.Transport.pause();
-          this.toggle = '▶️';
+          this.playing = false;
+        } else {
+          Tone.Transport.start();
+          this.playing = true;
         }
       },
       stopMusic(event) {
         Tone.Transport.stop();
-        this.toggle = '▶️';
+        this.playing = false;
       },
     },
     watch: {
