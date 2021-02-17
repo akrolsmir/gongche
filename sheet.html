@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Sheet</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="sheet.css">
-<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="sheet.css" />
+<link
+  href="https://fonts.googleapis.com/css?family=Noto+Serif+TC"
+  rel="stylesheet"
+/>
 <div class="songdata">
   <div class="locale-changer">
     <select v-model="$i18n.locale">
@@ -14,28 +17,38 @@
   <h1>{{ song.title }}</h1>
   <div id="metadata">
     <div id="left">
-      <p>{{ $t('keySignature') }}:
+      <p>
+        {{ $t('keySignature') }}:
         <select v-model="keySignature">
-          <option v-for="s in signatures">
-            {{ s }}
-          </option>
+          <option v-for="s in signatures">{{ s }}</option>
         </select>
-      <p>{{ $t('playback')}}: 
-        <button v-on:click='stopMusic()'>⏹️</button>
-        <button v-on:click='toggleMusic()'>{{ toggle }}</button>
-      <p>{{ $t('bpm') }}: {{ bpm }} 
-        <input type="range" v-model='bpm' min='30' max='150' value='120'>
-      <p>{{ $t('skeletal') }}: 
+      </p>
+
+      <p>
+        {{ $t('playback')}}:
+        <button v-on:click="stopMusic()">⏹️</button>
+        <button v-on:click="toggleMusic()">{{ toggle }}</button>
+      </p>
+
+      <p>
+        {{ $t('bpm') }}: {{ bpm }}
+        <input type="range" v-model="bpm" min="30" max="150" value="120" />
+      </p>
+
+      <p>
+        {{ $t('skeletal') }}:
         <select v-model="skeletal">
           <option value="off">----</option>
           <option value="first">{{ $t('firstNote') }}</option>
           <option value="last">{{ $t('lastNote') }}</option>
         </select>
+      </p>
     </div>
+
     <div id="right">
-      <p>{{ $t('source') }}: {{ song.composer }}
-      <p>{{ $t('id') }}: {{ song.id }}
-      <p>{{ $t('region') }}: {{ $t(song.region.toLowerCase()) }}
+      <p>{{ $t('source') }}: {{ song.composer }}</p>
+      <p>{{ $t('id') }}: {{ song.id }}</p>
+      <p>{{ $t('region') }}: {{ $t(song.region.toLowerCase()) }}</p>
       <p v-if="song.getRhymeCategories().length > 0">
         {{ $t('rhymeCategory') }}: {{ song.getRhymeCategories()[0] }}
       </p>
