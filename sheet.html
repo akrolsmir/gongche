@@ -14,8 +14,8 @@
       <option value="zh">中文</option>
     </select>
   </div>
-  <h1>{{ song.title }}</h1>
-  <div id="metadata">
+  <h1 v-cloak>{{ song.title }}</h1>
+  <div id="metadata" v-cloak>
     <div id="left">
       <p>
         {{ $t('keySignature') }}:

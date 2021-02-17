@@ -36,3 +36,8 @@ select {
 .songdata {
   width: 750px;
 }
+
+[v-cloak],
+[v-cloak] * {
+  display: none;
+}
