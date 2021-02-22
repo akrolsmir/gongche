@@ -23,7 +23,7 @@
     <div id="left">
       <label> {{ $t('keySignature') }}: </label>
       <div class="select is-small">
-        <select v-model="keySignature" :disabled="playing">
+        <select v-model="keySignature" :disabled="playing || song.isLoading">
           <option v-for="s in signatures">{{ s }}</option>
         </select>
       </div>
@@ -54,7 +54,7 @@
       <div>
         <label> {{ $t('skeletal') }}: </label>
         <div class="select is-small">
-          <select v-model="skeletal" :disabled="playing">
+          <select v-model="skeletal" :disabled="playing || song.isLoading">
             <option value="off">----</option>
             <option value="first">{{ $t('firstNote') }}</option>
             <option value="last">{{ $t('lastNote') }}</option>
