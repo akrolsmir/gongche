@@ -9,21 +9,8 @@ h1 {
   text-align: center;
 }
 
-table {
-  border-collapse: collapse;
-  border: 2px solid rgb(200,200,200);
-}
-
-td, th {
-  border: 1px solid rgb(190,190,190);
-}
-
-th {
-  width: 80px;
-}
-
 td {
-  width: 65px;
+  width: 75px;
 }
 
 td.padding {
@@ -32,4 +19,8 @@ td.padding {
 
 td.rhyme {
   background: aquamarine;
+}
+
+[v-cloak] {
+  display: none;
 }

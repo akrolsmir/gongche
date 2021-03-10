@@ -299,7 +299,10 @@ function getTimeSignature(melody) {
   return TimeSignature.FREE;
 }
 
-function renderSheet(lyrics, melody) {
+function renderSheet(song) {
+  let lyrics = song.fullLyrics;
+  let melody = song.melody;
+
   vexflowContext.clear();
   const timeSignature = getTimeSignature(melody);
   const quarters = assignLyrics(melody, lyrics);
@@ -375,11 +378,7 @@ function renderSheet(lyrics, melody) {
 
 async function main() {
   const urlParams = new URLSearchParams(window.location.search);
-  let songId = urlParams.get('songId');
-  songId = songId ? songId : '6584.1';
-
-  const songJson = await loadSongJson(songId);
-  const song = Song.fromJson(songJson);
+  let songId = urlParams.get('songId') || '6584.1';
 
   const i18n = new VueI18n({
     locale: 'en', // set locale
@@ -390,45 +389,59 @@ async function main() {
     i18n,
     el: '.songdata',
     data: {
-      song,
+      song: {
+        title: '-',
+        composer: '-',
+        id: songId,
+        region: '-',
+        getRhymeCategories: () => [],
+        isLoading: true,
+      },
       keySignature: 'D',
       signatures: Object.keys(VF.keySignature.keySpecs),
-      toggle: '▶️',
+      playing: false,
       bpm: '120',
       skeletal: 'off',
     },
     methods: {
       toggleMusic(event) {
-        if (this.toggle == '▶️') {
-          Tone.Transport.start();
-          this.toggle = '⏸️';
-        } else if (this.toggle == '⏸️') {
+        if (this.playing) {
           Tone.Transport.pause();
-          this.toggle = '▶️';
+          this.playing = false;
+        } else {
+          Tone.Transport.start();
+          this.playing = true;
         }
       },
       stopMusic(event) {
         Tone.Transport.stop();
-        this.toggle = '▶️';
+        this.playing = false;
       },
     },
     watch: {
       bpm(newBpm) {
         Tone.Transport.bpm.value = newBpm;
       },
-      keySignature: () => {
-        renderSheet(song.fullLyrics, song.melody);
+      keySignature() {
+        renderSheet(this.song);
       },
-      skeletal: () => {
-        renderSheet(song.fullLyrics, song.melody);
+      skeletal() {
+        renderSheet(this.song);
       },
     },
+    async mounted() {
+      const songJson = await loadSongJson(songId);
+      this.song = Song.fromJson(songJson);
+
+      initVexflow();
+
+      try {
+        renderSheet(this.song);
+      } catch (e) {
+        alert(e);
+      }
+    },
   });
-  try {
-    renderSheet(song.fullLyrics, song.melody);
-  } catch (e) {
-    alert(e);
-  }
 }
 
 export function getRhythmized(lyrics, melody) {
@@ -450,14 +463,17 @@ export function getQuarters(song) {
 // TODO: See if we can remove that global context.
 let VF, vexflowRenderer, vexflowContext, vueApp;
 
-// To load sheet.js to get melody breakdowns but without rendering, set:
-// window.VEXFLOW_HEADLESS = true;
-if (!window.VEXFLOW_HEADLESS) {
-  VF = Vex.Flow;
+function initVexflow() {
   // Create an SVG renderer and attach it to the DIV element named "vexflow".
   const vexflowDiv = document.getElementById('vexflow');
   vexflowRenderer = new VF.Renderer(vexflowDiv, VF.Renderer.Backends.SVG);
   // And get a drawing context:
   vexflowContext = vexflowRenderer.getContext();
+}
+
+// To load sheet.js to get melody breakdowns but without rendering, set:
+// window.VEXFLOW_HEADLESS = true;
+if (!window.VEXFLOW_HEADLESS) {
+  VF = Vex.Flow;
   main();
 }

@@ -4,31 +4,35 @@ export const ProsodyComponent = {
     tableStyle(song) {
       // From https://stackoverflow.com/a/7616484/1222351
       function hashString(str) {
-        var hash = 0, i, chr;
+        var hash = 0,
+          i,
+          chr;
         if (str.length === 0) return hash;
         for (i = 0; i < str.length; i++) {
           chr = str.charCodeAt(i);
-          hash = ((hash << 5) - hash) + chr;
+          hash = (hash << 5) - hash + chr;
           hash |= 0; // Convert to 32bit integer
         }
         return hash;
       }
       // Reverse the string, to generate wider color ranges over small sigdigits.
       const seed = hashString(song.id.split('').reverse().join(''));
-      // Set opacity to be #66 to keep text readable.
-      return `background-color: ${randomColor({ seed }) + '66'}`;
-    }
+      // Set opacity to be #40 to keep text readable.
+      return `background-color: ${randomColor({ seed }) + '40'}`;
+    },
   },
   template: `
   <div>
   <template v-for="line in lines">
-    <table :style="colorize ? tableStyle(line.song) : ''">
-      <tbody>
+    <table class="table is-narrow" :style="colorize ? tableStyle(line.song) : ''">
+      <thead>
         <tr>
-          <td style='text-align: center' :colspan='line.words.length + 1'>
+          <th style='text-align: center' :colspan='line.words.length + 1'>
             {{ $t('lineOf', {num: line.index, id: line.song.id})}}《{{ line.song.title }} - {{ line.song.composer }}》
-          </td>
+          </th>
         </tr>
+      </thead>
+      <tbody>
         <template v-for='header in headers'>
           <tr>
             <th>{{ $t(header) }}</th>
@@ -41,5 +45,5 @@ export const ProsodyComponent = {
     </table>
   </template>
   </div>
-`
+`,
 };

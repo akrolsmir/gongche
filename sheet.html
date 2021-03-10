@@ -1,41 +1,71 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Sheet</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="sheet.css">
-<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC" rel="stylesheet">
+<link rel="manifest" href="manifest.json" />
+<link
+  href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="sheet.css" />
+<link
+  rel="stylesheet"
+  href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+/>
 <div class="songdata">
-  <div class="locale-changer">
+  <div class="locale-changer select is-small mt-1">
     <select v-model="$i18n.locale">
       <option value="en">English</option>
       <option value="zh">中文</option>
     </select>
   </div>
-  <h1>{{ song.title }}</h1>
-  <div id="metadata">
+  <h1 v-cloak>{{ song.title }}</h1>
+  <div id="metadata" v-cloak>
     <div id="left">
-      <p>{{ $t('keySignature') }}:
-        <select v-model="keySignature">
-          <option v-for="s in signatures">
-            {{ s }}
-          </option>
+      <label> {{ $t('keySignature') }}: </label>
+      <div class="select is-small">
+        <select v-model="keySignature" :disabled="playing || song.isLoading">
+          <option v-for="s in signatures">{{ s }}</option>
         </select>
-      <p>{{ $t('playback')}}: 
-        <button v-on:click='stopMusic()'>⏹️</button>
-        <button v-on:click='toggleMusic()'>{{ toggle }}</button>
-      <p>{{ $t('bpm') }}: {{ bpm }} 
-        <input type="range" v-model='bpm' min='30' max='150' value='120'>
-      <p>{{ $t('skeletal') }}: 
-        <select v-model="skeletal">
-          <option value="off">----</option>
-          <option value="first">{{ $t('firstNote') }}</option>
-          <option value="last">{{ $t('lastNote') }}</option>
-        </select>
+      </div>
+      <div>
+        <label> {{ $t('playback')}}: </label>
+        <a
+          class="icon is-small"
+          @click.prevent="stopMusic()"
+          href="#"
+          aria-label="stop"
+        >
+          <i class="fas fa-stop"></i>
+        </a>
+        <a
+          class="icon is-small"
+          @click.prevent="toggleMusic()"
+          href="#"
+          :aria-label="playing ? 'pause' : 'play'"
+        >
+          <i v-if="playing" class="fas fa-pause"></i>
+          <i v-else class="fas fa-play"></i>
+        </a>
+      </div>
+      <div>
+        <label>{{ $t('bpm') }}: {{ bpm }}</label>
+        <input type="range" v-model="bpm" min="30" max="150" value="120" />
+      </div>
+      <div>
+        <label> {{ $t('skeletal') }}: </label>
+        <div class="select is-small">
+          <select v-model="skeletal" :disabled="playing || song.isLoading">
+            <option value="off">----</option>
+            <option value="first">{{ $t('firstNote') }}</option>
+            <option value="last">{{ $t('lastNote') }}</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div id="right">
-      <p>{{ $t('source') }}: {{ song.composer }}
-      <p>{{ $t('id') }}: {{ song.id }}
-      <p>{{ $t('region') }}: {{ $t(song.region.toLowerCase()) }}
+      <p>{{ $t('source') }}: {{ song.composer }}</p>
+      <p>{{ $t('id') }}: {{ song.id }}</p>
+      <p>{{ $t('region') }}: {{ $t(song.region.toLowerCase()) }}</p>
       <p v-if="song.getRhymeCategories().length > 0">
         {{ $t('rhymeCategory') }}: {{ song.getRhymeCategories()[0] }}
       </p>
